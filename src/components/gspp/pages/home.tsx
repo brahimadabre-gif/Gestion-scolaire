@@ -30,7 +30,7 @@ function Hero() {
           <div className="text-center lg:text-left">
             <Badge variant="outline" className="animate-fade-up mb-5 gap-1.5 rounded-full border-emerald-600/30 bg-emerald-600/5 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-              Version 3.2 disponible — bulletins personnalisables
+              Gestion Scolaire Pro Plus 2.2.4
             </Badge>
             <h1 className="animate-fade-up-delay-1 text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.4rem]">
               La solution complète pour <span className="gspp-gradient-text">simplifier la gestion scolaire</span>
@@ -79,10 +79,10 @@ function Hero() {
 // ── Statistiques ─────────────────────────────────────────────
 function StatsBand() {
   const stats = [
-    { value: "0", label: "écoles primaires équipées" },
-    { value: "0", label: "élèves gérés chaque année" },
-    { value: "0", label: "enseignants utilisateurs" },
-    { value: "0 %", label: "de clients satisfaits" },
+      { value: "25", label: "écoles primaires équipées" },
+      { value: "5000+", label: "élèves gérés chaque année" },
+      { value: "200+", label: "enseignants utilisateurs" },
+      { value: "99 %", label: "de clients satisfaits" },
   ];
   return (
     <section className="border-y bg-secondary/40">
