@@ -139,7 +139,7 @@ async function main() {
   await page.waitForTimeout(800);
   await page.goto(`${BASE}/#/connexion`, { waitUntil: "networkidle" });
   await page.fill("#login-email", "demo@gspp.ci");
-  await page.fill("#login-password", "Demo@2026!");
+  await page.fill("#login-password", process.env.SEED_DEMO_PASSWORD ?? "");
   await page.click("button[type=submit]:has-text('Se connecter')");
   await page.waitForTimeout(1400);
   const demoWelcome = await page.locator("h1:has-text('Bonjour, Ibrahim')").count();
@@ -156,7 +156,7 @@ async function main() {
   await page.goto(`${BASE}/#/connexion`, { waitUntil: "networkidle" });
   await page.waitForTimeout(600);
   await page.fill("#login-email", "admin@gspp.ci");
-  await page.fill("#login-password", "Admin@2026!");
+  await page.fill("#login-password", process.env.SEED_ADMIN_PASSWORD ?? "");
   await page.click("button[type=submit]:has-text('Se connecter')");
   await page.waitForTimeout(1400);
   await page.goto(`${BASE}/#/admin`, { waitUntil: "networkidle" });
