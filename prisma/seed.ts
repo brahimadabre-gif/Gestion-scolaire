@@ -313,12 +313,12 @@ async function main() {
   // ── Articles (actualités) ──────────────────────────────────
   const articles = [
     {
-      slug: "version-3-2-bulletins-personnalisables",
-      title: "Version 3.2 : bulletins personnalisables et nouveau module de classement",
-      excerpt: "La mise à jour majeure de Gestion Scolaire Pro Plus arrive avec les modèles de bulletins personnalisables, les distinctions automatiques et un import intelligent repensé.",
+      slug: "version-2-2-4",
+      title: "Gestion Scolaire Pro Plus 2.2.4",
+      excerpt: "La version 2.2.4 de Gestion Scolaire Pro Plus apporte les dernières corrections et améliorations du logiciel.",
       category: "version", coverEmoji: "🎉",
       content: [
-        "Nous sommes fiers d'annoncer la disponibilité de la version 3.2 de Gestion Scolaire Pro Plus, la plus importante mise à jour de l'année. Cette version a été conçue à partir des retours de plus de 300 enseignants et directeurs qui utilisent le logiciel chaque jour.",
+        "La version 2.2.4 de Gestion Scolaire Pro Plus regroupe les dernières corrections et améliorations du logiciel.",
         "Le module de bulletins accueille une personnalisation complète : importez le logo de votre établissement, choisissez vos couleurs, vos mentions et votre modèle d'en-tête. Chaque bulletin reflète désormais l'identité de votre école, prêt à être remis aux parents.",
         "Le nouveau module de classement introduit les distinctions automatiques : tableau d'excellence, encouragements et félicitations sont attribués selon les règles que vous définissez. Le rapport de résultats du conseil de classe se génère en un clic.",
         "Enfin, l'import intelligent de documents a été repensé : glissez-déposez votre fichier Excel d'élèves, le logiciel détecte automatiquement les colonnes, signale les doublons et les informations manquantes avant l'importation.",
