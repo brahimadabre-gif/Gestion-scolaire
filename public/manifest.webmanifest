@@ -1,0 +1,13 @@
+{
+  "name": "Gestion Scolaire Pro Plus",
+  "short_name": "GSPP",
+  "description": "La solution complète pour simplifier la gestion d'une école primaire : CP1, CP2, CE1, CE2, CM1, CM2, notes, bulletins, certificats et administration.",
+  "lang": "fr",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7fdf9",
+  "theme_color": "#047857",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

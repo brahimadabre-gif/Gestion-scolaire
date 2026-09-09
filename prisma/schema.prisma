@@ -1,0 +1,257 @@
+// Schéma de base de données — Gestion Scolaire Pro Plus
+// Plateforme centrale : présentation → documentation → compte → abonnement → paiement → téléchargement → licence → support
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// UTILISATEURS & AUTHENTIFICATION
+// ─────────────────────────────────────────────────────────────
+
+model User {
+  id             String        @id @default(cuid())
+  firstName      String
+  lastName       String
+  email          String        @unique
+  phone          String?
+  password       String // Hash bcrypt — jamais de mot de passe en clair
+  establishment  String?
+  country        String        @default("Côte d'Ivoire")
+  role           String        @default("USER") // USER | SUPPORT | ADMIN
+  emailVerified  Boolean       @default(false)
+  active         Boolean       @default(true)
+  lastLoginAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  subscriptions  Subscription[]
+  payments       Payment[]
+  tickets        SupportTicket[]
+  resetTokens    PasswordResetToken[]
+  activityLogs   ActivityLog[]
+  licenseKeys    LicenseKey[]
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique // Hash du token stocké
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────
+// ABONNEMENTS & PAIEMENTS
+// ─────────────────────────────────────────────────────────────
+
+// Formules configurables depuis l'interface d'administration
+model SubscriptionPlan {
+  id             String        @id @default(cuid())
+  slug           String        @unique // essentiel | professionnel | etablissement
+  name           String
+  description    String
+  monthlyPrice   Float         @default(0) // Prix mensuel (FCFA)
+  annualPrice    Float         @default(0) // Prix annuel (FCFA) — économies affichées automatiquement
+  maxUsers       Int           @default(1) // Nombre d'utilisateurs
+  maxSchools     Int           @default(1) // Nombre d'établissements
+  maxStudents    Int           @default(200) // Limite d'élèves
+  features       String        @default("[]") // JSON array des fonctionnalités incluses
+  highlighted    Boolean       @default(false) // Formule mise en avant
+  active         Boolean       @default(true)
+  sortOrder      Int           @default(0)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  subscriptions  Subscription[]
+}
+
+model Subscription {
+  id             String     @id @default(cuid())
+  reference      String     @unique // REF-XXXX pour suivi
+  userId         String
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId         String
+  plan           SubscriptionPlan @relation(fields: [planId], references: [id])
+  billingCycle   String     @default("monthly") // monthly | annual
+  status         String     @default("PENDING") // PENDING | AWAITING_PAYMENT | ACTIVE | EXPIRED | CANCELLED
+  startDate      DateTime?
+  endDate        DateTime?
+  daysRemaining  Int        @default(0) // recalculé à la lecture
+  autoRenew      Boolean    @default(false)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  payments       Payment[]
+  licenseKeys    LicenseKey[]
+}
+
+model Payment {
+  id             String   @id @default(cuid())
+  reference      String   @unique // PAY-XXXX
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  amount         Float
+  method         String   @default("mobile_money") // mobile_money | card | bank_transfer | cash
+  phoneMsisdn    String?  // Numéro Mobile Money — AUCUNE donnée de carte bancaire stockée
+  status         String   @default("PENDING") // PENDING | COMPLETED | FAILED | REFUNDED
+  invoiceNumber  String?  // Facture générée après paiement complété
+  providerRef    String?  // Référence du PSP (à intégrer ultérieurement)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// Clés de licence pour l'activation du logiciel — API sécurisée
+model LicenseKey {
+  id             String   @id @default(cuid())
+  key            String   @unique
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  status         String   @default("INACTIVE") // INACTIVE | ACTIVE | REVOKED
+  activatedAt    DateTime?
+  lastCheckAt    DateTime?
+  deviceFingerprint String?
+  maxDevices     Int      @default(2)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────
+// SUPPORT
+// ─────────────────────────────────────────────────────────────
+
+model SupportTicket {
+  id          String   @id @default(cuid())
+  reference   String   @unique // TCK-XXXX
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name        String
+  email       String
+  subject     String
+  category    String   @default("general") // general | technique | facturation | installation | abonnement
+  message     String
+  attachment  String?  // Nom de fichier (stockage à configurer)
+  status      String   @default("OPEN") // OPEN | IN_PROGRESS | RESOLVED | CLOSED
+  priority    String   @default("NORMAL") // LOW | NORMAL | HIGH
+  response    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────
+// CONTENU ÉDITORIAL (gérable depuis l'administration)
+// ─────────────────────────────────────────────────────────────
+
+// Actualités / nouveautés / tutoriels / annonces
+model Article {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  content     String
+  category    String   @default("annonce") // annonce | version | correction | tutoriel | conseils
+  coverEmoji  String   @default("📰")
+  published   Boolean  @default(true)
+  views       Int      @default(0)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Témoignages d'enseignants, directeurs, établissements
+model Testimonial {
+  id            String  @id @default(cuid())
+  name          String
+  role          String  // Directeur, Enseignant, ...
+  establishment String
+  content       String
+  rating        Int     @default(5) // 1 à 5
+  initials      String  // Initiales pour l'avatar
+  color         String  @default("emerald") // Couleur de l'avatar
+  published     Boolean @default(true)
+  sortOrder     Int     @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Questions fréquentes — accordéon
+model FaqItem {
+  id       String  @id @default(cuid())
+  question String
+  answer   String
+  category String  @default("general") // general | compte | abonnement | logiciel | support
+  sortOrder Int    @default(0)
+  published Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Sections de la notice d'utilisation (documentation en ligne)
+model DocSection {
+  id       String  @id @default(cuid())
+  number   Int     // 1 à 19
+  slug     String  @unique
+  title    String
+  content  String  // Markdown
+  icon     String  @default("book")
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────
+// LOGICIEL — versions & téléchargements
+// ─────────────────────────────────────────────────────────────
+
+model SoftwareVersion {
+  id            String   @id @default(cuid())
+  version       String   @unique // 3.2.1
+  channel       String   @default("stable") // stable | beta
+  releaseDate   DateTime
+  fileSizeMb    Float    @default(85.4)
+  minOs         String   @default("Windows 10 64 bits")
+  installerName String   @default("GestionScolaireProPlus-Setup.exe")
+  downloadUrl   String   // URL/fichier configurable — à remplacer à chaque nouvelle version
+  changelog     String   // Markdown
+  md5           String?
+  downloads     Int      @default(0)
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Paramètres centralisés du site (modifiables depuis l'administration)
+model SiteSettings {
+  id                String @id @default("main")
+  siteName          String @default("Gestion Scolaire Pro Plus")
+  slogan            String @default("Simplifiez votre travail avec Gestion Scolaire Pro Plus !")
+  contactEmail      String @default("brahimadabre@yahoo.com")
+  contactPhone      String @default("+2250709933364")
+  addressLine       String @default("Abidjan, Côte d'Ivoire")
+  facebookUrl       String @default("")
+  twitterUrl        String @default("")
+  linkedinUrl       String @default("")
+  youtubeUrl        String @default("")
+  maintenanceMode   Boolean @default(false)
+  defaultDownloadUrl String @default("https://downloads.gestionscolaireproplus.com/GestionScolaireProPlus-Setup.exe")
+  updatedAt         DateTime @updatedAt
+}
+
+// Journal des actions importantes (sécurité & audit)
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String   // LOGIN, REGISTER, PASSWORD_RESET, SUBSCRIPTION_CREATED, PAYMENT, ADMIN_ACTION...
+  details   String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+}
