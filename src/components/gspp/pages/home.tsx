@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { api, Article, FaqItem, Plan, Testimonial } from "../api";
 import { Link, navigate } from "../router";
-import { AppMockup, MockupVariant } from "../app-mockup";
+import { AppMockup } from "../app-mockup";
 import { Section, SectionHeading, Stars, InitialsAvatar, Spinner } from "../ui-bits";
 import { formatDate, formatFcfa } from "@/lib/site";
 import { Button } from "@/components/ui/button";
@@ -240,6 +240,48 @@ function Screenshots() {
           width={1536}
           height={1024}
           className="h-auto w-full object-contain"
+          priority={selectedImage === 0}
+        />
+      </div>
+    </Section>
+  );
+}
+
+const ANDROID_PRESENTATION_IMAGES = [
+  { label: "Accueil Android", src: "/presentation/presentation-android-1.png", alt: "Écran d'accueil de Gestion Scolaire Pro Plus sur Android" },
+  { label: "Tableau de bord", src: "/presentation/presentation-android-2.png", alt: "Tableau de bord de Gestion Scolaire Pro Plus sur Android" },
+  { label: "Menu principal", src: "/presentation/presentation-android-3.png", alt: "Menu principal de Gestion Scolaire Pro Plus sur Android" },
+  { label: "Bulletin scolaire", src: "/presentation/presentation-android-4.png", alt: "Bulletin scolaire de Gestion Scolaire Pro Plus sur Android" },
+] as const;
+
+function AndroidScreenshots() {
+  const [selectedImage, setSelectedImage] = useState(0);
+  const image = ANDROID_PRESENTATION_IMAGES[selectedImage];
+
+  return (
+    <Section className="bg-secondary/40">
+      <SectionHeading
+        eyebrow="Présentation Android"
+        title="Gestion Scolaire Pro Plus dans votre poche"
+        description="Retrouvez vos élèves, vos résultats et vos documents essentiels depuis votre téléphone Android."
+      />
+      <Tabs value={String(selectedImage)} onValueChange={(v) => setSelectedImage(Number(v))} className="mt-10">
+        <TabsList className="mx-auto flex h-auto flex-wrap justify-center gap-1 rounded-full p-1.5">
+          {ANDROID_PRESENTATION_IMAGES.map((item, index) => (
+            <TabsTrigger key={item.src} value={String(index)} className="rounded-full px-4 py-2">
+              {item.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+      <div className="mx-auto mt-8 max-w-4xl overflow-hidden rounded-2xl border bg-card p-3 shadow-xl sm:p-5">
+        <Image
+          key={image.src}
+          src={image.src}
+          alt={image.alt}
+          width={1080}
+          height={1536}
+          className="mx-auto h-auto max-h-[780px] w-auto max-w-full object-contain"
           priority={selectedImage === 0}
         />
       </div>
@@ -519,6 +561,7 @@ export function HomePage() {
       <Advantages />
       <Categories />
       <Screenshots />
+      <AndroidScreenshots />
       <HowItWorks />
       <PricingPreview />
       <Testimonials />
