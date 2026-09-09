@@ -6,6 +6,7 @@
 // ─────────────────────────────────────────────────────────────
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import crypto from "node:crypto";
 
 const db = new PrismaClient();
 
@@ -13,8 +14,8 @@ async function main() {
   console.log("🌱 Seed — Gestion Scolaire Pro Plus");
 
   // ── Comptes ────────────────────────────────────────────────
-  const adminPass = await bcrypt.hash("Admin@2026!", 10);
-  const demoPass = await bcrypt.hash("Demo@2026!", 10);
+  const adminPass = await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD ?? crypto.randomUUID(), 10);
+  const demoPass = await bcrypt.hash(process.env.SEED_DEMO_PASSWORD ?? crypto.randomUUID(), 10);
   const siteAdminUsername = process.env.SITE_ADMIN_USERNAME ?? "brahima05";
   const siteAdminPassword = process.env.SITE_ADMIN_PASSWORD;
 
@@ -448,9 +449,7 @@ async function main() {
     versions: await db.softwareVersion.count(),
   };
   console.log("✅ Seed terminé :", counts);
-  console.log("👤 Admin : admin@gspp.ci / Admin@2026!");
-  console.log("👤 Démo (abonné) : demo@gspp.ci / Demo@2026!");
-  console.log("👤 Essai (sans abonnement) : essai@gspp.ci / Demo@2026!");
+  console.log("👤 Comptes de démonstration créés avec des secrets fournis par l'environnement.");
 }
 
 // ─────────────────────────────────────────────────────────────
