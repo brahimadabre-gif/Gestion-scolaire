@@ -70,6 +70,23 @@ const docSchema = z.object({
   icon: z.string().trim().max(40).default("book"),
 });
 
+const librarySchema = z.object({
+  title: z.string().trim().min(2).max(200),
+  description: z.string().trim().max(1000).default(""),
+  author: z.string().trim().max(160).default(""),
+  category: z.string().trim().min(2).max(80).default("Cours"),
+  level: z.string().trim().max(80).default("Tous niveaux"),
+  fileType: z.string().trim().max(20).default("PDF"),
+  fileSizeMb: z.coerce.number().min(0).max(100000).default(0),
+  coverUrl: z.string().trim().max(500).refine((value) => value === "" || URL.canParse(value), "URL de couverture invalide").default(""),
+  downloadUrl: z.string().trim().min(1).max(500).refine((value) => {
+    try { const url = new URL(value); return ["http:", "https:"].includes(url.protocol); } catch { return false; }
+  }, "URL de téléchargement invalide"),
+  featured: z.coerce.boolean().default(false),
+  published: z.coerce.boolean().default(true),
+  sortOrder: z.coerce.number().int().default(0),
+});
+
 const ticketPatchSchema = z.object({
   status: z.enum(["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"]).optional(),
   priority: z.enum(["LOW", "NORMAL", "HIGH"]).optional(),
@@ -96,6 +113,7 @@ const REGISTRY: Record<string, { delegate: Delegate }> = {
   testimonials: { delegate: db.testimonial },
   versions: { delegate: db.softwareVersion },
   docs: { delegate: db.docSection },
+  library: { delegate: db.libraryDocument },
   tickets: { delegate: db.supportTicket },
   subscriptions: { delegate: db.subscription },
   payments: { delegate: db.payment },
@@ -109,6 +127,7 @@ function schemaForCreate(entity: string): z.ZodType | null {
     case "testimonials": return testimonialSchema;
     case "versions": return versionSchema;
     case "docs": return docSchema;
+    case "library": return librarySchema;
     default: return null;
   }
 }

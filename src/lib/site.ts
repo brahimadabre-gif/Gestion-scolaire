@@ -28,7 +28,7 @@ export const SITE = {
 
 // Types de routes de l'application (routeur par hash côté client)
 export type Route =
-  | "/" | "/fonctionnalites" | "/tarifs" | "/telecharger" | "/notice"
+  | "/" | "/fonctionnalites" | "/tarifs" | "/telecharger" | "/notice" | "/bibliotheque"
   | "/tutoriel-compte" | "/faq" | "/support" | "/actualites"
   | "/connexion" | "/inscription" | "/mot-de-passe-oublie"
   | "/compte" | "/compte/abonnement" | "/compte/paiements" | "/compte/support"
@@ -41,6 +41,7 @@ export const MAIN_NAV: { label: string; route: Route }[] = [
   { label: "Tarifs", route: "/tarifs" },
   { label: "Télécharger", route: "/telecharger" },
   { label: "Notice", route: "/notice" },
+  { label: "Bibliothèque", route: "/bibliotheque" },
   { label: "Actualités", route: "/actualites" },
   { label: "FAQ", route: "/faq" },
   { label: "Contact", route: "/support" },
@@ -53,6 +54,7 @@ export const FOOTER_NAV = {
     { label: "Tarifs", route: "/tarifs" },
     { label: "Télécharger", route: "/telecharger" },
     { label: "Documentation", route: "/notice" },
+    { label: "Bibliothèque", route: "/bibliotheque" },
     { label: "Tutoriels", route: "/tutoriel-compte" },
     { label: "FAQ", route: "/faq" },
     { label: "Contact", route: "/support" },

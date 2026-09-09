@@ -23,7 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard, Users, CreditCard, Receipt, LifeBuoy, Package, Download,
+  LayoutDashboard, Users, CreditCard, Receipt, LifeBuoy, Package, Download, BookOpen,
   Newspaper, HelpCircle, MessageSquareQuote, Settings, Plus, Pencil, Trash2,
   Loader2, TrendingUp, UserCheck, UserX, ShieldCheck, ArrowUpCircle, Activity,
 } from "lucide-react";
@@ -105,7 +105,7 @@ function EntityCrud({ entity, title, fields, description }: {
         toast.success("Élément créé.");
       }
       await queryClient.invalidateQueries({ queryKey: ["admin", entity] });
-      await queryClient.invalidateQueries({ queryKey: [entity === "plans" ? "plans" : entity === "articles" ? "articles" : entity === "faqs" ? "faqs" : entity === "testimonials" ? "testimonials" : entity === "versions" ? "version" : "docs"] });
+      await queryClient.invalidateQueries({ queryKey: [entity === "plans" ? "plans" : entity === "articles" ? "articles" : entity === "faqs" ? "faqs" : entity === "testimonials" ? "testimonials" : entity === "versions" ? "version" : entity === "library" ? "library" : "docs"] });
       setEditing(null);
       setCreating(false);
     } catch (err) {
@@ -857,6 +857,7 @@ export function AdminPage() {
     { id: "tickets", label: "Tickets", icon: LifeBuoy },
     { id: "plans", label: "Formules", icon: Package },
     { id: "versions", label: "Versions", icon: Download },
+    { id: "library", label: "Bibliothèque", icon: BookOpen },
     { id: "articles", label: "Articles", icon: Newspaper },
     { id: "faqs", label: "FAQ", icon: HelpCircle },
     { id: "testimonials", label: "Témoignages", icon: MessageSquareQuote },
@@ -930,6 +931,28 @@ export function AdminPage() {
               { name: "downloadUrl", label: "URL de téléchargement", type: "text", placeholder: "https://downloads…/Setup.exe" },
               { name: "changelog", label: "Journal des modifications (Markdown)", type: "textarea" },
               { name: "active", label: "Version active", type: "boolean" },
+            ]}
+          />
+        </TabsContent>
+
+        <TabsContent value="library" className="mt-6">
+          <EntityCrud
+            entity="library"
+            title="Bibliothèque — livres et documents"
+            description="Ajoutez une ressource, indiquez son URL de couverture et son lien de téléchargement, puis publiez-la pour les utilisateurs."
+            fields={[
+              { name: "title", label: "Titre", type: "text", placeholder: "Manuel élèves des cours moyen" },
+              { name: "description", label: "Description", type: "textarea", placeholder: "Présentation du livre ou du document" },
+              { name: "author", label: "Auteur / organisme", type: "text" },
+              { name: "category", label: "Catégorie", type: "text", placeholder: "Manuels, Cours, Guides…" },
+              { name: "level", label: "Niveau", type: "text", placeholder: "CM1, CM2, Tous niveaux…" },
+              { name: "fileType", label: "Type de fichier", type: "text", placeholder: "PDF" },
+              { name: "fileSizeMb", label: "Taille (Mo)", type: "number" },
+              { name: "coverUrl", label: "URL de la couverture", type: "text", placeholder: "https://…/couverture.jpg" },
+              { name: "downloadUrl", label: "URL de téléchargement", type: "text", placeholder: "https://…/manuel.pdf" },
+              { name: "featured", label: "Mettre en avant", type: "boolean" },
+              { name: "published", label: "Publié dans la bibliothèque", type: "boolean" },
+              { name: "sortOrder", label: "Ordre d'affichage", type: "number" },
             ]}
           />
         </TabsContent>

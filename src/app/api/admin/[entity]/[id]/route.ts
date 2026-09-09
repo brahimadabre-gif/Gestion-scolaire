@@ -22,6 +22,23 @@ const paymentPatchSchema = z.object({
   activationCode: z.string().trim().max(80).optional(),
 });
 
+const libraryPatchSchema = z.object({
+  title: z.string().trim().min(2).max(200).optional(),
+  description: z.string().trim().max(1000).optional(),
+  author: z.string().trim().max(160).optional(),
+  category: z.string().trim().min(2).max(80).optional(),
+  level: z.string().trim().max(80).optional(),
+  fileType: z.string().trim().max(20).optional(),
+  fileSizeMb: z.coerce.number().min(0).max(100000).optional(),
+  coverUrl: z.string().trim().max(500).refine((value) => value === "" || URL.canParse(value), "URL de couverture invalide").optional(),
+  downloadUrl: z.string().trim().min(1).max(500).refine((value) => {
+    try { const url = new URL(value); return ["http:", "https:"].includes(url.protocol); } catch { return false; }
+  }, "URL de téléchargement invalide").optional(),
+  featured: z.coerce.boolean().optional(),
+  published: z.coerce.boolean().optional(),
+  sortOrder: z.coerce.number().int().optional(),
+});
+
 const ALLOWED_FIELDS: Record<string, string[]> = {
   plans: ["slug", "name", "description", "monthlyPrice", "annualPrice", "maxUsers", "maxSchools", "maxStudents", "features", "highlighted", "active", "sortOrder"],
   articles: ["slug", "title", "excerpt", "content", "category", "coverEmoji", "published", "publishedAt"],
@@ -29,6 +46,7 @@ const ALLOWED_FIELDS: Record<string, string[]> = {
   testimonials: ["name", "role", "establishment", "content", "rating", "initials", "color", "published", "sortOrder"],
   versions: ["version", "channel", "releaseDate", "fileSizeMb", "minOs", "installerName", "downloadUrl", "changelog", "active"],
   docs: ["number", "slug", "title", "content", "icon"],
+  library: ["title", "description", "author", "category", "level", "fileType", "fileSizeMb", "coverUrl", "downloadUrl", "featured", "published", "sortOrder"],
 };
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ entity: string; id: string }> }) {
@@ -121,6 +139,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ entity
           }
           break;
         }
+        case "library": {
+          const allowed = ALLOWED_FIELDS[entity];
+          const data: Record<string, unknown> = {};
+          for (const key of allowed) if (key in body) data[key] = body[key];
+          const parsed = libraryPatchSchema.parse(data);
+          updated = await db.libraryDocument.update({ where: { id }, data: parsed });
+          break;
+        }
         default:
           return fail("Entité inconnue.", 404);
       }
@@ -155,6 +181,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ entit
       faqs: () => db.faqItem.delete({ where: { id } }),
       testimonials: () => db.testimonial.delete({ where: { id } }),
       docs: () => db.docSection.delete({ where: { id } }),
+      library: () => db.libraryDocument.delete({ where: { id } }),
       versions: () => db.softwareVersion.delete({ where: { id } }),
       plans: () => db.subscriptionPlan.delete({ where: { id } }),
       tickets: () => db.supportTicket.delete({ where: { id } }),

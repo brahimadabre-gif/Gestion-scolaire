@@ -208,6 +208,29 @@ model DocSection {
   createdAt DateTime @default(now())
 }
 
+// Livres et documents téléchargeables depuis la bibliothèque publique
+model LibraryDocument {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @default("")
+  author      String   @default("")
+  category    String   @default("Cours")
+  level       String   @default("Tous niveaux")
+  fileType    String   @default("PDF")
+  fileSizeMb  Float    @default(0)
+  coverUrl    String   @default("")
+  downloadUrl String
+  featured    Boolean  @default(false)
+  published   Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  downloads   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, category, level])
+  @@index([featured, sortOrder])
+}
+
 // ─────────────────────────────────────────────────────────────
 // LOGICIEL — versions & téléchargements
 // ─────────────────────────────────────────────────────────────

@@ -14,6 +14,7 @@ import { FeaturesPage } from "./pages/features";
 import { PricingPage } from "./pages/pricing";
 import { DownloadPage } from "./pages/download";
 import { DocsPage } from "./pages/docs";
+import { LibraryPage } from "./pages/library";
 import { TutorialPage } from "./pages/tutorial";
 import { FaqPage } from "./pages/faq";
 import { SupportPage } from "./pages/support";
@@ -75,6 +76,8 @@ function Routes() {
       return <DownloadPage />;
     case "/notice":
       return <DocsPage />;
+    case "/bibliotheque":
+      return <LibraryPage />;
     case "/tutoriel-compte":
       return <TutorialPage />;
     case "/faq":
