@@ -2,6 +2,7 @@
 
 // ── Page d'accueil — Gestion Scolaire Pro Plus ───────────────
 import { useState } from "react";
+import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { api, Article, FaqItem, Plan, Testimonial } from "../api";
 import { Link, navigate } from "../router";
@@ -204,25 +205,43 @@ function Categories() {
 }
 
 // ── Captures d'écran (onglets) ───────────────────────────────
+const PRESENTATION_IMAGES = [
+  { label: "Accueil", src: "/presentation/presentation-pc-1.png", alt: "Écran d'accueil de Gestion Scolaire Pro Plus" },
+  { label: "Tableau de bord", src: "/presentation/presentation-pc-2.png", alt: "Tableau de bord de Gestion Scolaire Pro Plus" },
+  { label: "Registre d'appel", src: "/presentation/presentation-pc-3.png", alt: "Registre d'appel de Gestion Scolaire Pro Plus" },
+  { label: "Gestion des matières", src: "/presentation/presentation-pc-4.png", alt: "Gestion des matières de Gestion Scolaire Pro Plus" },
+  { label: "Bulletin scolaire", src: "/presentation/presentation-pc-5.png", alt: "Bulletin scolaire de Gestion Scolaire Pro Plus" },
+] as const;
+
 function Screenshots() {
-  const [variant, setVariant] = useState<MockupVariant>("notes");
+  const [selectedImage, setSelectedImage] = useState(0);
+  const image = PRESENTATION_IMAGES[selectedImage];
   return (
     <Section>
       <SectionHeading
         eyebrow="Le logiciel en images"
         title="Une interface claire, rapide et agréable"
-        description="Conçue avec des enseignants et des directeurs d'école primaire : chaque écran est optimisé pour les tâches du quotidien."
+        description="Découvrez les écrans réels de Gestion Scolaire Pro Plus, conçus pour les tâches quotidiennes des écoles primaires."
       />
-      <Tabs value={variant} onValueChange={(v) => setVariant(v as MockupVariant)} className="mt-10">
+      <Tabs value={String(selectedImage)} onValueChange={(v) => setSelectedImage(Number(v))} className="mt-10">
         <TabsList className="mx-auto flex flex-wrap justify-center gap-1 rounded-full p-1.5 h-auto">
-          <TabsTrigger value="notes" className="rounded-full px-4 py-2">Saisie des notes</TabsTrigger>
-          <TabsTrigger value="bulletin" className="rounded-full px-4 py-2">Bulletins</TabsTrigger>
-          <TabsTrigger value="classement" className="rounded-full px-4 py-2">Classement</TabsTrigger>
-          <TabsTrigger value="dashboard" className="rounded-full px-4 py-2">Tableau de bord</TabsTrigger>
+          {PRESENTATION_IMAGES.map((item, index) => (
+            <TabsTrigger key={item.src} value={String(index)} className="rounded-full px-4 py-2">
+              {item.label}
+            </TabsTrigger>
+          ))}
         </TabsList>
       </Tabs>
-      <div className="mx-auto mt-8 max-w-4xl">
-        <AppMockup key={variant} variant={variant} />
+      <div className="mx-auto mt-8 max-w-5xl overflow-hidden rounded-2xl border bg-card shadow-xl">
+        <Image
+          key={image.src}
+          src={image.src}
+          alt={image.alt}
+          width={1536}
+          height={1024}
+          className="h-auto w-full object-contain"
+          priority={selectedImage === 0}
+        />
       </div>
     </Section>
   );
