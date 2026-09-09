@@ -86,11 +86,10 @@ bun scripts/e2e-test.ts      # tests navigateur complets
 
 ## 5. Comptes de démonstration (seed)
 
-| Compte | Mot de passe | Rôle |
-|---|---|---|
-| `admin@gspp.ci` | `Admin@2026!` | Administrateur (espace /#/admin) |
-| `demo@gspp.ci` | `Demo@2026!` | Client avec abonnement Professionnel actif + licence |
-| `essai@gspp.ci` | `Demo@2026!` | Client sans abonnement (tester la souscription) |
+Les comptes de démonstration sont initialisés par le seed, mais aucun mot de passe
+n'est stocké dans le dépôt. Définissez `SEED_ADMIN_PASSWORD` et
+`SEED_DEMO_PASSWORD` uniquement dans l'environnement privé du déploiement ou
+dans un fichier local non versionné.
 
 ## 6. Intégration avec le logiciel (API machine-à-machine)
 
