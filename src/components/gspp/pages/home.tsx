@@ -146,22 +146,22 @@ const CATEGORIES = [
   {
     icon: GraduationCap,
     title: "Gestion pédagogique",
-    items: ["Élèves et classes CP1-CM2", "Matières et coefficients", "Barèmes /10 et /20", "Classements et compositions", "Bulletins scolaires"],
+    items: ["Élèves et classes CP1-CM2", "Matières et coefficients", "Barèmes /10 et /20", "Classements et compositions", "Groupes d'EPS par classe", "Bulletins scolaires"],
   },
   {
     icon: Building2,
     title: "Gestion administrative",
-    items: ["Inscriptions et admissions", "Promotions automatiques", "Documents administratifs", "Signatures électroniques", "Rapports et statistiques"],
+    items: ["Inscriptions et admissions", "Gestion des enseignants", "Promotions automatiques", "Registre d'appel et assiduité", "Documents administratifs", "Rapports et statistiques"],
   },
   {
     icon: Zap,
     title: "Automatisation",
-    items: ["Calcul automatique des moyennes", "Génération de documents", "Import intelligent", "Classement automatique", "Rapports en un clic"],
+    items: ["Calcul automatique des moyennes", "Création équilibrée des groupes d'EPS", "Génération de documents", "Import et sauvegarde des données", "Classement automatique", "Rapports en un clic"],
   },
   {
     icon: FolderDown,
     title: "Documents & impressions",
-    items: ["Bulletins et fiches scolaires", "Listes de classes", "Relevés de notes", "Certificats de scolarité", "Documents officiels"],
+    items: ["Bulletins et fiches scolaires", "Listes de classes", "Groupes d'EPS imprimables", "Relevés de notes", "Certificats de scolarité et de fréquentation", "Documents officiels"],
   },
 ];
 
