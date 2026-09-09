@@ -36,6 +36,10 @@ function getClientOs(): OS {
 const subscribeNoop = () => () => {};
 const getServerOs = () => "other" as OS;
 
+const ANDROID_INSTALLER_URL =
+  "https://github.com/brahimadabre-gif/Gestion-scolaire/raw/refs/heads/main/public/downloads/gestion%20scolaire%20pro%20plus%20v%201-4.apk";
+const ANDROID_INSTALLER_NAME = "gestion scolaire pro plus v 1-4.apk";
+
 export function DownloadPage() {
   const { user, subscription } = useAuth();
   // OS détecté automatiquement (client uniquement) — l'utilisateur peut le changer via les onglets
@@ -126,6 +130,15 @@ export function DownloadPage() {
                       <DownloadIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                       Télécharger pour Windows ({version.fileSizeMb} Mo)
                     </Button>
+                  ) : os === "android" ? (
+                    <Button
+                      size="lg"
+                      className="w-full rounded-full text-base"
+                      onClick={() => window.open(ANDROID_INSTALLER_URL, "_blank", "noopener")}
+                    >
+                      <DownloadIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+                      Télécharger pour Android (8,9 Mo)
+                    </Button>
                   ) : (
                     <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-800 dark:text-amber-300">
                       <p className="flex items-center justify-center gap-2 font-semibold">
@@ -138,7 +151,11 @@ export function DownloadPage() {
                     </div>
                   )}
                   <p className="mt-3 text-xs text-muted-foreground">
-                    {hasInstaller ? `Fichier : ${version.installerName} · Installer pour ${osLabel[os]}` : "Aucun installateur ajouté pour le moment"}
+                    {os === "android"
+                      ? `Fichier : ${ANDROID_INSTALLER_NAME} · Installer pour Android`
+                      : hasInstaller
+                        ? `Fichier : ${version.installerName} · Installer pour Windows`
+                        : "Aucun installateur ajouté pour le moment"}
                   </p>
                 </div>
               </div>
