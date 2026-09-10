@@ -121,7 +121,7 @@ model LicenseKey {
   activatedAt    DateTime?
   lastCheckAt    DateTime?
   deviceFingerprint String?
-  maxDevices     Int      @default(2)
+  maxDevices     Int      @default(1)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }

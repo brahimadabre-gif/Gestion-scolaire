@@ -450,6 +450,8 @@ function AdminUsers() {
 // ═════════════════════════════════════════════════════════════
 function AdminSubscriptions() {
   const queryClient = useQueryClient();
+  const [extensionDays, setExtensionDays] = useState<Record<string, string>>({});
+  const [endDates, setEndDates] = useState<Record<string, string>>({});
   const { data: subs, isLoading } = useQuery<Record<string, unknown>[]>({
     queryKey: ["admin", "subscriptions"],
     queryFn: async () => {
@@ -459,10 +461,10 @@ function AdminSubscriptions() {
     },
   });
 
-  const setStatus = async (id: unknown, status: string) => {
+  const updateSubscription = async (id: unknown, payload: Record<string, unknown>, message: string) => {
     try {
-      await api.patch(`/api/admin/subscriptions/${id}`, { status });
-      toast.success(status === "ACTIVE" ? "Abonnement activé — licence générée si nécessaire." : "Statut mis à jour.");
+      await api.patch(`/api/admin/subscriptions/${id}`, payload);
+      toast.success(message);
       await queryClient.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
       await queryClient.invalidateQueries({ queryKey: ["admin", "stats"] });
     } catch (err) {
@@ -470,11 +472,34 @@ function AdminSubscriptions() {
     }
   };
 
+  const setStatus = (id: unknown, status: string) => {
+    const label = status === "CANCELLED" ? "mettre fin à cet abonnement" : status === "EXPIRED" ? "faire expirer cet abonnement" : "réactiver cet abonnement";
+    if (!window.confirm(`Confirmer la décision : ${label} ?`)) return;
+    return updateSubscription(id, { status }, status === "ACTIVE" ? "Abonnement réactivé — licence générée si nécessaire." : "Décision appliquée à l’abonnement.");
+  };
+
+  const extend = (id: unknown) => {
+    const days = Number(extensionDays[String(id)]);
+    if (!Number.isInteger(days) || days < 1) {
+      toast.error("Saisissez un nombre de jours valide.");
+      return;
+    }
+    if (!window.confirm(`Confirmer la prolongation de ${days} jour(s) ?`)) return;
+    return updateSubscription(id, { extendDays: days }, `Abonnement prolongé de ${days} jour(s).`);
+  };
+
+  const setEndDate = (id: unknown) => {
+    const date = endDates[String(id)];
+    if (!date) { toast.error("Choisissez une date de fin."); return; }
+    if (!window.confirm(`Confirmer la nouvelle date de fin : ${date} ?`)) return;
+    return updateSubscription(id, { endDate: date }, "Date de fin enregistrée.");
+  };
+
   return (
     <div>
       <h2 className="text-lg font-bold">Abonnements</h2>
       <p className="text-sm text-muted-foreground">
-        Activez, expirez ou annulez les abonnements. L&apos;activation génère la clé de licence si nécessaire.
+        Contrôlez les décisions d&apos;abonnement : activation, fin, expiration, prolongation et date de fin personnalisée.
       </p>
       {isLoading ? (
         <Spinner />
@@ -488,7 +513,8 @@ function AdminSubscriptions() {
                 <th className="px-4 py-3 font-semibold">Cycle</th>
                 <th className="px-4 py-3 font-semibold">Période</th>
                 <th className="px-4 py-3 font-semibold">Statut</th>
-                <th className="px-4 py-3 text-right font-semibold">Actions</th>
+                <th className="px-4 py-3 font-semibold">Contrôle de durée</th>
+                <th className="px-4 py-3 text-right font-semibold">Décision</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -504,6 +530,29 @@ function AdminSubscriptions() {
                       {s.endDate ? new Date(String(s.endDate)).toLocaleDateString("fr-FR") : "—"}
                     </td>
                     <td className="px-4 py-3"><StatusBadge status={String(s.status)} /></td>
+                    <td className="px-4 py-3">
+                      <div className="flex min-w-[270px] flex-wrap items-center gap-1.5">
+                        <Input
+                          type="number"
+                          min={1}
+                          max={3650}
+                          className="h-8 w-20 text-xs"
+                          placeholder="Jours"
+                          aria-label={`Jours à ajouter pour ${String(s.reference)}`}
+                          value={extensionDays[String(s.id)] ?? ""}
+                          onChange={(e) => setExtensionDays((prev) => ({ ...prev, [String(s.id)]: e.target.value }))}
+                        />
+                        <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => extend(s.id)}>Prolonger</Button>
+                        <Input
+                          type="date"
+                          className="h-8 w-36 text-xs"
+                          aria-label={`Date de fin pour ${String(s.reference)}`}
+                          value={endDates[String(s.id)] ?? ""}
+                          onChange={(e) => setEndDates((prev) => ({ ...prev, [String(s.id)]: e.target.value }))}
+                        />
+                        <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setEndDate(s.id)}>Enregistrer</Button>
+                      </div>
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-1.5">
                         {s.status !== "ACTIVE" && (
@@ -713,7 +762,7 @@ function AdminTickets() {
                   )}
                 </div>
               </div>
-              {t.response && (
+              {Boolean(t.response) && (
                 <div className="mt-3 rounded-xl border-l-4 border-emerald-500 bg-emerald-500/5 px-4 py-3 text-sm text-muted-foreground">
                   {String(t.response)}
                 </div>

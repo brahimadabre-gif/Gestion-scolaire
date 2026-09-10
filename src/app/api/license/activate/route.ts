@@ -16,10 +16,16 @@ export async function POST(req: Request) {
   return handle(async () => {
     const ip = getClientIp(req);
 
-    // 1. Vérification de la clé API du logiciel (serveur à serveur)
+    // 1. Les clients desktop/mobile ne peuvent pas garder un secret fiable
+    // dans leur binaire. La protection repose donc sur HTTPS, la clé de licence
+    // à forte entropie et la limitation des tentatives. La clé privée reste
+    // disponible pour d'éventuels appels serveur à serveur.
     const apiKey = req.headers.get("x-api-key");
+    const publicClient = req.headers.get("x-gspp-client");
     const expectedKey = process.env.SOFTWARE_API_KEY;
-    if (!expectedKey || !apiKey || apiKey !== expectedKey) {
+    const trustedServer = Boolean(expectedKey && apiKey && apiKey === expectedKey);
+    const trustedApp = publicClient === "desktop" || publicClient === "android";
+    if (!trustedServer && !trustedApp) {
       return fail("Clé API invalide.", 401);
     }
 
@@ -58,14 +64,17 @@ export async function POST(req: Request) {
         data: {
           status: "ACTIVE",
           activatedAt: new Date(),
-          deviceFingerprint: data.deviceFingerprint || null,
+          deviceFingerprint: data.deviceFingerprint,
           lastCheckAt: new Date(),
         },
       });
       await logAction("LICENSE_ACTIVATED", license.userId, `${license.key}`, ip);
     } else {
       // Déjà active : vérifier que l'empreinte correspond (anti-piratage multi-postes)
-      if (license.deviceFingerprint && data.deviceFingerprint && license.deviceFingerprint !== data.deviceFingerprint) {
+      if (!license.deviceFingerprint) {
+        return fail("Cette licence active doit être réinitialisée par l’administrateur avant toute nouvelle activation.", 409);
+      }
+      if (license.deviceFingerprint !== data.deviceFingerprint) {
         return fail("Cette licence est déjà active sur un autre appareil.", 409);
       }
       await db.licenseKey.update({

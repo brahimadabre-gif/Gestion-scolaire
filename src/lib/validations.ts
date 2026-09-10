@@ -94,8 +94,9 @@ export const ticketSchema = z.object({
 });
 
 export const licenseActivateSchema = z.object({
-  licenseKey: z.string().trim().min(10),
-  deviceFingerprint: z.string().trim().min(4).max(120).optional().or(z.literal("")),
+  licenseKey: z.string().trim().min(8).max(80).regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/, "Code de licence invalide"),
+  // Toute licence délivrée par le serveur doit être liée à un appareil réel.
+  deviceFingerprint: z.string().trim().min(4).max(120),
 });
 
 export const adminPlanSchema = z.object({

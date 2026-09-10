@@ -16,10 +16,14 @@ export async function POST(req: Request) {
   return handle(async () => {
     const ip = getClientIp(req);
 
-    // 1. Clé API du logiciel
+    // Un secret ne doit pas être embarqué dans le logiciel client. Les clients
+    // utilisent HTTPS + clé de licence + limitation des tentatives.
     const apiKey = req.headers.get("x-api-key");
+    const publicClient = req.headers.get("x-gspp-client");
     const expectedKey = process.env.SOFTWARE_API_KEY;
-    if (!expectedKey || !apiKey || apiKey !== expectedKey) {
+    const trustedServer = Boolean(expectedKey && apiKey && apiKey === expectedKey);
+    const trustedApp = publicClient === "desktop" || publicClient === "android";
+    if (!trustedServer && !trustedApp) {
       return fail("Clé API invalide.", 401);
     }
 

@@ -14,8 +14,11 @@ const ticketPatchSchema = z.object({
 });
 
 const subPatchSchema = z.object({
-  status: z.enum(["PENDING", "AWAITING_PAYMENT", "ACTIVE", "EXPIRED", "CANCELLED"]),
-});
+  status: z.enum(["PENDING", "AWAITING_PAYMENT", "ACTIVE", "EXPIRED", "CANCELLED"]).optional(),
+  extendDays: z.number().int().min(1).max(3650).optional(),
+  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date de fin invalide").optional(),
+  decisionNote: z.string().trim().max(500).optional(),
+}).refine((value) => value.status || value.extendDays || value.endDate, "Aucune décision fournie.");
 
 const paymentPatchSchema = z.object({
   status: z.enum(["PENDING", "COMPLETED", "FAILED"]),
@@ -68,34 +71,46 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ entity
         }
         // ── Abonnements : changement de statut manuel ───────────
         case "subscriptions": {
-          const { status } = subPatchSchema.parse(body);
-          if (status !== "ACTIVE") {
-            updated = await db.subscription.update({ where: { id }, data: { status } });
-            break;
-          }
           const sub = await db.subscription.findUnique({ where: { id }, include: { plan: true } });
           if (!sub) return fail("Abonnement introuvable.", 404);
+          const { status, extendDays, endDate: requestedEndDate, decisionNote } = subPatchSchema.parse(body);
           const now = new Date();
           const days = sub.billingCycle === "monthly" ? 30 : 365;
-          const endDate = sub.endDate && sub.endDate > now
+          const baseEndDate = sub.endDate && sub.endDate > now
             ? sub.endDate
             : new Date(now.getTime() + days * 86_400_000);
+          let endDate = requestedEndDate
+            ? new Date(`${requestedEndDate}T23:59:59.999Z`)
+            : baseEndDate;
+          if (Number.isNaN(endDate.getTime())) return fail("Date de fin invalide.", 422);
+          if (extendDays) endDate = new Date(baseEndDate.getTime() + extendDays * 86_400_000);
+          const nextStatus = status ?? (sub.status === "EXPIRED" ? "ACTIVE" : sub.status);
           updated = await db.subscription.update({
             where: { id },
-            data: { status: "ACTIVE", startDate: sub.startDate ?? now, endDate },
+            data: {
+              status: nextStatus,
+              startDate: nextStatus === "ACTIVE" ? (sub.startDate ?? now) : sub.startDate,
+              endDate,
+            },
           });
           const license = await db.licenseKey.findFirst({ where: { subscriptionId: id } });
-          if (!license) {
+          if (nextStatus === "ACTIVE" && !license) {
             await db.licenseKey.create({
               data: {
                 key: generateLicenseKey(),
                 userId: sub.userId,
                 subscriptionId: sub.id,
                 status: "INACTIVE",
-                maxDevices: sub.plan.maxUsers,
+                maxDevices: 1,
               },
             });
           }
+          await logAction(
+            "ADMIN_SUBSCRIPTION_DECISION",
+            admin.id,
+            `${id} → ${nextStatus}; fin=${endDate.toISOString()}; jours=${extendDays ?? 0}; note=${decisionNote ?? ""}`,
+            ip,
+          );
           break;
         }
         // ── Paiements : confirmation = activation complète ──────
@@ -132,7 +147,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ entity
             testimonials: db.testimonial,
             versions: db.softwareVersion,
             docs: db.docSection,
-          }[entity];
+          }[entity] as unknown as { update: (args: { where: { id: string }; data: Record<string, unknown> }) => Promise<unknown> } | undefined;
+          if (!delegate) return fail("Entité inconnue.", 404);
           updated = await delegate.update({ where: { id }, data });
           if (entity === "plans") {
             updated = { ...(updated as { features: string }), features: JSON.parse((updated as { features: string }).features || "[]") };

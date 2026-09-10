@@ -162,7 +162,7 @@ async function main() {
           key: "GSPP-DEMO1-PRO22-KEY33-XXXXX",
           userId: demo.id, subscriptionId: sub.id,
           status: "ACTIVE", activatedAt: new Date("2026-01-20"),
-          maxDevices: 2,
+          maxDevices: 1,
         },
       });
     }
@@ -712,7 +712,7 @@ function buildDocs() {
       content: [
         "## Les questions les plus posées au support",
         "**Le logiciel fonctionne-t-il sans Internet ?** Oui, entièrement : notes, bulletins, impressions et classements sont hors ligne. Internet ne sert qu'à l'activation et à la vérification périodique de la licence.",
-        "**Puis-je installer le logiciel sur plusieurs ordinateurs ?** Oui, dans la limite du nombre d'appareils de votre formule (1 pour Essentiel, 5 pour Professionnel, 20 pour Établissement).",
+        "**Puis-je utiliser le même code sur plusieurs ordinateurs ?** Non. Chaque code délivré par le serveur est lié au premier appareil utilisé pour l'activation. Les anciennes clés intégrées au logiciel restent disponibles pour une activation manuelle hors serveur.",
         "**Mes données d'élèves sont-elles envoyées sur Internet ?** Non. Toutes les données scolaires restent sur votre ordinateur. Le site officiel ne gère que votre compte, votre abonnement et votre licence.",
         "**Comment transférer mes données vers un nouvel ordinateur ?** Faites une sauvegarde complète (fichier `.gsbackup`) sur l'ancien poste, installez le logiciel sur le nouveau, puis restaurez la sauvegarde.",
         "**Puis-je essayer avant d'acheter ?** Oui : créez votre compte et contactez le support pour obtenir une période d'évaluation.",
