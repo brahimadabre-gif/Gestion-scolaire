@@ -413,6 +413,38 @@ async function main() {
     });
   }
 
+  // ── Bibliothèque : programmes éducatifs et guides d'exécution ─
+  const libraryDocuments = [
+    { level: "CP1", slug: "cp1", size: 2.11, order: 1 },
+    { level: "CP2", slug: "cp2", size: 2.13, order: 2 },
+    { level: "CE1", slug: "ce1", size: 2.35, order: 3 },
+    { level: "CE2", slug: "ce2", size: 2.49, order: 4 },
+    { level: "CM1", slug: "cm1", size: 2.87, order: 5 },
+    { level: "CM2", slug: "cm2", size: 2.80, order: 6 },
+  ];
+  for (const item of libraryDocuments) {
+    const title = `Programmes éducatifs et guides d'exécution - ${item.level}`;
+    const existing = await db.libraryDocument.findFirst({ where: { title } });
+    if (!existing) {
+      await db.libraryDocument.create({
+        data: {
+          title,
+          description: `Programme éducatif et guide d'exécution du Primaire pour le niveau ${item.level}.`,
+          author: "DPFC - Ministère de l'Éducation Nationale",
+          category: "Programmes éducatifs",
+          level: item.level,
+          fileType: "PDF",
+          fileSizeMb: item.size,
+          coverUrl: `https://gestionscolaireproplus.netlify.app/library/covers/${item.slug}.png`,
+          downloadUrl: `https://gestionscolaireproplus.netlify.app/library/programme-educatif-${item.slug}.pdf`,
+          featured: true,
+          published: true,
+          sortOrder: item.order,
+        },
+      });
+    }
+  }
+
   // ── Tickets de démonstration ───────────────────────────────
   const ticketCount = await db.supportTicket.count();
   if (ticketCount === 0) {
@@ -446,6 +478,7 @@ async function main() {
     testimonials: await db.testimonial.count(),
     articles: await db.article.count(),
     docs: await db.docSection.count(),
+    library: await db.libraryDocument.count(),
     versions: await db.softwareVersion.count(),
   };
   console.log("✅ Seed terminé :", counts);
