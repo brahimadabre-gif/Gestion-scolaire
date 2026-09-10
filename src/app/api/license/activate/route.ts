@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { ok, fail, handle, rateLimit, getClientIp, logAction } from "@/lib/api-helpers";
+import { ok, fail, handle, rateLimit, getClientIp, logAction, withPublicLicenseCors } from "@/lib/api-helpers";
 import { licenseActivateSchema } from "@/lib/validations";
 
 /**
@@ -13,7 +13,7 @@ import { licenseActivateSchema } from "@/lib/validations";
  * Réponse : statut d'activation + informations d'abonnement pour le logiciel.
  */
 export async function POST(req: Request) {
-  return handle(async () => {
+  return withPublicLicenseCors(await handle(async () => {
     const ip = getClientIp(req);
 
     // 1. Les clients desktop/mobile ne peuvent pas garder un secret fiable
@@ -103,5 +103,9 @@ export async function POST(req: Request) {
         name: `${license.user.firstName} ${license.user.lastName}`,
       },
     });
-  });
+  }));
+}
+
+export function OPTIONS() {
+  return withPublicLicenseCors(new Response(null, { status: 204 }));
 }

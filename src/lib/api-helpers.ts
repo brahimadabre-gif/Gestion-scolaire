@@ -12,6 +12,22 @@ export function fail(message: string, status = 400, extra?: Record<string, unkno
   return NextResponse.json({ success: false, error: message, ...extra }, { status });
 }
 
+// Les applications Windows/Android appellent uniquement les routes licence
+// depuis leur WebView. Sans ces en-têtes, le navigateur masque la réponse
+// serveur et remonte à l'application une erreur générique « Failed to fetch ».
+export function withPublicLicenseCors(response: Response): Response {
+  const headers = new Headers(response.headers);
+  headers.set("Access-Control-Allow-Origin", "*");
+  headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  headers.set("Access-Control-Allow-Headers", "Content-Type, x-gspp-client, x-api-key");
+  headers.set("Access-Control-Max-Age", "86400");
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 // Wrapper global : capture les erreurs AuthError / Zod / inattendues
 export async function handle(fn: () => Promise<Response>): Promise<Response> {
   try {

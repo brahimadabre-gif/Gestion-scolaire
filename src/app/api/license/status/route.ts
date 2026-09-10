@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { ok, fail, handle, rateLimit, getClientIp } from "@/lib/api-helpers";
+import { ok, fail, handle, rateLimit, getClientIp, withPublicLicenseCors } from "@/lib/api-helpers";
 
 /**
  * POST /api/license/status — Vérification du statut licence/abonnement (API machine à machine)
@@ -13,7 +13,7 @@ import { ok, fail, handle, rateLimit, getClientIp } from "@/lib/api-helpers";
  * Corps : { licenseKey }
  */
 export async function POST(req: Request) {
-  return handle(async () => {
+  return withPublicLicenseCors(await handle(async () => {
     const ip = getClientIp(req);
 
     // Un secret ne doit pas être embarqué dans le logiciel client. Les clients
@@ -93,5 +93,9 @@ export async function POST(req: Request) {
         establishment: license.user.establishment,
       },
     });
-  });
+  }));
+}
+
+export function OPTIONS() {
+  return withPublicLicenseCors(new Response(null, { status: 204 }));
 }
