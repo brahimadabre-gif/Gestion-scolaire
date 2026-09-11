@@ -170,13 +170,13 @@ async function main() {
 
   // ── Version logicielle ─────────────────────────────────────
   const versionData = {
-    version: "2.2.4",
+    version: "2.2.6",
     channel: "stable",
-    releaseDate: new Date("2026-09-09"),
+    releaseDate: new Date("2026-09-11"),
     fileSizeMb: 15.8,
     minOs: "Windows 10 64 bits (ou supérieur), 4 Go de RAM, 500 Mo d'espace disque",
-    installerName: "Gestion_Scolaire_Pro_Plus_v2.2.4_Groupe_EPS_fix_page_blanche_x64_Setup.exe",
-    downloadUrl: "https://gestionscolaireproplus.netlify.app/downloads/GestionScolaireProPlus-Setup.exe",
+    installerName: "Gestion_Scolaire_Pro_Plus_v2.2.6_x64_Setup.exe",
+    downloadUrl: "https://gestionscolaireproplus.netlify.app/downloads/Gestion_Scolaire_Pro_Plus_v2.2.6_x64_Setup.exe",
     changelog: [
       "## Nouveautés",
       "- **Groupe d'EPS** : création automatique des groupes par classe selon les effectifs",
@@ -186,6 +186,8 @@ async function main() {
       "- Calcul des moyennes 3 fois plus rapide sur les classes de plus de 100 élèves",
       "- Nouvelle interface de saisie des notes avec navigation au clavier",
       "## Corrections",
+      "- Activation des licences via la connexion native de l'application",
+      "- Historique public simplifié pour ne pas exposer les détails internes de sécurité",
       "- Correction des pages blanches supplémentaires lors de l'impression des documents",
       "- Correction de l'impression du module Groupe d'EPS",
       "- Stabilité accrue lors de la promotion des élèves en fin d'année",

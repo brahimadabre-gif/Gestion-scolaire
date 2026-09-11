@@ -31,7 +31,7 @@ function Hero() {
           <div className="text-center lg:text-left">
             <Badge variant="outline" className="animate-fade-up mb-5 gap-1.5 rounded-full border-emerald-600/30 bg-emerald-600/5 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-              Gestion Scolaire Pro Plus 2.2.4
+              Gestion Scolaire Pro Plus 2.2.6
             </Badge>
             <h1 className="animate-fade-up-delay-1 text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.4rem]">
               La solution complète pour <span className="gspp-gradient-text">simplifier la gestion scolaire</span>
