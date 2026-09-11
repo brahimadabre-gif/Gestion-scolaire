@@ -37,8 +37,8 @@ const subscribeNoop = () => () => {};
 const getServerOs = () => "other" as OS;
 
 const ANDROID_INSTALLER_URL =
-  "https://github.com/brahimadabre-gif/Gestion-scolaire/raw/refs/heads/main/public/downloads/gestion%20scolaire%20pro%20plus%20v%201-4.apk";
-const ANDROID_INSTALLER_NAME = "gestion scolaire pro plus v 1-4.apk";
+  "https://github.com/brahimadabre-gif/Gestion-scolaire/raw/refs/heads/main/public/downloads/gestion%20scolaire%20pro%20plus%20v%201-5.apk";
+const ANDROID_INSTALLER_NAME = "gestion scolaire pro plus v 1-5.apk";
 
 export function DownloadPage() {
   const { user, subscription } = useAuth();
