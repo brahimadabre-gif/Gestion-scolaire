@@ -8,7 +8,7 @@ export const SITE = {
   tagline: "La solution complète pour simplifier la gestion scolaire.",
   description:
     "Gagnez du temps, réduisez les erreurs et simplifiez la gestion quotidienne de votre école primaire grâce à une solution pensée pour les directeurs et enseignants : CP1, CP2, CE1, CE2, CM1, CM2, notes, bulletins, classements, certificats et administration.",
-  url: "https://www.gestionscolaireproplus.com",
+  url: "https://gestionscolaire.pro",
   email: "brahimadabre@yahoo.com",
   phone: "+2250709933364",
   city: "Abidjan, Côte d'Ivoire",

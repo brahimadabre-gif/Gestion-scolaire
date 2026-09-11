@@ -26,6 +26,9 @@ export const metadata: Metadata = {
   creator: "Gestion Scolaire Pro Plus",
   publisher: "Gestion Scolaire Pro Plus",
   applicationName: "Gestion Scolaire Pro Plus",
+  alternates: {
+    canonical: SITE.url,
+  },
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/favicon.svg" }],
@@ -73,7 +76,6 @@ const jsonLd = {
   offers: [
     { "@type": "Offer", name: "Gestion Scolaire Pro Plus", price: "15000", priceCurrency: "XOF", description: "Accès pendant 12 mois sur Windows et Android" },
   ],
-  aggregateRating: { "@type": "AggregateRating", ratingValue: "4.8", ratingCount: "0" },
 };
 
 export default function RootLayout({

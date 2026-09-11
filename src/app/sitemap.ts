@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 import { SITE } from "@/lib/site";
 
-// Sitemap — le site est une SPA monopage (routeur par hash) :
-// les ancres principales sont référencées comme sections de la page racine.
+// Sitemap — les ancres hash sont conservées pour le routeur client historique.
+// L'URL canonique reste la page publique principale.
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = SITE.url;
   const now = new Date();
