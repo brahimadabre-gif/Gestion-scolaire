@@ -164,6 +164,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ entity: 
       });
       return ok(items);
     }
+    if (entity === "subscriptions") {
+      const items = await db.subscription.findMany({
+        include: {
+          user: { select: { firstName: true, lastName: true, email: true } },
+          plan: true,
+        },
+        orderBy: { createdAt: "desc" },
+      });
+      return ok(items);
+    }
     const items = await entry.delegate.findMany();
     if (entity === "plans") {
       return ok((items as { features: string }[]).map((it) => ({ ...it, features: JSON.parse(it.features || "[]") })));

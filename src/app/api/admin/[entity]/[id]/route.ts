@@ -203,6 +203,11 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ entit
       tickets: () => db.supportTicket.delete({ where: { id } }),
       // Supprimer uniquement l'historique du paiement, sans toucher à l'abonnement ni à la licence.
       payments: () => db.payment.delete({ where: { id } }),
+      // Supprimer l'abonnement et ses dépendances sans supprimer le compte client.
+      subscriptions: () => db.$transaction(async (tx) => {
+        await tx.licenseKey.deleteMany({ where: { subscriptionId: id } });
+        return tx.subscription.delete({ where: { id } });
+      }),
     };
     const del = DELETABLE[entity];
     if (!del) return fail("Suppression non permise pour cette entité.", 400);

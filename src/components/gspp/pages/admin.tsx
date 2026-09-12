@@ -495,6 +495,19 @@ function AdminSubscriptions() {
     return updateSubscription(id, { endDate: date }, "Date de fin enregistrée.");
   };
 
+  const deleteSubscription = async (id: unknown, reference: string) => {
+    if (!window.confirm(`Supprimer définitivement l’abonnement ${reference} et ses paiements/licences associés ? Le compte client sera conservé.`)) return;
+    try {
+      await api.delete(`/api/admin/subscriptions/${id}`);
+      toast.success("Abonnement supprimé.");
+      await queryClient.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin", "payments"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin", "stats"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Suppression impossible.");
+    }
+  };
+
   return (
     <div>
       <h2 className="text-lg font-bold">Abonnements</h2>
@@ -509,6 +522,7 @@ function AdminSubscriptions() {
             <thead>
               <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <th className="px-4 py-3 font-semibold">Référence</th>
+                <th className="px-4 py-3 font-semibold">Abonné</th>
                 <th className="px-4 py-3 font-semibold">Formule</th>
                 <th className="px-4 py-3 font-semibold">Cycle</th>
                 <th className="px-4 py-3 font-semibold">Période</th>
@@ -523,6 +537,11 @@ function AdminSubscriptions() {
                 return (
                   <tr key={String(s.id)} className="transition hover:bg-secondary/40">
                     <td className="px-4 py-3 font-mono text-xs font-semibold">{String(s.reference)}</td>
+                    <td className="px-4 py-3">
+                      {s.user && typeof s.user === "object"
+                        ? `${String((s.user as Record<string, unknown>).firstName ?? "")} ${String((s.user as Record<string, unknown>).lastName ?? "")}`.trim()
+                        : "—"}
+                    </td>
                     <td className="px-4 py-3">{plan ? String(plan.name) : "—"}</td>
                     <td className="px-4 py-3 text-muted-foreground">{s.billingCycle === "annual" ? "Annuel" : "Mensuel"}</td>
                     <td className="px-4 py-3 text-xs text-muted-foreground">
@@ -565,6 +584,15 @@ function AdminSubscriptions() {
                             Annuler
                           </Button>
                         )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 rounded-full text-xs text-destructive"
+                          onClick={() => deleteSubscription(s.id, String(s.reference ?? s.id))}
+                          title="Supprimer cet abonnement"
+                        >
+                          Supprimer
+                        </Button>
                       </div>
                     </td>
                   </tr>
