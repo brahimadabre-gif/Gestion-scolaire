@@ -201,6 +201,8 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ entit
       versions: () => db.softwareVersion.delete({ where: { id } }),
       plans: () => db.subscriptionPlan.delete({ where: { id } }),
       tickets: () => db.supportTicket.delete({ where: { id } }),
+      // Supprimer uniquement l'historique du paiement, sans toucher à l'abonnement ni à la licence.
+      payments: () => db.payment.delete({ where: { id } }),
     };
     const del = DELETABLE[entity];
     if (!del) return fail("Suppression non permise pour cette entité.", 400);

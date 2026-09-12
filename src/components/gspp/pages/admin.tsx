@@ -598,6 +598,18 @@ function AdminPayments() {
     }
   };
 
+  const deletePayment = async (id: unknown, reference: string) => {
+    if (!window.confirm(`Supprimer définitivement le paiement ${reference} ? Cette action ne supprimera pas l’abonnement ni la licence.`)) return;
+    try {
+      await api.delete(`/api/admin/payments/${id}`);
+      toast.success("Paiement supprimé.");
+      await queryClient.invalidateQueries({ queryKey: ["admin", "payments"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin", "stats"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Suppression impossible.");
+    }
+  };
+
   return (
     <div>
       <h2 className="text-lg font-bold">Paiements & factures</h2>
@@ -662,6 +674,15 @@ function AdminPayments() {
                           </Button>
                         </>
                       )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8 rounded-full text-xs text-destructive"
+                        onClick={() => deletePayment(p.id, String(p.reference ?? p.id))}
+                        title="Supprimer ce paiement"
+                      >
+                        Supprimer
+                      </Button>
                     </div>
                   </td>
                 </tr>
