@@ -36,9 +36,10 @@ function getClientOs(): OS {
 const subscribeNoop = () => () => {};
 const getServerOs = () => "other" as OS;
 
-const ANDROID_INSTALLER_URL =
-  "https://github.com/brahimadabre-gif/Gestion-scolaire/raw/refs/heads/main/public/downloads/gestion%20scolaire%20pro%20plus%20v%201-5.apk";
-const ANDROID_INSTALLER_NAME = "gestion scolaire pro plus v 1-5.apk";
+const ANDROID_INSTALLER_URL = "/downloads/APK-Gestion-Scolaire-Pro-v1.5.1.apk";
+const ANDROID_INSTALLER_NAME = "APK-Gestion-Scolaire-Pro-v1.5.1.apk";
+const ANDROID_VERSION = "1.5.1";
+const ANDROID_FILE_SIZE = "8,5 Mo";
 
 export function DownloadPage() {
   const { user, subscription } = useAuth();
@@ -137,7 +138,7 @@ export function DownloadPage() {
                       onClick={() => window.open(ANDROID_INSTALLER_URL, "_blank", "noopener")}
                     >
                       <DownloadIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-                      Télécharger pour Android (8,9 Mo)
+                      Télécharger pour Android v{ANDROID_VERSION} ({ANDROID_FILE_SIZE})
                     </Button>
                   ) : (
                     <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-800 dark:text-amber-300">
