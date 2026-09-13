@@ -175,6 +175,29 @@ export interface PaymentRecord {
   subscription?: { plan?: { name: string; slug: string } };
 }
 
+export interface AmbassadorReferral {
+  id: string;
+  client: { firstName: string; lastName: string; email: string };
+  codeSubmitted: string;
+  status: string;
+  commissionAmount: number;
+  commissionStatus: string;
+  confirmedAt: string | null;
+  createdAt: string;
+  subscription: { reference: string; status: string; createdAt: string } | null;
+}
+
+export interface AmbassadorReferralsResponse {
+  code: string;
+  commissionAmount: number;
+  referrals: AmbassadorReferral[];
+  totalReferred: number;
+  totalConfirmed: number;
+  totalPending: number;
+  totalCommissions: number;
+  totalBonuses: number;
+}
+
 export interface TicketRecord {
   id: string;
   reference: string;

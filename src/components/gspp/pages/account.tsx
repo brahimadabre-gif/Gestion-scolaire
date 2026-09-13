@@ -3,7 +3,7 @@
 // ── Espace client — tableau de bord + paiements/factures ────
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, PaymentRecord, SubscriptionRecord } from "../api";
+import { api, AmbassadorReferralsResponse, PaymentRecord, SubscriptionRecord } from "../api";
 import { Link, navigate } from "../router";
 import { useAuth } from "../auth-context";
 import { Section, StatusBadge, Spinner, ErrorNote } from "../ui-bits";
@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import {
   Download, CreditCard, Receipt, BookOpen, LifeBuoy, Building2, Mail, Phone,
   Globe2, ShieldCheck, Copy, KeyRound, CalendarDays, Clock3, MonitorSmartphone,
-  ArrowRight, CircleAlert, UserCircle2, Loader2, CheckCircle2,
+  ArrowRight, CircleAlert, UserCircle2, Loader2, CheckCircle2, Users, UserCheck,
 } from "lucide-react";
 
 // ── Tableau de bord ──────────────────────────────────────────
@@ -40,6 +40,13 @@ export function AccountDashboard() {
   const progress = subscription?.status === "ACTIVE" && totalDurationDays > 0
     ? Math.round((subscription.daysRemaining / totalDurationDays) * 100)
     : 0;
+
+  const isAmbassador = user.role === "AMBASSADOR";
+  const { data: ambassadorData, isLoading: ambassadorLoading } = useQuery<AmbassadorReferralsResponse>({
+    queryKey: ["ambassador", "referrals"],
+    queryFn: () => api.get<AmbassadorReferralsResponse>("/api/ambassador/referrals"),
+    enabled: isAmbassador,
+  });
 
   return (
     <main id="contenu" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -199,6 +206,87 @@ export function AccountDashboard() {
         ))}
       </div>
 
+      {isAmbassador && (
+        <section className="mt-10" aria-labelledby="ambassador-referrals-title">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 dark:text-emerald-400">
+                Programme ambassadeur
+              </p>
+              <h2 id="ambassador-referrals-title" className="mt-1 flex items-center gap-2 text-lg font-bold">
+                <UserCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                Mes recommandations
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Suivez les clients qui ont utilisé votre code et vos commissions.
+              </p>
+            </div>
+            {ambassadorData?.code && (
+              <div className="rounded-xl border border-emerald-600/30 bg-emerald-600/5 px-4 py-2 text-sm">
+                Mon code : <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">{ambassadorData.code}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-3">
+            {[
+              { label: "Clients recommandés", value: ambassadorData?.totalReferred ?? 0, icon: Users },
+              { label: "Abonnements confirmés", value: ambassadorData?.totalConfirmed ?? 0, icon: CheckCircle2 },
+              { label: "Commissions validées", value: formatFcfa((ambassadorData?.totalCommissions ?? 0) + (ambassadorData?.totalBonuses ?? 0)), icon: CreditCard },
+            ].map((stat) => (
+              <div key={stat.label} className="rounded-2xl border bg-card p-4">
+                <stat.icon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                <p className="mt-3 text-xl font-extrabold">{stat.value}</p>
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5 overflow-x-auto rounded-2xl border bg-card">
+            {ambassadorLoading ? <div className="p-10"><Spinner /></div> : (
+              <table className="w-full min-w-[760px] text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                    <th className="px-5 py-3 font-semibold">Client recommandé</th>
+                    <th className="px-4 py-3 font-semibold">Date</th>
+                    <th className="px-4 py-3 font-semibold">Abonnement</th>
+                    <th className="px-4 py-3 font-semibold">Statut</th>
+                    <th className="px-5 py-3 font-semibold">Commission</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {(ambassadorData?.referrals ?? []).map((referral) => {
+                    const confirmed = referral.status === "CONFIRMED";
+                    return (
+                      <tr key={referral.id} className="transition hover:bg-secondary/40">
+                        <td className="px-5 py-3.5">
+                          <p className="font-semibold">{referral.client.firstName} {referral.client.lastName}</p>
+                          <p className="text-xs text-muted-foreground">{referral.client.email}</p>
+                        </td>
+                        <td className="px-4 py-3.5 text-muted-foreground">{formatDate(referral.createdAt)}</td>
+                        <td className="px-4 py-3.5 font-mono text-xs">{referral.subscription?.reference ?? "En attente"}</td>
+                        <td className="px-4 py-3.5">
+                          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${confirmed ? "bg-emerald-600/10 text-emerald-700 dark:text-emerald-400" : "bg-amber-500/10 text-amber-800 dark:text-amber-300"}`}>
+                            {confirmed ? "Paiement confirmé" : referral.status === "PAYMENT_PENDING" ? "Paiement en attente" : "Inscrit"}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5 font-semibold">
+                          {formatFcfa(referral.commissionAmount)}
+                          <span className="ml-1 text-xs font-normal text-muted-foreground">({referral.commissionStatus === "PENDING" ? "en attente" : "validée"})</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {!ambassadorData?.referrals.length && (
+                    <tr><td colSpan={5} className="px-5 py-10 text-center text-muted-foreground">Aucun client n&apos;a encore utilisé votre code.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Informations du compte */}
       <h2 className="mt-10 text-lg font-bold">Mon compte</h2>
       <div className="mt-4 grid gap-5 lg:grid-cols-2">
@@ -224,7 +312,7 @@ export function AccountDashboard() {
             )}
             <div className="flex justify-between gap-4">
               <dt className="text-muted-foreground">Rôle</dt>
-              <dd className="font-semibold">{user.role === "ADMIN" ? "Administrateur" : user.role === "SUPPORT" ? "Support" : "Utilisateur"}</dd>
+              <dd className="font-semibold">{user.role === "ADMIN" ? "Administrateur" : user.role === "SUPPORT" ? "Support" : user.role === "AMBASSADOR" ? "Ambassadeur" : "Utilisateur"}</dd>
             </div>
           </dl>
         </div>
