@@ -56,6 +56,11 @@ export async function POST(req: Request) {
       },
     });
 
+    await db.referral.updateMany({
+      where: { clientUserId: user.id, status: "REGISTERED" },
+      data: { subscriptionId: sub.id, status: "PAYMENT_PENDING" },
+    });
+
     const payment = await db.payment.create({
       data: {
         reference: generateReference("PAY"),

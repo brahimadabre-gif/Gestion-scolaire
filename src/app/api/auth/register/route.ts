@@ -18,6 +18,11 @@ export async function POST(req: Request) {
     const body = await req.json();
     const data = registerSchema.parse(body);
 
+    const ambassador = data.ambassadorCode
+      ? await db.ambassador.findFirst({ where: { code: data.ambassadorCode.toUpperCase(), active: true } })
+      : null;
+    if (data.ambassadorCode && !ambassador) return fail("Code ambassadeur invalide ou inactif.", 422);
+
     const existing = await db.user.findUnique({ where: { email: data.email.toLowerCase() } });
     if (existing) {
       return fail("Un compte existe déjà avec cette adresse e-mail.", 409);
@@ -36,6 +41,17 @@ export async function POST(req: Request) {
         emailVerified: true, // Vérification par e-mail à activer lors de l'intégration du service SMTP
       },
     });
+
+    if (ambassador) {
+      await db.referral.create({
+        data: {
+          ambassadorId: ambassador.id,
+          clientUserId: user.id,
+          codeSubmitted: ambassador.code,
+          commissionAmount: ambassador.commissionAmount,
+        },
+      });
+    }
 
     // Session automatique après inscription
     const token = await createSessionToken({ userId: user.id, email: user.email, role: user.role });

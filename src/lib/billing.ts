@@ -75,6 +75,11 @@ export async function confirmPaymentAndActivate(
       },
     });
 
+    await tx.referral.updateMany({
+      where: { subscriptionId: sub.id, status: "PAYMENT_PENDING" },
+      data: { status: "CONFIRMED", commissionStatus: "VALIDATED", confirmedAt: now },
+    });
+
     return { payment: updatedPayment, subscription: updatedSub, license };
   });
 }

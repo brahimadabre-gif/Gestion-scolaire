@@ -922,6 +922,39 @@ function AdminSettings() {
 // ═════════════════════════════════════════════════════════════
 // Page Administration
 // ═════════════════════════════════════════════════════════════
+function AdminAmbassadors() {
+  const queryClient = useQueryClient();
+  const { data: ambassadors, isLoading } = useQuery<Record<string, unknown>[]>({
+    queryKey: ["admin", "ambassadors"],
+    queryFn: () => api.get<Record<string, unknown>[]>("/api/admin/ambassadors"),
+  });
+  const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", phone: "", password: "", commissionAmount: "1500" });
+  const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((current) => ({ ...current, [key]: e.target.value }));
+  const create = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSaving(true);
+    try {
+      await api.post("/api/admin/ambassadors", { ...form, commissionAmount: Number(form.commissionAmount) });
+      toast.success("Compte ambassadeur créé.");
+      setForm({ firstName: "", lastName: "", email: "", phone: "", password: "", commissionAmount: "1500" });
+      setOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ["admin", "ambassadors"] });
+    } catch (err) { toast.error(err instanceof Error ? err.message : "Création impossible."); }
+    finally { setSaving(false); }
+  };
+  const updateCommission = async (id: string, value: string) => {
+    try { await api.patch(`/api/admin/ambassadors/${id}`, { commissionAmount: Number(value) }); await queryClient.invalidateQueries({ queryKey: ["admin", "ambassadors"] }); toast.success("Commission mise à jour."); }
+    catch (err) { toast.error(err instanceof Error ? err.message : "Modification impossible."); }
+  };
+  return <div>
+    <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-lg font-bold">Ambassadeurs</h2><p className="text-sm text-muted-foreground">Créez les comptes, suivez les recommandations et fixez la commission par abonnement confirmé.</p></div><Button className="rounded-full" onClick={() => setOpen(!open)}><Plus className="mr-1.5 h-4 w-4" aria-hidden="true" /> Créer un ambassadeur</Button></div>
+    {open && <form onSubmit={create} className="mt-5 grid gap-4 rounded-2xl border bg-card p-5 sm:grid-cols-2 lg:grid-cols-3"><Input value={form.firstName} onChange={set("firstName")} placeholder="Prénom" required /><Input value={form.lastName} onChange={set("lastName")} placeholder="Nom" required /><Input type="email" value={form.email} onChange={set("email")} placeholder="E-mail" required /><Input value={form.phone} onChange={set("phone")} placeholder="Téléphone" /><Input type="password" value={form.password} onChange={set("password")} placeholder="Mot de passe temporaire" required minLength={8} /><Input type="number" value={form.commissionAmount} onChange={set("commissionAmount")} placeholder="Commission (FCFA)" min={0} required /><div className="flex gap-2 sm:col-span-2 lg:col-span-3"><Button type="submit" disabled={saving}>{saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}Créer le compte</Button><Button type="button" variant="outline" onClick={() => setOpen(false)}>Annuler</Button></div></form>}
+    {isLoading ? <Spinner /> : <div className="mt-5 overflow-x-auto rounded-2xl border"><table className="w-full min-w-[800px] text-sm"><thead><tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground"><th className="px-4 py-3">Ambassadeur</th><th className="px-4 py-3">Code</th><th className="px-4 py-3">Abonnements confirmés</th><th className="px-4 py-3">Commission</th><th className="px-4 py-3">Gains</th></tr></thead><tbody className="divide-y">{(ambassadors ?? []).map((a) => { const u = a.user as Record<string, unknown>; return <tr key={String(a.id)}><td className="px-4 py-3"><strong>{String(u?.firstName ?? "")} {String(u?.lastName ?? "")}</strong><span className="block text-xs text-muted-foreground">{String(u?.email ?? "")}</span></td><td className="px-4 py-3 font-mono text-xs">{String(a.code)}</td><td className="px-4 py-3">{String(a.totalConfirmed ?? 0)}</td><td className="px-4 py-3"><Input className="w-32" type="number" defaultValue={String(a.commissionAmount ?? 1500)} min={0} onBlur={(e) => updateCommission(String(a.id), e.target.value)} /></td><td className="px-4 py-3 font-semibold text-emerald-700">{formatFcfa(Number(a.totalCommissions ?? 0) + Number(a.totalBonuses ?? 0))}</td></tr>; })}{!ambassadors?.length && <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">Aucun ambassadeur enregistré.</td></tr>}</tbody></table></div>}
+  </div>;
+}
+
 export function AdminPage() {
   const { user, isLoading, isAdmin } = useAuth();
 
@@ -952,6 +985,7 @@ export function AdminPage() {
     { id: "users", label: "Utilisateurs", icon: Users },
     { id: "subscriptions", label: "Abonnements", icon: ArrowUpCircle },
     { id: "payments", label: "Paiements", icon: Receipt },
+    { id: "ambassadors", label: "Ambassadeurs", icon: UserCheck },
     { id: "tickets", label: "Tickets", icon: LifeBuoy },
     { id: "plans", label: "Formules", icon: Package },
     { id: "versions", label: "Versions", icon: Download },
@@ -990,6 +1024,7 @@ export function AdminPage() {
         <TabsContent value="users" className="mt-6"><AdminUsers /></TabsContent>
         <TabsContent value="subscriptions" className="mt-6"><AdminSubscriptions /></TabsContent>
         <TabsContent value="payments" className="mt-6"><AdminPayments /></TabsContent>
+        <TabsContent value="ambassadors" className="mt-6"><AdminAmbassadors /></TabsContent>
         <TabsContent value="tickets" className="mt-6"><AdminTickets /></TabsContent>
 
         <TabsContent value="plans" className="mt-6">

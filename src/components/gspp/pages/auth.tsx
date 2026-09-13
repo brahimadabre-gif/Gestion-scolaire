@@ -177,7 +177,7 @@ export function RegisterPage() {
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", phone: "",
-    password: "", confirmPassword: "", establishment: "", country: "Côte d'Ivoire",
+    password: "", confirmPassword: "", establishment: "", country: "Côte d'Ivoire", ambassadorCode: "",
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -185,6 +185,10 @@ export function RegisterPage() {
   useEffect(() => {
     if (user) navigate("/compte");
   }, [user]);
+
+  useEffect(() => {
+    if (route.query.ambassadeur) set("ambassadorCode")(route.query.ambassadeur.toUpperCase());
+  }, [route.query.ambassadeur]);
 
   const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -240,6 +244,11 @@ export function RegisterPage() {
             <Label htmlFor="reg-lastname">Nom *</Label>
             <Input id="reg-lastname" value={form.lastName} onChange={(e) => set("lastName")(e.target.value)} placeholder="Traoré" autoComplete="family-name" required />
           </div>
+        </div>
+        <div className="space-y-1.5 rounded-2xl border border-emerald-600/20 bg-emerald-600/5 p-4">
+          <Label htmlFor="reg-ambassador">Code ambassadeur (si vous avez été recommandé)</Label>
+          <Input id="reg-ambassador" value={form.ambassadorCode} onChange={(e) => set("ambassadorCode")(e.target.value.toUpperCase())} placeholder="AMB-XXXX-000000" autoComplete="off" />
+          <p className="text-xs text-muted-foreground">Ce code permet d&apos;attribuer votre inscription à l&apos;ambassadeur qui vous a recommandé.</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">

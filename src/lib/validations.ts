@@ -22,6 +22,7 @@ export const registerSchema = z
     confirmPassword: z.string(),
     establishment: z.string().trim().max(120).optional().or(z.literal("")),
     country: z.string().trim().min(2).max(80).default("Côte d'Ivoire"),
+    ambassadorCode: z.string().trim().max(40).optional().or(z.literal("")),
   })
   .refine((d) => d.password === d.confirmPassword, {
     message: "Les mots de passe ne correspondent pas",
