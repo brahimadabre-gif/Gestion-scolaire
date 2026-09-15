@@ -3,6 +3,45 @@ import { ok, fail, handle, rateLimit, getClientIp, logAction, assertSameOrigin }
 import { forgotPasswordSchema } from "@/lib/validations";
 import { generateResetToken } from "@/lib/auth";
 
+const genericMessage =
+  "Si un compte existe avec cette adresse, un lien de réinitialisation vient d'être envoyé. Vérifiez votre boîte de réception et vos spams.";
+
+async function sendResetEmail(email: string, rawToken: string) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.MAIL_FROM ?? "support@gestionscolaire.pro";
+  const appUrl = process.env.APP_URL ?? "https://gestionscolaire.pro";
+
+  if (!apiKey) throw new Error("RESEND_API_KEY non configurée");
+
+  const resetUrl = `${appUrl}/#/mot-de-passe-oublie?token=${encodeURIComponent(rawToken)}`;
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: [email],
+      subject: "Réinitialisation de votre mot de passe",
+      html: `
+        <div style="font-family:Arial,sans-serif;line-height:1.6;color:#102322;max-width:600px;margin:auto">
+          <h2>Réinitialisation du mot de passe</h2>
+          <p>Vous avez demandé la réinitialisation de votre mot de passe Gestion Scolaire Pro Plus.</p>
+          <p><a href="${resetUrl}" style="display:inline-block;background:#008b68;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none">Réinitialiser mon mot de passe</a></p>
+          <p>Ce lien est valable pendant une heure. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.</p>
+        </div>
+      `,
+      text: `Réinitialisez votre mot de passe ici : ${resetUrl}\n\nCe lien est valable pendant une heure.`,
+    }),
+  });
+
+  if (!response.ok) {
+    const details = await response.text();
+    throw new Error(`Échec de l'envoi Resend (${response.status}): ${details}`);
+  }
+}
+
 export async function POST(req: Request) {
   return handle(async () => {
     assertSameOrigin(req);
@@ -16,9 +55,6 @@ export async function POST(req: Request) {
     const user = await db.user.findUnique({ where: { email: data.email.toLowerCase() } });
 
     // Réponse identique que le compte existe ou non (anti-énumération)
-    const genericMessage =
-      "Si un compte existe avec cette adresse, un lien de réinitialisation vient d'être envoyé. Vérifiez votre boîte de réception et vos spams.";
-
     if (user) {
       const { raw, hashed } = generateResetToken();
       await db.passwordResetToken.create({
@@ -30,10 +66,13 @@ export async function POST(req: Request) {
       });
       await logAction("PASSWORD_RESET_REQUEST", user.id, `Demande de réinitialisation`, ip);
 
-      // NOTE INTÉGRATION E-MAIL : envoyer `raw` par e-mail via le service SMTP configuré.
-      // En environnement de développement sans SMTP, le lien est retourné pour les tests.
-      const devLink = `/#/mot-de-passe-oublie?token=${raw}`;
-      return ok({ message: genericMessage, devLink });
+      try {
+        await sendResetEmail(user.email, raw);
+      } catch (error) {
+        await db.passwordResetToken.deleteMany({ where: { token: hashed } });
+        console.error("PASSWORD_RESET_EMAIL_FAILED", error);
+        return fail("Le service d'e-mail est momentanément indisponible. Réessayez plus tard.", 503);
+      }
     }
 
     return ok({ message: genericMessage });

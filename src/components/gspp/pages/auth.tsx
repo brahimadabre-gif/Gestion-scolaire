@@ -317,7 +317,7 @@ function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState<{ message: string; devLink?: string } | null>(null);
+  const [sent, setSent] = useState<{ message: string } | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -325,7 +325,7 @@ function ForgotPasswordForm() {
     setError(null);
     setLoading(true);
     try {
-      const res = await api.post<{ message: string; devLink?: string }>("/api/auth/forgot-password", { email });
+      const res = await api.post<{ message: string }>("/api/auth/forgot-password", { email });
       setSent(res);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Demande impossible.");
@@ -344,17 +344,6 @@ function ForgotPasswordForm() {
         <div className="space-y-4 text-center">
           <MailCheck className="mx-auto h-12 w-12 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
           <p className="text-sm leading-relaxed text-muted-foreground">{sent.message}</p>
-          {/* Environnement de démonstration sans service e-mail : le lien s'affiche ici.
-              En production, ce bloc disparaît dès que le SMTP est configuré. */}
-          {sent.devLink && (
-            <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 text-left text-xs leading-relaxed text-amber-800 dark:text-amber-300">
-              <p className="font-semibold">Mode démonstration (service e-mail non configuré)</p>
-              <p className="mt-1">En production, ce lien serait envoyé uniquement par e-mail. Pour tester :</p>
-              <a href={sent.devLink} className="mt-2 block break-all font-mono font-semibold text-primary underline underline-offset-4">
-                {sent.devLink}
-              </a>
-            </div>
-          )}
         </div>
       ) : (
         <form onSubmit={submit} className="space-y-4" noValidate>
