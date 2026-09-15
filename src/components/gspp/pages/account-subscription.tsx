@@ -87,8 +87,15 @@ export function AccountSubscriptionPage() {
   };
 
   // Le paiement est vérifié manuellement après réception de la preuve.
-  const contactAfterPayment = () => {
-    window.open("https://wa.me/2250709933364", "_blank", "noopener,noreferrer");
+  const contactAfterPayment = (paymentReference?: string) => {
+    const message = [
+      "Bonjour, mon paiement de 15 000 FCFA a été effectué.",
+      `Nom : ${user.firstName} ${user.lastName}`,
+      `E-mail : ${user.email}`,
+      `Référence : ${paymentReference ?? "Non disponible"}`,
+      "Merci de vérifier la preuve jointe et d’activer mon abonnement.",
+    ].join("\n");
+    window.open(`https://wa.me/2250709933364?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
   };
 
   // ── Écran de félicitations après activation ────────────────
@@ -137,6 +144,14 @@ export function AccountSubscriptionPage() {
     const payment = pendingSub.payments?.find((p) => p.status === "PENDING");
     const pendingPlan = pendingSub.plan;
     const pendingAmount = payment?.amount ?? 0;
+    const whatsappMessage = [
+      "Bonjour, mon paiement de 15 000 FCFA a été effectué.",
+      `Nom : ${user.firstName} ${user.lastName}`,
+      `E-mail : ${user.email}`,
+      `Référence : ${payment?.reference ?? "Non disponible"}`,
+      "Merci de vérifier la preuve jointe et d’activer mon abonnement.",
+    ].join("\n");
+    const whatsappHref = `https://wa.me/2250709933364?text=${encodeURIComponent(whatsappMessage)}`;
     return (
       <main id="contenu" className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
         <Button variant="ghost" size="sm" className="mb-5 -ml-2 rounded-full" onClick={() => navigate("/compte/abonnement")}>
@@ -205,7 +220,7 @@ export function AccountSubscriptionPage() {
                 </div>
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Contact</p>
-                  <a className="mt-1 block font-semibold text-emerald-700 hover:underline" href="https://wa.me/2250709933364">WhatsApp / appel</a>
+                  <a className="mt-1 block font-semibold text-emerald-700 hover:underline" href={whatsappHref}>WhatsApp / appel</a>
                 </div>
               </div>
             </div>
@@ -223,7 +238,7 @@ export function AccountSubscriptionPage() {
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Numéro Orange Money</p>
                 <p className="mt-1 font-mono text-xl font-bold">+225 07 09 93 33 64</p>
                 <p className="mt-3 text-sm"><strong>Montant :</strong> {formatFcfa(pendingAmount)}</p>
-                <a className="mt-3 inline-block font-semibold text-emerald-700 hover:underline" href="https://wa.me/2250709933364">Envoyer la preuve par WhatsApp / appeler</a>
+                <a className="mt-3 inline-block font-semibold text-emerald-700 hover:underline" href={whatsappHref}>Envoyer la preuve par WhatsApp / appeler</a>
               </div>
             </div>
           )}
@@ -233,7 +248,7 @@ export function AccountSubscriptionPage() {
           <Button
             size="lg"
             className="mt-6 w-full rounded-full text-base"
-            onClick={contactAfterPayment}
+            onClick={() => contactAfterPayment(payment?.reference)}
             disabled={payment?.status !== "PENDING"}
           >
             <Smartphone className="mr-2 h-4 w-4" aria-hidden="true" /> J&apos;ai payé — envoyer la preuve par WhatsApp
