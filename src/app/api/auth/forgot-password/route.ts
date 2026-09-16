@@ -7,24 +7,24 @@ const genericMessage =
   "Si un compte existe avec cette adresse, un lien de réinitialisation vient d'être envoyé. Vérifiez votre boîte de réception et vos spams.";
 
 async function sendResetEmail(email: string, rawToken: string) {
-  const apiKey = process.env.BREVO_API_KEY;
+  const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.MAIL_FROM ?? "support@gestionscolaire.pro";
   const appUrl = process.env.APP_URL ?? "https://gestionscolaire.pro";
 
-  if (!apiKey) throw new Error("BREVO_API_KEY non configurée");
+  if (!apiKey) throw new Error("RESEND_API_KEY non configurée");
 
   const resetUrl = `${appUrl}/#/mot-de-passe-oublie?token=${encodeURIComponent(rawToken)}`;
-  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+  const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      "api-key": apiKey,
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      sender: { email: from, name: "Gestion Scolaire Pro Plus" },
-      to: [{ email }],
+      from,
+      to: [email],
       subject: "Réinitialisation de votre mot de passe",
-      htmlContent: `
+      html: `
         <div style="font-family:Arial,sans-serif;line-height:1.6;color:#102322;max-width:600px;margin:auto">
           <h2>Réinitialisation du mot de passe</h2>
           <p>Vous avez demandé la réinitialisation de votre mot de passe Gestion Scolaire Pro Plus.</p>
@@ -32,13 +32,13 @@ async function sendResetEmail(email: string, rawToken: string) {
           <p>Ce lien est valable pendant une heure. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.</p>
         </div>
       `,
-      textContent: `Réinitialisez votre mot de passe ici : ${resetUrl}\n\nCe lien est valable pendant une heure.`,
+      text: `Réinitialisez votre mot de passe ici : ${resetUrl}\n\nCe lien est valable pendant une heure.`,
     }),
   });
 
   if (!response.ok) {
     const details = await response.text();
-    throw new Error(`Échec de l'envoi Brevo (${response.status}): ${details}`);
+    throw new Error(`Échec de l'envoi Resend (${response.status}): ${details}`);
   }
 }
 
