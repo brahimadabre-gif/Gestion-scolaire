@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { ok, fail, handle, rateLimit, getClientIp, logAction, assertSameOrigin } from "@/lib/api-helpers";
 import { registerSchema } from "@/lib/validations";
+import { normalizePhoneNumber } from "@/lib/phone";
 import { hashPassword, createSessionToken, SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
 
 export async function POST(req: Request) {
@@ -16,7 +17,14 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const data = registerSchema.parse(body);
+    const parsed = registerSchema.safeParse(body);
+    if (!parsed.success) {
+      const phoneIssue = parsed.error.issues.find((issue) => issue.path[0] === "phone");
+      return fail(phoneIssue?.message ?? parsed.error.issues[0]?.message ?? "Données invalides", 422);
+    }
+    const data = parsed.data;
+    const phone = normalizePhoneNumber(data.phone, data.country);
+    if (!phone) return fail("Veuillez saisir un numéro de téléphone valide.", 422);
 
     const ambassador = data.ambassadorCode
       ? await db.ambassador.findFirst({ where: { code: data.ambassadorCode.toUpperCase(), active: true } })
@@ -34,7 +42,7 @@ export async function POST(req: Request) {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email.toLowerCase(),
-        phone: data.phone || null,
+        phone,
         password: hashed,
         establishment: data.establishment || null,
         country: data.country,

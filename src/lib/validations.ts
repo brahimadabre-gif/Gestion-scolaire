@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { phoneValidationMessage } from "./phone";
 
 // ── Schémas de validation Zod (validation côté serveur) ──────
 
@@ -7,12 +8,12 @@ export const registerSchema = z
     firstName: z.string().trim().min(2, "Le prénom doit contenir au moins 2 caractères").max(60),
     lastName: z.string().trim().min(2, "Le nom doit contenir au moins 2 caractères").max(60),
     email: z.string().trim().email("Adresse e-mail invalide").max(120),
-    phone: z
-      .string()
-      .trim()
-      .regex(/^[+0-9 ().-]{8,20}$/, "Numéro de téléphone invalide")
-      .optional()
-      .or(z.literal("")),
+    phone: z.preprocess(
+      (value) => (typeof value === "string" ? value.trim() : value),
+      z.string({ error: "Le numéro de téléphone est obligatoire." })
+        .min(1, "Le numéro de téléphone est obligatoire.")
+        .max(40, "Veuillez saisir un numéro de téléphone valide."),
+    ),
     password: z
       .string()
       .min(8, "Le mot de passe doit contenir au moins 8 caractères")
@@ -27,6 +28,10 @@ export const registerSchema = z
   .refine((d) => d.password === d.confirmPassword, {
     message: "Les mots de passe ne correspondent pas",
     path: ["confirmPassword"],
+  })
+  .superRefine((data, ctx) => {
+    const message = phoneValidationMessage(data.phone, data.country);
+    if (message) ctx.addIssue({ code: "custom", path: ["phone"], message });
   });
 
 export const loginSchema = z.object({

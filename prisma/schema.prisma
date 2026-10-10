@@ -156,17 +156,21 @@ model AmbassadorBonus {
 model LicenseKey {
   id                String        @id @default(cuid())
   key               String        @unique
-  userId            String
-  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String?
+  user              User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
   subscriptionId    String?
   subscription      Subscription? @relation(fields: [subscriptionId], references: [id])
   status            String        @default("INACTIVE") // INACTIVE | ACTIVE | REVOKED
+  validityMonths    Int?          // défini pour les codes à durée différée créés par l'administration
   activatedAt       DateTime?
+  expiresAt         DateTime?     // fixé à la première activation pour les licences directes
   lastCheckAt       DateTime?
   deviceFingerprint String?
   maxDevices        Int           @default(1)
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
+
+  @@index([status, createdAt])
 }
 
 // ─────────────────────────────────────────────────────────────

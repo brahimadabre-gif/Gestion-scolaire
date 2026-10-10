@@ -8,6 +8,7 @@ import { Link, navigate, useRoute } from "../router";
 import { useAuth } from "../auth-context";
 import { ErrorNote } from "../ui-bits";
 import { passwordStrength } from "@/lib/validations";
+import { phoneValidationMessage } from "@/lib/phone";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -182,6 +183,8 @@ export function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
+
   useEffect(() => {
     if (user) navigate("/compte");
   }, [user]);
@@ -190,12 +193,12 @@ export function RegisterPage() {
     if (route.query.ambassadeur) set("ambassadorCode")(route.query.ambassadeur.toUpperCase());
   }, [route.query.ambassadeur]);
 
-  const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
-
   const validate = (): string | null => {
     if (form.firstName.trim().length < 2) return "Veuillez saisir votre prénom.";
     if (form.lastName.trim().length < 2) return "Veuillez saisir votre nom.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return "Adresse e-mail invalide.";
+    const phoneError = phoneValidationMessage(form.phone, form.country);
+    if (phoneError) return phoneError;
     if (form.password.length < 8) return "Le mot de passe doit contenir au moins 8 caractères.";
     if (!/[A-Z]/.test(form.password) || !/[a-z]/.test(form.password) || !/[0-9]/.test(form.password))
       return "Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.";
@@ -256,8 +259,8 @@ export function RegisterPage() {
             <Input id="reg-email" type="email" value={form.email} onChange={(e) => set("email")(e.target.value)} placeholder="vous@etablissement.ci" autoComplete="email" required />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="reg-phone">Téléphone</Label>
-            <Input id="reg-phone" type="tel" value={form.phone} onChange={(e) => set("phone")(e.target.value)} placeholder="+225 07 00 00 00 00" autoComplete="tel" />
+            <Label htmlFor="reg-phone">Téléphone *</Label>
+            <Input id="reg-phone" type="tel" value={form.phone} onChange={(e) => set("phone")(e.target.value)} placeholder="+225 07 00 00 00 00" autoComplete="tel" required />
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">

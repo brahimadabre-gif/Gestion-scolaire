@@ -22,10 +22,11 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { AdminLicenses } from "./admin-licenses";
 import {
   LayoutDashboard, Users, CreditCard, Receipt, LifeBuoy, Package, Download, BookOpen,
   Newspaper, HelpCircle, MessageSquareQuote, Settings, Plus, Pencil, Trash2,
-  Loader2, TrendingUp, UserCheck, UserX, ShieldCheck, ArrowUpCircle, Activity,
+  Loader2, TrendingUp, UserCheck, UserX, ShieldCheck, ArrowUpCircle, Activity, KeyRound,
 } from "lucide-react";
 
 // ═════════════════════════════════════════════════════════════
@@ -393,6 +394,7 @@ function AdminUsers() {
                     <td className="px-4 py-3">
                       <p className="font-semibold">{String(u.firstName)} {String(u.lastName)}</p>
                       <p className="text-xs text-muted-foreground">{String(u.email)}</p>
+                      <p className="text-xs text-muted-foreground">{u.phone ? `Téléphone : ${String(u.phone)}` : "Téléphone non renseigné"}</p>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{String(u.establishment ?? "—")}</td>
                     <td className="px-4 py-3 text-muted-foreground">{formatDate(String(u.createdAt))}</td>
@@ -984,6 +986,7 @@ export function AdminPage() {
     { id: "overview", label: "Résumé", icon: LayoutDashboard },
     { id: "users", label: "Utilisateurs", icon: Users },
     { id: "subscriptions", label: "Abonnements", icon: ArrowUpCircle },
+    { id: "licenses", label: "Gestion des licences", icon: KeyRound },
     { id: "payments", label: "Paiements", icon: Receipt },
     { id: "ambassadors", label: "Ambassadeurs", icon: UserCheck },
     { id: "tickets", label: "Tickets", icon: LifeBuoy },
@@ -1023,6 +1026,7 @@ export function AdminPage() {
         <TabsContent value="overview" className="mt-6"><Overview /></TabsContent>
         <TabsContent value="users" className="mt-6"><AdminUsers /></TabsContent>
         <TabsContent value="subscriptions" className="mt-6"><AdminSubscriptions /></TabsContent>
+        <TabsContent value="licenses" className="mt-6"><AdminLicenses /></TabsContent>
         <TabsContent value="payments" className="mt-6"><AdminPayments /></TabsContent>
         <TabsContent value="ambassadors" className="mt-6"><AdminAmbassadors /></TabsContent>
         <TabsContent value="tickets" className="mt-6"><AdminTickets /></TabsContent>
