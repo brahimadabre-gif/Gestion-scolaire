@@ -45,38 +45,38 @@
 
 :root {
   --radius: 0.625rem;
-  /* Identité visuelle : vert émeraude profond (éducation, confiance, croissance) + ambre chaleureux */
+  /* Identité visuelle : orange chaleureux, contrasté et accessible */
   --background: oklch(0.995 0.002 160);
   --foreground: oklch(0.19 0.02 200);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.19 0.02 200);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.19 0.02 200);
-  --primary: oklch(0.508 0.118 165.612);
-  --primary-foreground: oklch(0.985 0.01 160);
-  --secondary: oklch(0.955 0.02 166);
-  --secondary-foreground: oklch(0.35 0.07 165);
-  --muted: oklch(0.965 0.008 170);
+  --primary: oklch(0.53 0.18 35);
+  --primary-foreground: oklch(0.99 0.005 50);
+  --secondary: oklch(0.96 0.025 55);
+  --secondary-foreground: oklch(0.38 0.12 38);
+  --muted: oklch(0.965 0.008 55);
   --muted-foreground: oklch(0.5 0.02 200);
-  --accent: oklch(0.955 0.02 166);
-  --accent-foreground: oklch(0.35 0.07 165);
+  --accent: oklch(0.96 0.025 55);
+  --accent-foreground: oklch(0.38 0.12 38);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.91 0.015 170);
-  --input: oklch(0.91 0.015 170);
-  --ring: oklch(0.596 0.145 163.225);
-  --chart-1: oklch(0.596 0.145 163.225);
+  --border: oklch(0.92 0.018 55);
+  --input: oklch(0.92 0.018 55);
+  --ring: oklch(0.62 0.19 38);
+  --chart-1: oklch(0.62 0.19 38);
   --chart-2: oklch(0.769 0.16 70.08);
   --chart-3: oklch(0.444 0.11 200);
   --chart-4: oklch(0.646 0.18 300);
-  --chart-5: oklch(0.627 0.194 149.214);
-  --sidebar: oklch(0.985 0.005 165);
+  --chart-5: oklch(0.68 0.17 45);
+  --sidebar: oklch(0.99 0.008 55);
   --sidebar-foreground: oklch(0.19 0.02 200);
-  --sidebar-primary: oklch(0.508 0.118 165.612);
-  --sidebar-primary-foreground: oklch(0.985 0.01 160);
-  --sidebar-accent: oklch(0.955 0.02 166);
-  --sidebar-accent-foreground: oklch(0.35 0.07 165);
-  --sidebar-border: oklch(0.91 0.015 170);
-  --sidebar-ring: oklch(0.596 0.145 163.225);
+  --sidebar-primary: oklch(0.53 0.18 35);
+  --sidebar-primary-foreground: oklch(0.99 0.005 50);
+  --sidebar-accent: oklch(0.96 0.025 55);
+  --sidebar-accent-foreground: oklch(0.38 0.12 38);
+  --sidebar-border: oklch(0.92 0.018 55);
+  --sidebar-ring: oklch(0.62 0.19 38);
 }
 
 .dark {
@@ -86,31 +86,31 @@
   --card-foreground: oklch(0.955 0.01 160);
   --popover: oklch(0.205 0.018 205);
   --popover-foreground: oklch(0.955 0.01 160);
-  --primary: oklch(0.696 0.17 162.48);
-  --primary-foreground: oklch(0.14 0.02 200);
+  --primary: oklch(0.72 0.17 42);
+  --primary-foreground: oklch(0.18 0.035 35);
   --secondary: oklch(0.27 0.02 200);
   --secondary-foreground: oklch(0.955 0.01 160);
   --muted: oklch(0.26 0.02 200);
-  --muted-foreground: oklch(0.7 0.015 180);
-  --accent: oklch(0.28 0.03 180);
+  --muted-foreground: oklch(0.7 0.015 55);
+  --accent: oklch(0.28 0.03 45);
   --accent-foreground: oklch(0.955 0.01 160);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(0.3 0.02 200);
   --input: oklch(0.3 0.02 200);
-  --ring: oklch(0.696 0.17 162.48);
-  --chart-1: oklch(0.696 0.17 162.48);
+  --ring: oklch(0.72 0.17 42);
+  --chart-1: oklch(0.72 0.17 42);
   --chart-2: oklch(0.795 0.16 86.047);
   --chart-3: oklch(0.6 0.11 200);
   --chart-4: oklch(0.7 0.18 300);
-  --chart-5: oklch(0.7 0.19 149.214);
+  --chart-5: oklch(0.76 0.16 48);
   --sidebar: oklch(0.18 0.015 205);
   --sidebar-foreground: oklch(0.955 0.01 160);
-  --sidebar-primary: oklch(0.696 0.17 162.48);
-  --sidebar-primary-foreground: oklch(0.14 0.02 200);
-  --sidebar-accent: oklch(0.28 0.03 180);
+  --sidebar-primary: oklch(0.72 0.17 42);
+  --sidebar-primary-foreground: oklch(0.18 0.035 35);
+  --sidebar-accent: oklch(0.28 0.04 45);
   --sidebar-accent-foreground: oklch(0.955 0.01 160);
   --sidebar-border: oklch(0.3 0.02 200);
-  --sidebar-ring: oklch(0.696 0.17 162.48);
+  --sidebar-ring: oklch(0.72 0.17 42);
 }
 
 @layer base {
@@ -130,26 +130,26 @@
 @layer utilities {
   /* Dégradés de marque */
   .gspp-gradient-text {
-    background: linear-gradient(120deg, oklch(0.508 0.118 165.612), oklch(0.627 0.17 149));
+      background: linear-gradient(120deg, oklch(0.53 0.18 35), oklch(0.68 0.17 45));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
   .dark .gspp-gradient-text {
-    background: linear-gradient(120deg, oklch(0.696 0.17 162.48), oklch(0.795 0.16 86.047));
+    background: linear-gradient(120deg, oklch(0.72 0.17 42), oklch(0.82 0.15 75));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
   .gspp-hero-glow {
     background:
-      radial-gradient(600px 300px at 15% 0%, oklch(0.9 0.12 165 / 0.35), transparent 70%),
-      radial-gradient(600px 300px at 85% 10%, oklch(0.9 0.12 85 / 0.25), transparent 70%);
+      radial-gradient(600px 300px at 15% 0%, oklch(0.9 0.12 45 / 0.28), transparent 70%),
+      radial-gradient(600px 300px at 85% 10%, oklch(0.9 0.12 75 / 0.2), transparent 70%);
   }
   .dark .gspp-hero-glow {
     background:
-      radial-gradient(600px 300px at 15% 0%, oklch(0.4 0.09 165 / 0.35), transparent 70%),
-      radial-gradient(600px 300px at 85% 10%, oklch(0.4 0.09 85 / 0.2), transparent 70%);
+      radial-gradient(600px 300px at 15% 0%, oklch(0.4 0.09 45 / 0.3), transparent 70%),
+      radial-gradient(600px 300px at 85% 10%, oklch(0.4 0.09 75 / 0.2), transparent 70%);
   }
 
   /* Animations discrètes */
@@ -176,7 +176,7 @@
   }
   .card-hover:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 32px -12px oklch(0.3 0.06 165 / 0.25);
+    box-shadow: 0 12px 32px -12px oklch(0.35 0.12 40 / 0.2);
     border-color: var(--ring);
   }
 
@@ -184,14 +184,14 @@
   .gspp-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
   .gspp-scrollbar::-webkit-scrollbar-track { background: transparent; }
   .gspp-scrollbar::-webkit-scrollbar-thumb {
-    background: oklch(0.75 0.02 170 / 0.6);
+    background: oklch(0.75 0.02 55 / 0.6);
     border-radius: 9999px;
   }
-  .gspp-scrollbar::-webkit-scrollbar-thumb:hover { background: oklch(0.6 0.05 170 / 0.8); }
+  .gspp-scrollbar::-webkit-scrollbar-thumb:hover { background: oklch(0.6 0.05 45 / 0.8); }
 
   /* Motif de points pour sections d'arrière-plan */
   .gspp-dots {
-    background-image: radial-gradient(oklch(0.6 0.08 165 / 0.18) 1px, transparent 1px);
+    background-image: radial-gradient(oklch(0.62 0.14 42 / 0.18) 1px, transparent 1px);
     background-size: 22px 22px;
   }
 

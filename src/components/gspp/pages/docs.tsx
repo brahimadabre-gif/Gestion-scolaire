@@ -87,7 +87,7 @@ export function DocsPage() {
       {/* En-tête de la documentation */}
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 dark:text-emerald-400">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-600 dark:text-orange-400">
             Documentation
           </p>
           <h1 className="mt-1 text-3xl font-extrabold tracking-tight">Notice d&apos;utilisation</h1>
@@ -133,13 +133,13 @@ export function DocsPage() {
                   className={cn(
                     "flex items-start gap-2.5 rounded-xl px-3 py-2 text-[13px] transition-colors",
                     s.slug === currentSlug
-                      ? "bg-emerald-600/10 font-semibold text-emerald-700 dark:text-emerald-400"
+                      ? "bg-orange-600/10 font-semibold text-orange-700 dark:text-orange-400"
                       : "text-muted-foreground hover:bg-secondary/70 hover:text-foreground"
                   )}
                 >
                   <span className={cn(
                     "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[10px] font-bold",
-                    s.slug === currentSlug ? "bg-emerald-600 text-white" : "bg-muted text-muted-foreground"
+                    s.slug === currentSlug ? "bg-orange-600 text-white" : "bg-muted text-muted-foreground"
                   )}>
                     {s.number}
                   </span>
@@ -160,7 +160,7 @@ export function DocsPage() {
           ) : (
             <div className="rounded-3xl border bg-card px-6 py-8 sm:px-10 sm:py-10">
               <div className="mb-6 flex items-center gap-3 border-b pb-6">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-600/10 text-orange-700 dark:text-orange-400">
                   <DocIcon icon={section.icon} className="h-5.5 w-5.5" />
                 </span>
                 <div>

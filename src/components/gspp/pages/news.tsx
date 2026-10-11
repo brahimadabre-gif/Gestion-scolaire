@@ -13,7 +13,7 @@ import ReactMarkdown from "react-markdown";
 import { ArrowLeft, CalendarDays } from "lucide-react";
 
 const CATEGORY_STYLES: Record<string, { label: string; cls: string }> = {
-  version: { label: "Nouvelle version", cls: "bg-emerald-600/10 text-emerald-700 dark:text-emerald-400" },
+  version: { label: "Nouvelle version", cls: "bg-orange-600/10 text-orange-700 dark:text-orange-400" },
   annonce: { label: "Annonce", cls: "bg-sky-500/10 text-sky-700 dark:text-sky-400" },
   correction: { label: "Correction", cls: "bg-amber-500/10 text-amber-700 dark:text-amber-500" },
   tutoriel: { label: "Tutoriel", cls: "bg-violet-500/10 text-violet-700 dark:text-violet-400" },
@@ -46,12 +46,12 @@ export function NewsListPage() {
           <div className="space-y-10">
             {/* Article à la une */}
             <article className="card-hover grid cursor-pointer gap-6 rounded-3xl border bg-card p-6 sm:p-8 lg:grid-cols-[1fr_1.2fr]" onClick={() => navigate(`/actualites?article=${featured.slug}`)}>
-              <div className="flex items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600/10 to-amber-500/10 py-14">
+              <div className="flex items-center justify-center rounded-2xl bg-gradient-to-br from-orange-600/10 to-amber-500/10 py-14">
                 <span className="text-7xl" aria-hidden="true">{featured.coverEmoji}</span>
               </div>
               <div className="flex flex-col justify-center">
                 <div className="flex flex-wrap items-center gap-3">
-                  <Badge className="rounded-full bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-600/10">
+                  <Badge className="rounded-full bg-orange-600/10 text-orange-700 dark:text-orange-400 hover:bg-orange-600/10">
                     {CATEGORY_STYLES[featured.category]?.label ?? featured.category}
                   </Badge>
                   <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -145,11 +145,11 @@ export function NewsArticlePage({ slug }: { slug: string }) {
         <h1 className="mt-4 text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">
           {article.title}
         </h1>
-        <p className="mt-4 border-l-4 border-emerald-600 pl-4 text-lg leading-relaxed text-muted-foreground">
+        <p className="mt-4 border-l-4 border-orange-600 pl-4 text-lg leading-relaxed text-muted-foreground">
           {article.excerpt}
         </p>
 
-        <div className="my-8 flex items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-600/10 to-amber-500/10 py-16">
+        <div className="my-8 flex items-center justify-center rounded-3xl bg-gradient-to-br from-orange-600/10 to-amber-500/10 py-16">
           <span className="text-8xl" aria-hidden="true">{article.coverEmoji}</span>
         </div>
 

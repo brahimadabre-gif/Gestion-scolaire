@@ -210,7 +210,7 @@ async function main() {
     },
     {
       question: "Comment télécharger le logiciel ?",
-      answer: "Rendez-vous sur la page « Télécharger ». Le site détecte automatiquement votre système d'exploitation et vous propose le bon fichier d'installation. Après votre achat, la clé de licence est disponible dans votre espace client pour activer le logiciel.",
+      answer: "Rendez-vous sur la page « Télécharger ». Le site détecte automatiquement votre système d'exploitation et vous propose le bon fichier d'installation. Contactez le développeur pour obtenir une clé d’activation. Si une clé est déjà disponible dans votre espace client, utilisez-la pour activer le logiciel.",
       category: "logiciel", sortOrder: 3,
     },
     {
@@ -220,17 +220,17 @@ async function main() {
     },
     {
       question: "Comment activer mon abonnement ?",
-      answer: "Créez votre compte, choisissez la formule Professionnel à 15 000 FCFA pour 12 mois, puis payez par Wave ou Orange Money sur le +225 07 09 93 33 64. Envoyez ensuite vos nom et prénom ainsi que la preuve du dépôt par WhatsApp. L'abonnement est activé après vérification.",
+      answer: "Consultez les formules sur la page « Tarifs », puis contactez le développeur par WhatsApp ou par appel au +225 07 09 93 33 64 pour connaître les étapes d’obtention de votre clé d’activation.",
       category: "abonnement", sortOrder: 5,
     },
     {
       question: "Comment renouveler mon abonnement ?",
-      answer: "Depuis votre espace client, onglet « Mon abonnement », cliquez sur « Renouveler » avant la date d'expiration. La durée restante est ajoutée à votre nouvelle période, vous ne perdez aucun jour. Vous pouvez également activer le renouvellement automatique.",
+      answer: "Contactez le développeur par WhatsApp ou par appel au +225 07 09 93 33 64 avant l’expiration pour connaître les étapes de renouvellement de votre clé.",
       category: "abonnement", sortOrder: 6,
     },
     {
       question: "Comment changer de formule ?",
-      answer: "Vous pouvez passer à une formule supérieure à tout moment depuis votre espace client. La différence est calculée au prorata des jours restants. Le changement prend effet immédiatement après le paiement.",
+      answer: "Consultez les formules disponibles sur la page « Tarifs », puis contactez le développeur pour connaître les étapes de changement de formule.",
       category: "abonnement", sortOrder: 7,
     },
     {
@@ -262,6 +262,9 @@ async function main() {
   for (const f of faqs) {
     const exists = await db.faqItem.findFirst({ where: { question: f.question } });
     if (!exists) await db.faqItem.create({ data: f });
+    else if (["Comment télécharger le logiciel ?", "Comment activer mon abonnement ?", "Comment renouveler mon abonnement ?", "Comment changer de formule ?"].includes(f.question)) {
+      await db.faqItem.update({ where: { id: exists.id }, data: { answer: f.answer } });
+    }
   }
 
   // ── Témoignages ────────────────────────────────────────────
@@ -320,14 +323,12 @@ async function main() {
     },
     {
       slug: "paiement-mobile-money-disponible",
-      title: "Paiement par Wave ou Orange Money",
-      excerpt: "Réglez 15 000 FCFA pour 12 mois par Wave ou Orange Money, puis envoyez la preuve du dépôt pour l'activation.",
+      title: "Obtenir une clé d’activation",
+      excerpt: "Découvrez comment contacter le développeur pour obtenir votre clé d’activation.",
       category: "annonce", coverEmoji: "📱",
       content: [
-        "Souscrire à un abonnement Gestion Scolaire Pro Plus est simple : choisissez la formule Professionnel à 15 000 FCFA pour 12 mois.",
-        "Effectuez le dépôt par Wave, avec le QR code ou le numéro +225 07 09 93 33 64, ou par Orange Money sur ce même numéro.",
-        "Envoyez vos nom et prénom ainsi que la preuve du dépôt par WhatsApp. L'abonnement est activé après vérification du paiement.",
-        "Cette évolution s'inscrit dans notre engagement : rendre la gestion scolaire professionnelle accessible à tous les établissements, avec les moyens de paiement qu'ils utilisent déjà au quotidien.",
+        "Consultez les formules disponibles sur la page Tarifs.",
+        "Contactez le développeur par WhatsApp ou par appel au +225 07 09 93 33 64 pour connaître les étapes d’obtention de votre clé.",
       ].join("\n\n"),
       publishedAt: new Date("2026-07-02"),
     },
@@ -389,7 +390,9 @@ async function main() {
   for (const a of articles) {
     await db.article.upsert({
       where: { slug: a.slug },
-      update: {},
+      update: a.slug === "paiement-mobile-money-disponible"
+        ? { title: a.title, excerpt: a.excerpt, content: a.content, category: a.category, coverEmoji: a.coverEmoji }
+        : {},
       create: a,
     });
   }
@@ -678,10 +681,10 @@ function buildDocs() {
         "## Gérer votre abonnement depuis le site",
         "Votre espace client affiche en permanence : la formule active, les dates de début et d'expiration, le nombre de jours restants, vos factures et votre clé de licence. La page **Abonnements** du site présente les formules disponibles et leurs tarifs.",
         "## Souscrire ou renouveler",
-        "1. Connectez-vous à votre espace client.\n2. Choisissez la formule Professionnel pour 12 mois.\n3. Réglez 15 000 FCFA par Wave avec le QR code ou sur le +225 07 09 93 33 64, ou par Orange Money sur ce même numéro.\n4. Envoyez vos nom et prénom ainsi que la preuve du dépôt par WhatsApp. L'activation intervient après vérification.",
+        "1. Consultez les formules disponibles sur la page Tarifs.\n2. Contactez le développeur par WhatsApp ou par appel au +225 07 09 93 33 64.\n3. Suivez les étapes communiquées pour obtenir votre clé d’activation.",
         "## Votre licence et vos appareils",
         "Chaque abonnement autorise un nombre d'appareils défini par la formule. Vous pouvez désactiver un ancien poste depuis votre espace client pour libérer une activation. En cas de réinstallation de Windows, désactivez d'abord la licence, puis réactivez.",
-        "> Activez le **renouvellement automatique** pour ne jamais interrompre la génération de bulletins en pleine période de conseils de classe.",
+        "> Pour renouveler votre accès ou changer de formule, contactez le développeur depuis la page **Tarifs**.",
       ].join("\n\n"),
     },
     {

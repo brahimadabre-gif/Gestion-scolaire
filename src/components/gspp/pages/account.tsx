@@ -53,7 +53,7 @@ export function AccountDashboard() {
       {/* Salutation */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 dark:text-emerald-400">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-600 dark:text-orange-400">
             Espace client
           </p>
           <h1 className="mt-1 text-3xl font-extrabold tracking-tight">
@@ -73,7 +73,7 @@ export function AccountDashboard() {
         <div className="rounded-3xl border bg-card p-6 sm:p-7">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="flex items-center gap-2 text-lg font-bold">
-              <CreditCard className="h-5 w-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+              <CreditCard className="h-5 w-5 text-orange-600 dark:text-orange-400" aria-hidden="true" />
               Mon abonnement
             </h2>
             {subscription ? <StatusBadge status={subscription.status} /> : null}
@@ -104,7 +104,7 @@ export function AccountDashboard() {
                   <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> Jours restants
                   </p>
-                  <p className="mt-1 text-sm font-bold text-emerald-700 dark:text-emerald-400">
+                  <p className="mt-1 text-sm font-bold text-orange-700 dark:text-orange-400">
                     {subscription.daysRemaining} jour{subscription.daysRemaining > 1 ? "s" : ""}
                   </p>
                 </div>
@@ -147,12 +147,12 @@ export function AccountDashboard() {
         {/* Licence */}
         <div className="rounded-3xl border bg-card p-6 sm:p-7">
           <h2 className="flex items-center gap-2 text-lg font-bold">
-            <KeyRound className="h-5 w-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+            <KeyRound className="h-5 w-5 text-orange-600 dark:text-orange-400" aria-hidden="true" />
             Licence logicielle
           </h2>
           {licenseKey ? (
             <>
-              <div className="mt-4 rounded-2xl border border-dashed border-emerald-600/50 bg-emerald-600/5 p-4">
+              <div className="mt-4 rounded-2xl border border-dashed border-orange-600/50 bg-orange-600/5 p-4">
                 <p className="font-mono text-sm font-bold tracking-wider select-all">{licenseKey.key}</p>
                 <p className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                   <MonitorSmartphone className="h-3.5 w-3.5" aria-hidden="true" />
@@ -197,7 +197,7 @@ export function AccountDashboard() {
             onClick={a.onClick}
             className="card-hover rounded-2xl border bg-card p-5 text-left"
           >
-            <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">
+            <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-orange-600/10 text-orange-700 dark:text-orange-400">
               <a.icon className="h-5 w-5" aria-hidden="true" />
             </span>
             <p className="text-[15px] font-semibold">{a.title}</p>
@@ -210,11 +210,11 @@ export function AccountDashboard() {
         <section className="mt-10" aria-labelledby="ambassador-referrals-title">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 dark:text-emerald-400">
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-600 dark:text-orange-400">
                 Programme ambassadeur
               </p>
               <h2 id="ambassador-referrals-title" className="mt-1 flex items-center gap-2 text-lg font-bold">
-                <UserCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                <UserCheck className="h-5 w-5 text-orange-600 dark:text-orange-400" aria-hidden="true" />
                 Mes recommandations
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -222,8 +222,8 @@ export function AccountDashboard() {
               </p>
             </div>
             {ambassadorData?.code && (
-              <div className="rounded-xl border border-emerald-600/30 bg-emerald-600/5 px-4 py-2 text-sm">
-                Mon code : <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">{ambassadorData.code}</span>
+              <div className="rounded-xl border border-orange-600/30 bg-orange-600/5 px-4 py-2 text-sm">
+                Mon code : <span className="font-mono font-bold text-orange-700 dark:text-orange-400">{ambassadorData.code}</span>
               </div>
             )}
           </div>
@@ -235,7 +235,7 @@ export function AccountDashboard() {
               { label: "Commissions validées", value: formatFcfa((ambassadorData?.totalCommissions ?? 0) + (ambassadorData?.totalBonuses ?? 0)), icon: CreditCard },
             ].map((stat) => (
               <div key={stat.label} className="rounded-2xl border bg-card p-4">
-                <stat.icon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                <stat.icon className="h-5 w-5 text-orange-600 dark:text-orange-400" aria-hidden="true" />
                 <p className="mt-3 text-xl font-extrabold">{stat.value}</p>
                 <p className="text-xs text-muted-foreground">{stat.label}</p>
               </div>
@@ -266,7 +266,7 @@ export function AccountDashboard() {
                         <td className="px-4 py-3.5 text-muted-foreground">{formatDate(referral.createdAt)}</td>
                         <td className="px-4 py-3.5 font-mono text-xs">{referral.subscription?.reference ?? "En attente"}</td>
                         <td className="px-4 py-3.5">
-                          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${confirmed ? "bg-emerald-600/10 text-emerald-700 dark:text-emerald-400" : "bg-amber-500/10 text-amber-800 dark:text-amber-300"}`}>
+                          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${confirmed ? "bg-orange-600/10 text-orange-700 dark:text-orange-400" : "bg-amber-500/10 text-amber-800 dark:text-amber-300"}`}>
                             {confirmed ? "Paiement confirmé" : referral.status === "PAYMENT_PENDING" ? "Paiement en attente" : "Inscrit"}
                           </span>
                         </td>
@@ -292,7 +292,7 @@ export function AccountDashboard() {
       <div className="mt-4 grid gap-5 lg:grid-cols-2">
         <div className="rounded-2xl border bg-card p-6">
           <h3 className="flex items-center gap-2 text-[15px] font-semibold">
-            <UserCircle2 className="h-4.5 w-4.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+            <UserCircle2 className="h-4.5 w-4.5 text-orange-600 dark:text-orange-400" aria-hidden="true" />
             Informations personnelles
           </h3>
           <dl className="mt-4 space-y-3 text-sm">
@@ -318,7 +318,7 @@ export function AccountDashboard() {
         </div>
         <div className="rounded-2xl border bg-card p-6">
           <h3 className="flex items-center gap-2 text-[15px] font-semibold">
-            <Building2 className="h-4.5 w-4.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+            <Building2 className="h-4.5 w-4.5 text-orange-600 dark:text-orange-400" aria-hidden="true" />
             Établissement
           </h3>
           <dl className="mt-4 space-y-3 text-sm">
@@ -424,7 +424,7 @@ export function AccountPaymentsPage() {
           <Receipt className="mx-auto h-10 w-10 text-muted-foreground/40" aria-hidden="true" />
           <p className="mt-3 text-sm text-muted-foreground">Aucun paiement pour le moment.</p>
           <Button className="mt-5 rounded-full" onClick={() => navigate("/compte/abonnement")}>
-            Souscrire un abonnement
+            Voir les formules et obtenir une clé
           </Button>
         </div>
       ) : (
@@ -465,7 +465,7 @@ export function AccountPaymentsPage() {
       )}
 
       <p className="mt-6 flex items-center gap-2 text-xs text-muted-foreground">
-        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+        <CheckCircle2 className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" aria-hidden="true" />
         Les factures sont générées automatiquement au format PDF dès la confirmation du paiement.
       </p>
     </main>

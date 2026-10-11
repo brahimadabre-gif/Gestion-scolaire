@@ -20,7 +20,7 @@ export function SiteFooter() {
               « {SITE.slogan} » — La solution complète pour les enseignants, directeurs et
               établissements scolaires. Notes, bulletins, classements et administration, sans stress.
             </p>
-            <div className="mt-4 flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-medium text-orange-600 dark:text-orange-400">
               <ShieldCheck className="h-4 w-4" aria-hidden="true" />
               Connexion sécurisée HTTPS · Données chiffrées
             </div>
@@ -95,7 +95,7 @@ export function SiteFooter() {
             © {new Date().getFullYear()} {SITE.name}. Tous droits réservés.
           </p>
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <GraduationCap className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+            <GraduationCap className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" aria-hidden="true" />
             Conçu pour les professionnels de l&apos;éducation, en Côte d&apos;Ivoire et partout en Afrique de l&apos;Ouest.
           </p>
         </div>

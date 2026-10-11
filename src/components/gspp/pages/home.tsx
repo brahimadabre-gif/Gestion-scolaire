@@ -6,7 +6,6 @@ import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { api, Article, FaqItem, Plan, Testimonial } from "../api";
 import { Link, navigate } from "../router";
-import { AppMockup } from "../app-mockup";
 import { Section, SectionHeading, Stars, InitialsAvatar, Spinner } from "../ui-bits";
 import { formatDate, formatFcfa } from "@/lib/site";
 import { Button } from "@/components/ui/button";
@@ -14,11 +13,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import {
-  Users, BookOpen, GraduationCap, Calculator, Trophy, FileText, Printer,
-  BarChart3, Building2, Import, ArrowUpCircle, PenLine, CalendarDays,
-  ShieldCheck, Sparkles, Download, CheckCircle2, ArrowRight, Monitor,
-  Smartphone, Cloud, UserPlus, CreditCard, KeyRound, LifeBuoy, Zap,
-  ClipboardList, FolderDown, Signature, Layers,
+  Users, BookOpen, GraduationCap, FileText, Building2,
+  ShieldCheck, Sparkles, Download, CheckCircle2, Monitor,
+  Cloud, UserPlus, KeyRound, Zap, ClipboardList, Layers,
 } from "lucide-react";
 
 // ── Hero ─────────────────────────────────────────────────────
@@ -27,49 +24,40 @@ function Hero() {
     <section className="relative overflow-hidden">
       <div className="gspp-hero-glow absolute inset-0" aria-hidden="true" />
       <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-14 sm:px-6 sm:pt-20 lg:px-8 lg:pb-24 lg:pt-24">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr]">
-          <div className="text-center lg:text-left">
-            <Badge variant="outline" className="animate-fade-up mb-5 gap-1.5 rounded-full border-emerald-600/30 bg-emerald-600/5 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+        <div className="mx-auto max-w-5xl">
+          <div className="text-center">
+            <Badge variant="outline" className="animate-fade-up mb-5 gap-1.5 rounded-full border-orange-600/30 bg-orange-600/5 px-3 py-1.5 text-xs font-semibold text-orange-700 dark:text-orange-400">
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-              Gestion Scolaire Pro Plus 2.3.12
+              Pour les écoles primaires · CP1 à CM2
             </Badge>
             <h1 className="animate-fade-up-delay-1 text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.4rem]">
-              La solution complète pour <span className="gspp-gradient-text">simplifier la gestion scolaire</span>
+              Toute la gestion de l’école, <span className="gspp-gradient-text">plus simplement.</span>
             </h1>
-            <p className="animate-fade-up-delay-2 mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg lg:mx-0">
-              Gagnez du temps, réduisez les erreurs et simplifiez la gestion quotidienne de votre
-              école primaire grâce à une solution pensée pour les directeurs et enseignants du
-              primaire : CP1, CP2, CE1, CE2, CM1, CM2, notes, bulletins, certificats et administration.
+            <p className="animate-fade-up-delay-2 mx-auto mt-5 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              Élèves, classes, appels, notes et bulletins : rassemblez les tâches scolaires dans une
+              seule application, sur ordinateur Windows ou Android.
             </p>
-            <div className="animate-fade-up-delay-3 mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
-              <Button size="lg" className="w-full rounded-full text-base shadow-lg shadow-emerald-600/20 sm:w-auto" onClick={() => navigate("/fonctionnalites")}>
-                Découvrir le logiciel
-                <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden="true" />
+            <div className="animate-fade-up-delay-3 mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Button size="lg" className="w-full rounded-full text-base shadow-lg shadow-orange-600/20 sm:w-auto" onClick={() => navigate("/inscription")}>
+                Créer un compte
+                <UserPlus className="ml-1.5 h-4 w-4" aria-hidden="true" />
               </Button>
               <Button size="lg" variant="outline" className="w-full rounded-full text-base sm:w-auto" onClick={() => navigate("/telecharger")}>
                 <Download className="mr-1.5 h-4 w-4" aria-hidden="true" />
-                Télécharger
-              </Button>
-              <Button size="lg" variant="secondary" className="w-full rounded-full text-base sm:w-auto" onClick={() => navigate("/inscription")}>
-                <UserPlus className="mr-1.5 h-4 w-4" aria-hidden="true" />
-                Créer un compte
+                Télécharger le logiciel
               </Button>
             </div>
-            <ul className="animate-fade-up-delay-3 mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-muted-foreground lg:justify-start">
+            <ul className="animate-fade-up-delay-3 mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-muted-foreground">
               <li className="flex items-center gap-1.5">
-                <Monitor className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" /> Windows 10/11 et Android
+                <Monitor className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" aria-hidden="true" /> Windows 10/11 et Android
               </li>
               <li className="flex items-center gap-1.5">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" /> Vos données restent chez vous
+                <ShieldCheck className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" aria-hidden="true" /> Vos données restent chez vous
               </li>
               <li className="flex items-center gap-1.5">
-                <Cloud className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" /> Fonctionne hors connexion
+                <Cloud className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" aria-hidden="true" /> Fonctionne hors connexion
               </li>
             </ul>
-          </div>
-          <div className="animate-float relative">
-            <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-br from-emerald-600/15 via-transparent to-amber-500/15 blur-2xl" aria-hidden="true" />
-            <AppMockup variant="dashboard" />
           </div>
         </div>
       </div>
@@ -90,7 +78,7 @@ function StatsBand() {
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-8 px-4 py-10 sm:px-6 md:grid-cols-4 lg:px-8">
         {stats.map((s) => (
           <div key={s.label} className="text-center">
-            <p className="text-3xl font-extrabold tracking-tight text-emerald-700 dark:text-emerald-400 sm:text-4xl">{s.value}</p>
+            <p className="text-3xl font-extrabold tracking-tight text-orange-700 dark:text-orange-400 sm:text-4xl">{s.value}</p>
             <p className="mt-1 text-sm text-muted-foreground">{s.label}</p>
           </div>
         ))}
@@ -103,19 +91,10 @@ function StatsBand() {
 const ADVANTAGES = [
   { icon: Users, title: "Gestion des élèves", text: "Fiches complètes, photos, tuteurs, historique : chaque élève est centralisé et consultable en deux clics." },
   { icon: Layers, title: "Gestion des classes", text: "Créez vos classes de CP1 à CM2, organisez les groupes parallèles et suivez les effectifs." },
-  { icon: BookOpen, title: "Gestion des notes", text: "Saisie ultra-rapide au clavier, barèmes /10 pour CP/CE et /20 pour CM, moyennes en temps réel." },
-  { icon: Calculator, title: "Calcul automatique des moyennes", text: "Moyennes pondérées par coefficients, recalcul instantané en cas de modification, transparence totale." },
-  { icon: Trophy, title: "Classement des élèves", text: "Rangs, ex æquo gérés, mentions et distinctions automatiques selon vos propres seuils." },
-  { icon: FileText, title: "Bulletins scolaires", text: "Bulletins professionnels à votre logo, appréciations automatiques, prêts à imprimer ou à exporter en PDF." },
-  { icon: GraduationCap, title: "Fiches scolaires", text: "Fiche complète par élève : scolarité, notes, absences et documents émis, pour toute l'année." },
-  { icon: Printer, title: "Impressions professionnelles", text: "Listes de classes, relevés, certificats et émargements : des documents nets, formatés et fiables." },
-  { icon: BarChart3, title: "Rapports de résultats", text: "Synthèses par classe et par école, taux de réussite et statistiques pour le suivi pédagogique." },
-  { icon: ClipboardList, title: "Gestion administrative", text: "Inscriptions, documents officiels, correspondances types : le bureau du directeur, simplifié." },
-  { icon: Import, title: "Import intelligent de documents", text: "Importez vos listes Excel en glisser-déposer : détection des colonnes et contrôle des doublons." },
-  { icon: ArrowUpCircle, title: "Promotion des élèves", text: "Le passage en classe supérieure, les redoublements et les départs gérés en une opération." },
-  { icon: PenLine, title: "Signatures électroniques", text: "Signature du directeur et cachet de l'établissement appliqués automatiquement sur vos documents." },
-  { icon: CalendarDays, title: "Années scolaires", text: "Archivez chaque année et retrouvez à tout moment les bulletins et résultats des années passées." },
-  { icon: Zap, title: "Rapide et hors connexion", text: "Aucune latence, aucune dépendance Internet pour le travail quotidien : tout est sur votre poste." },
+  { icon: ClipboardList, title: "Appel et assiduité", text: "Suivez les présences et absences de vos élèves, classe par classe." },
+  { icon: BookOpen, title: "Notes et moyennes", text: "Saisissez les notes et laissez le logiciel calculer les moyennes et les classements." },
+  { icon: FileText, title: "Bulletins et documents", text: "Préparez des bulletins, certificats et listes prêts à imprimer ou à exporter." },
+  { icon: Zap, title: "Travail hors connexion", text: "Continuez à gérer votre école même lorsque la connexion Internet est indisponible." },
 ];
 
 function Advantages() {
@@ -123,13 +102,13 @@ function Advantages() {
     <Section id="presentation">
       <SectionHeading
         eyebrow="Présentation du logiciel"
-        title="Tout ce dont votre école primaire a besoin, réuni dans un seul logiciel"
-        description="Gestion Scolaire Pro Plus accompagne les enseignants, directeurs et responsables administratifs du primaire tout au long de l'année scolaire — de l'inscription des élèves à l'impression des bulletins."
+        title="Les outils essentiels de votre école, réunis au même endroit"
+        description="De la gestion des élèves à l’impression des bulletins, retrouvez les fonctions du quotidien dans une interface claire."
       />
       <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {ADVANTAGES.map((a) => (
           <article key={a.title} className="card-hover rounded-2xl border bg-card p-6">
-            <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">
+            <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-orange-600/10 text-orange-700 dark:text-orange-400">
               <a.icon className="h-5.5 w-5.5" aria-hidden="true" />
             </span>
             <h3 className="text-base font-semibold">{a.title}</h3>
@@ -141,64 +120,34 @@ function Advantages() {
   );
 }
 
-// ── Catégories de fonctionnalités ────────────────────────────
-const CATEGORIES = [
-  {
-    icon: GraduationCap,
-    title: "Gestion pédagogique",
-    items: ["Élèves et classes CP1-CM2", "Matières et coefficients", "Barèmes /10 et /20", "Classements et compositions", "Groupes d'EPS par classe", "Bulletins scolaires"],
-  },
-  {
-    icon: Building2,
-    title: "Gestion administrative",
-    items: ["Inscriptions et admissions", "Gestion des enseignants", "Promotions automatiques", "Registre d'appel et assiduité", "Documents administratifs", "Rapports et statistiques"],
-  },
-  {
-    icon: Zap,
-    title: "Automatisation",
-    items: ["Calcul automatique des moyennes", "Création équilibrée des groupes d'EPS", "Génération de documents", "Import et sauvegarde des données", "Classement automatique", "Rapports en un clic"],
-  },
-  {
-    icon: FolderDown,
-    title: "Documents & impressions",
-    items: ["Bulletins et fiches scolaires", "Listes de classes", "Groupes d'EPS imprimables", "Relevés de notes", "Certificats de scolarité et de fréquentation", "Documents officiels"],
-  },
-];
-
-function Categories() {
+// ── Les personnes qui utilisent le logiciel ─────────────────
+function SchoolRoles() {
   return (
     <Section className="bg-secondary/40">
-      <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-        <div>
-          <SectionHeading
-            align="left"
-            eyebrow="Fonctionnalités"
-            title="Une organisation claire en 4 familles"
-            description="Chaque module est pensé pour un métier : enseigner, administrer, automatiser, imprimer. Vous n'apprenez qu'une seule interface."
-          />
-          <Button size="lg" className="mt-7 rounded-full" onClick={() => navigate("/fonctionnalites")}>
-            Voir toutes les fonctionnalités
-            <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden="true" />
-          </Button>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {CATEGORIES.map((c) => (
-            <article key={c.title} className="card-hover rounded-2xl border bg-card p-5">
-              <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">
-                <c.icon className="h-5 w-5" aria-hidden="true" />
-              </span>
-              <h3 className="text-[15px] font-semibold">{c.title}</h3>
-              <ul className="mt-3 space-y-1.5">
-                {c.items.map((i) => (
-                  <li key={i} className="flex items-start gap-1.5 text-[13px] text-muted-foreground">
-                    <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-                    {i}
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </div>
+      <SectionHeading
+        eyebrow="Pour toute l’équipe éducative"
+        title="Un outil adapté à chaque rôle dans l’école"
+        description="Enseignants et responsables partagent les informations utiles, avec des outils conçus pour leurs tâches quotidiennes."
+      />
+      <div className="mx-auto mt-10 grid max-w-5xl gap-5 md:grid-cols-2">
+        <article className="rounded-3xl border bg-card p-7 sm:p-8">
+          <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-600/10 text-orange-700 dark:text-orange-400"><GraduationCap className="h-6 w-6" aria-hidden="true" /></span>
+          <h3 className="text-xl font-bold">Pour les enseignants</h3>
+          <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+            <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />Faire l’appel et suivre l’assiduité.</li>
+            <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />Saisir les notes et consulter les moyennes.</li>
+            <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />Consulter les fiches pédagogiques hors connexion.</li>
+          </ul>
+        </article>
+        <article className="rounded-3xl border bg-card p-7 sm:p-8">
+          <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-600/10 text-orange-700 dark:text-orange-400"><Building2 className="h-6 w-6" aria-hidden="true" /></span>
+          <h3 className="text-xl font-bold">Pour les directeurs et l’administration</h3>
+          <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+            <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />Suivre les effectifs et l’organisation des classes.</li>
+            <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />Préparer bulletins, certificats et documents administratifs.</li>
+            <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />Consulter les résultats et rapports de l’établissement.</li>
+          </ul>
+        </article>
       </div>
     </Section>
   );
@@ -291,10 +240,9 @@ function AndroidScreenshots() {
 
 // ── Comment ça marche ────────────────────────────────────────
 const STEPS = [
-  { icon: UserPlus, title: "Créez votre compte", text: "Inscription gratuite en 2 minutes : nom, e-mail, établissement. Aucun engagement." },
-  { icon: CreditCard, title: "Abonnement simple", text: "15 000 FCFA pour 12 mois. Payez par Wave ou Orange Money." },
-  { icon: Download, title: "Téléchargez le logiciel", text: "Installez en quelques clics sur Windows et activez avec votre clé de licence." },
-  { icon: KeyRound, title: "Gérez votre école primaire", text: "Notes, bulletins, certificats, classements, rapports : toute la gestion scolaire, sans stress." },
+  { icon: UserPlus, title: "Créez votre compte", text: "Renseignez les informations de votre établissement pour accéder à votre espace client." },
+  { icon: KeyRound, title: "Obtenez votre clé", text: "Contactez le développeur pour connaître les étapes d’obtention de votre clé d’activation." },
+  { icon: Download, title: "Installez le logiciel", text: "Téléchargez l’application sur Windows ou Android, puis activez-la avec votre clé." },
 ];
 
 function HowItWorks() {
@@ -302,13 +250,13 @@ function HowItWorks() {
     <Section className="bg-secondary/40">
       <SectionHeading
         eyebrow="Parcours"
-        title="De la création du compte au premier bulletin, en moins d'une heure"
-        description="Un parcours simple, pensé pour que vous ne soyez jamais perdu."
+        title="Votre logiciel prêt en trois étapes"
+        description="Créez votre compte, obtenez votre clé et installez Gestion Scolaire Pro Plus."
       />
-      <ol className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <ol className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {STEPS.map((s, i) => (
           <li key={s.title} className="relative rounded-2xl border bg-card p-6">
-            <span className="absolute -top-3.5 left-6 rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold text-white shadow">
+            <span className="absolute -top-3.5 left-6 rounded-full bg-orange-600 px-3 py-1 text-xs font-bold text-white shadow">
               Étape {i + 1}
             </span>
             <span className="mb-4 mt-2 flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
@@ -336,7 +284,7 @@ function PricingPreview() {
       <SectionHeading
         eyebrow="Tarifs"
         title="Des formules pour chaque structure"
-        description="15 000 FCFA pour 12 mois. Payez par Wave ou Orange Money, puis envoyez la preuve du dépôt."
+        description="Consultez les formules disponibles et contactez le développeur pour obtenir une clé d’activation."
       />
       {isLoading ? (
         <Spinner />
@@ -346,11 +294,11 @@ function PricingPreview() {
             <article
               key={plan.slug}
               className={`relative flex w-full max-w-xl flex-col rounded-2xl border bg-card p-7 ${
-                plan.highlighted ? "border-emerald-600 shadow-xl shadow-emerald-600/10 ring-1 ring-emerald-600" : "card-hover"
+                plan.highlighted ? "border-orange-600 shadow-xl shadow-orange-600/10 ring-1 ring-orange-600" : "card-hover"
               }`}
             >
               {plan.highlighted && (
-                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-emerald-600 px-4 py-1 text-xs font-bold text-white shadow">
+                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-orange-600 px-4 py-1 text-xs font-bold text-white shadow">
                   Le plus choisi
                 </span>
               )}
@@ -360,13 +308,13 @@ function PricingPreview() {
                 <span className="text-3xl font-extrabold tracking-tight">{formatFcfa(plan.annualPrice)}</span>
                 <span className="text-sm text-muted-foreground"> / 12 mois</span>
               </p>
-              <p className="mt-1 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+              <p className="mt-1 text-xs font-medium text-orange-700 dark:text-orange-400">
                 Accès complet pendant 12 mois
               </p>
               <ul className="mt-6 flex-1 space-y-2.5">
                 {plan.features.slice(0, 5).map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-orange-600 dark:text-orange-400" aria-hidden="true" />
                     {f}
                   </li>
                 ))}
@@ -525,25 +473,24 @@ function FaqPreview() {
 function FinalCta() {
   return (
     <Section>
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-700 via-emerald-800 to-teal-900 px-6 py-16 text-center text-white sm:px-12">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-orange-700 via-orange-800 to-amber-900 px-6 py-16 text-center text-white sm:px-12">
         <div className="gspp-dots absolute inset-0 opacity-20" aria-hidden="true" />
         <div className="relative mx-auto max-w-2xl">
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
             Simplifiez votre travail avec Gestion Scolaire Pro Plus !
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-emerald-50/90">
-            Rejoignez les centaines d&apos;établissements qui gagnent du temps chaque jour.
-            Créez votre compte gratuitement, choisissez votre formule quand vous voulez.
+          <p className="mt-4 text-base leading-relaxed text-orange-50/90">
+            Créez votre compte, téléchargez le logiciel et contactez le développeur pour obtenir votre clé d’activation.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Button size="lg" className="rounded-full bg-white text-emerald-900 hover:bg-emerald-50" onClick={() => navigate("/inscription")}>
+            <Button size="lg" className="rounded-full bg-white text-orange-900 hover:bg-orange-50" onClick={() => navigate("/inscription")}>
               Créer mon compte gratuitement
             </Button>
             <Button size="lg" variant="outline" className="rounded-full border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white" onClick={() => navigate("/telecharger")}>
               Télécharger maintenant
             </Button>
-            <Button size="lg" variant="outline" className="rounded-full border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white" onClick={() => navigate("/support")}>
-              Besoin d&apos;aide ?
+            <Button size="lg" variant="outline" className="rounded-full border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white" onClick={() => navigate("/tarifs")}>
+              Voir les formules
             </Button>
           </div>
         </div>
@@ -557,11 +504,11 @@ export function HomePage() {
   return (
     <main id="contenu">
       <Hero />
-      <StatsBand />
-      <Advantages />
-      <Categories />
       <Screenshots />
       <AndroidScreenshots />
+      <StatsBand />
+      <Advantages />
+      <SchoolRoles />
       <HowItWorks />
       <PricingPreview />
       <Testimonials />

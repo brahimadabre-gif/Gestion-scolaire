@@ -20,12 +20,12 @@ const SIDEBAR_ITEMS = [
 
 function AppWindow({ children, title }: { children: React.ReactNode; title: string }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-2xl shadow-emerald-900/10 dark:shadow-black/40">
+    <div className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-2xl shadow-orange-900/10 dark:shadow-black/40">
       {/* Barre de fenêtre */}
       <div className="flex items-center gap-2 border-b bg-muted/70 px-4 py-2.5">
         <span className="h-2.5 w-2.5 rounded-full bg-rose-400" aria-hidden="true" />
         <span className="h-2.5 w-2.5 rounded-full bg-amber-400" aria-hidden="true" />
-        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" aria-hidden="true" />
+        <span className="h-2.5 w-2.5 rounded-full bg-orange-400" aria-hidden="true" />
         <span className="ml-3 flex-1 truncate text-[11px] font-medium text-muted-foreground">
           Gestion Scolaire Pro Plus — {title}
         </span>
@@ -35,7 +35,7 @@ function AppWindow({ children, title }: { children: React.ReactNode; title: stri
         {/* Menu latéral */}
         <aside className="hidden w-40 shrink-0 flex-col gap-0.5 border-r bg-muted/40 p-2.5 sm:flex" aria-hidden="true">
           <div className="mb-2 flex items-center gap-1.5 px-1.5">
-            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-600">
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-orange-600">
               <GraduationMark />
             </span>
             <span className="text-[10px] font-bold">GSPP</span>
@@ -45,7 +45,7 @@ function AppWindow({ children, title }: { children: React.ReactNode; title: stri
               key={item.label}
               className={cn(
                 "flex items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium",
-                item.active ? "bg-emerald-600 text-white" : "text-muted-foreground"
+                item.active ? "bg-orange-600 text-white" : "text-muted-foreground"
               )}
             >
               <item.icon className="h-3 w-3" />
@@ -100,7 +100,7 @@ function DashboardContent() {
         {stats.map((s) => (
           <div key={s.label} className="rounded-xl border bg-background p-2.5">
             <p className="text-[9px] font-medium text-muted-foreground">{s.label}</p>
-            <p className="mt-0.5 text-base font-bold text-emerald-700 dark:text-emerald-400">{s.value}</p>
+            <p className="mt-0.5 text-base font-bold text-orange-700 dark:text-orange-400">{s.value}</p>
             <p className="text-[9px] text-amber-600 dark:text-amber-400">{s.trend}</p>
           </div>
         ))}
@@ -108,7 +108,7 @@ function DashboardContent() {
       <div className="rounded-xl border bg-background">
         <div className="flex items-center justify-between border-b px-3 py-2">
           <p className="font-semibold">Derniers résultats saisis</p>
-          <span className="flex items-center gap-0.5 text-[9.5px] font-medium text-emerald-700 dark:text-emerald-400">
+          <span className="flex items-center gap-0.5 text-[9.5px] font-medium text-orange-700 dark:text-orange-400">
             Tout voir <ChevronRight className="h-2.5 w-2.5" />
           </span>
         </div>
@@ -116,14 +116,14 @@ function DashboardContent() {
           {rows.map((r) => (
             <div key={r.n} className="flex items-center justify-between px-3 py-1.5">
               <div className="flex items-center gap-2">
-                <span className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-emerald-100 text-[8px] font-bold text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300">
+                <span className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-orange-100 text-[8px] font-bold text-orange-700 dark:bg-orange-900/60 dark:text-orange-300">
                   {r.n[0]}
                 </span>
                 <span className="font-medium">{r.n}</span>
               </div>
               <div className="flex items-center gap-3 text-muted-foreground">
                 <span>{r.cls}</span>
-                <span className="rounded-md bg-emerald-600/10 px-1.5 py-0.5 font-bold text-emerald-700 dark:text-emerald-400">
+                <span className="rounded-md bg-orange-600/10 px-1.5 py-0.5 font-bold text-orange-700 dark:text-orange-400">
                   {r.cls.startsWith("CP") || r.cls.startsWith("CE") ? `${r.moy}/10` : `${r.moy}/20`}
                 </span>
                 <span className="w-6 text-right">{r.rank}</span>
@@ -150,7 +150,7 @@ function NotesContent() {
       <div className="flex flex-wrap items-center gap-1.5">
         <p className="mr-auto font-bold">Notes — Mathématiques · CE2 A · Composition 1</p>
         <span className="rounded-md bg-muted px-1.5 py-0.5 text-[9px] font-semibold">Barème /10</span>
-        <span className="rounded-md bg-emerald-600/10 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700 dark:text-emerald-400">
+        <span className="rounded-md bg-orange-600/10 px-1.5 py-0.5 text-[9px] font-bold text-orange-700 dark:text-orange-400">
           Moy. classe : 7,4
         </span>
       </div>
@@ -176,15 +176,15 @@ function NotesContent() {
                       <span className={cn(
                         "inline-block w-9 rounded-md border px-1 py-0.5 text-center font-semibold",
                         parseFloat(n.replace(",", ".")) >= 5
-                          ? "border-emerald-600/30 bg-emerald-600/5 text-emerald-700 dark:text-emerald-400"
+                          ? "border-orange-600/30 bg-orange-600/5 text-orange-700 dark:text-orange-400"
                           : "border-rose-400/40 bg-rose-500/5 text-rose-600 dark:text-rose-400",
-                        i === 2 && j === 2 && "ring-2 ring-emerald-500"
+                        i === 2 && j === 2 && "ring-2 ring-orange-500"
                       )}>
                         {n}
                       </span>
                     </td>
                   ))}
-                  <td className="px-3 py-1.5 text-right font-bold text-emerald-700 dark:text-emerald-400">
+                  <td className="px-3 py-1.5 text-right font-bold text-orange-700 dark:text-orange-400">
                     {m.toFixed(1).replace(".", ",")}
                   </td>
                 </tr>
@@ -220,7 +220,7 @@ function BulletinContent() {
       </div>
       <div className="rounded-xl border bg-background p-3">
         <div className="mb-2 flex items-center gap-2 border-b pb-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-600">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-600">
             <GraduationMark />
           </span>
           <div>
@@ -251,11 +251,11 @@ function BulletinContent() {
             ))}
           </tbody>
         </table>
-        <div className="mt-2 flex items-center justify-between rounded-lg bg-emerald-600/10 px-2.5 py-1.5">
-          <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
+        <div className="mt-2 flex items-center justify-between rounded-lg bg-orange-600/10 px-2.5 py-1.5">
+          <span className="text-[10px] font-bold text-orange-800 dark:text-orange-300">
             Moyenne générale : 14,55/20
           </span>
-          <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300">Rang : 3e / 42</span>
+          <span className="text-[10px] font-bold text-orange-800 dark:text-orange-300">Rang : 3e / 42</span>
           <span className="text-[9.5px] font-semibold text-amber-700 dark:text-amber-400">Félicitations</span>
         </div>
       </div>
@@ -288,7 +288,7 @@ function ClassementContent() {
         {podium.map((p, i) => (
           <div key={p.n} className="flex flex-col items-center gap-1">
             <span className="text-[9px] font-bold">{p.m}</span>
-            <span className="max-w-full truncate rounded-t-lg bg-emerald-600 px-1.5 py-1 text-[8.5px] font-semibold text-white">
+            <span className="max-w-full truncate rounded-t-lg bg-orange-600 px-1.5 py-1 text-[8.5px] font-semibold text-white">
               {p.n.split(" ")[1]}
             </span>
             <span className={cn("w-full rounded-sm", p.c, i === 0 ? "h-14" : i === 1 ? "h-10" : "h-8")} />
@@ -303,7 +303,7 @@ function ClassementContent() {
               <span className="w-4 text-center font-bold text-muted-foreground">{r.r}</span>
               <span className="font-medium">{r.n}</span>
             </span>
-            <span className="font-bold text-emerald-700 dark:text-emerald-400">{r.m}/20</span>
+            <span className="font-bold text-orange-700 dark:text-orange-400">{r.m}/20</span>
           </div>
         ))}
       </div>

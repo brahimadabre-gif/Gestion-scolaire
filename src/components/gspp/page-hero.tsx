@@ -17,7 +17,7 @@ export function PageHero({
       <div className="gspp-hero-glow absolute inset-0" aria-hidden="true" />
       <div className="relative mx-auto max-w-7xl px-4 py-14 text-center sm:px-6 sm:py-16 lg:px-8">
         {eyebrow && (
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 dark:text-emerald-400">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-orange-600 dark:text-orange-400">
             {eyebrow}
           </p>
         )}

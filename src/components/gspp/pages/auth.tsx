@@ -38,7 +38,7 @@ function AuthCard({
       <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl items-center justify-center px-4 py-12 sm:px-6">
         <div className="w-full max-w-lg">
           <div className="mb-6 flex justify-center lg:hidden">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-700 shadow-lg">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-600 to-orange-700 shadow-lg">
               <GraduationCap className="h-6 w-6 text-white" aria-hidden="true" />
             </span>
           </div>
@@ -87,7 +87,7 @@ function PasswordInput({
 function StrengthMeter({ pw }: { pw: string }) {
   const { score, label } = useMemo(() => passwordStrength(pw), [pw]);
   if (!pw) return null;
-  const colors = ["bg-rose-500", "bg-rose-400", "bg-amber-400", "bg-lime-500", "bg-emerald-500", "bg-emerald-600"];
+  const colors = ["bg-rose-500", "bg-rose-400", "bg-amber-400", "bg-lime-500", "bg-orange-500", "bg-orange-600"];
   return (
     <div className="mt-2">
       <div className="flex gap-1" aria-hidden="true">
@@ -163,7 +163,7 @@ export function LoginPage() {
           )}
         </Button>
         <p className="flex items-center justify-center gap-1.5 pt-1 text-xs text-muted-foreground">
-          <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+          <ShieldCheck className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" aria-hidden="true" />
           Connexion chiffrée — vos données sont protégées.
         </p>
       </form>
@@ -248,7 +248,7 @@ export function RegisterPage() {
             <Input id="reg-lastname" value={form.lastName} onChange={(e) => set("lastName")(e.target.value)} placeholder="Traoré" autoComplete="family-name" required />
           </div>
         </div>
-        <div className="space-y-1.5 rounded-2xl border border-emerald-600/20 bg-emerald-600/5 p-4">
+        <div className="space-y-1.5 rounded-2xl border border-orange-600/20 bg-orange-600/5 p-4">
           <Label htmlFor="reg-ambassador">Code ambassadeur (si vous avez été recommandé)</Label>
           <Input id="reg-ambassador" value={form.ambassadorCode} onChange={(e) => set("ambassadorCode")(e.target.value.toUpperCase())} placeholder="AMB-XXXX-000000" autoComplete="off" />
           <p className="text-xs text-muted-foreground">Ce code permet d&apos;attribuer votre inscription à l&apos;ambassadeur qui vous a recommandé.</p>
@@ -345,7 +345,7 @@ function ForgotPasswordForm() {
     >
       {sent ? (
         <div className="space-y-4 text-center">
-          <MailCheck className="mx-auto h-12 w-12 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+          <MailCheck className="mx-auto h-12 w-12 text-orange-600 dark:text-orange-400" aria-hidden="true" />
           <p className="text-sm leading-relaxed text-muted-foreground">{sent.message}</p>
         </div>
       ) : (
@@ -404,7 +404,7 @@ function ResetPasswordForm({ token }: { token: string }) {
     >
       {done ? (
         <div className="space-y-5 text-center">
-          <ShieldCheck className="mx-auto h-12 w-12 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+          <ShieldCheck className="mx-auto h-12 w-12 text-orange-600 dark:text-orange-400" aria-hidden="true" />
           <p className="text-sm text-muted-foreground">Votre mot de passe a été modifié avec succès.</p>
           <Button size="lg" className="w-full rounded-full" onClick={() => navigate("/connexion")}>
             Se connecter <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />

@@ -3,7 +3,6 @@
 // ── Page Fonctionnalités — organisées par catégories ─────────
 import { Link, navigate } from "../router";
 import { PageHero } from "../page-hero";
-import { AppMockup } from "../app-mockup";
 import { Section, SectionHeading } from "../ui-bits";
 import { Button } from "@/components/ui/button";
 import { navigate as nav } from "../router";
@@ -109,7 +108,7 @@ export function FeaturesPage() {
               }}
               className="card-hover flex items-center gap-3 rounded-2xl border bg-card px-4 py-3.5 text-sm font-semibold"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-600/10 text-orange-700 dark:text-orange-400">
                 <g.icon className="h-4.5 w-4.5" aria-hidden="true" />
               </span>
               {g.title}
@@ -129,7 +128,7 @@ export function FeaturesPage() {
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {g.features.map((f) => (
               <article key={f.name} className="card-hover rounded-2xl border bg-card p-5">
-                <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">
+                <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-orange-600/10 text-orange-700 dark:text-orange-400">
                   <f.icon className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <h3 className="text-[15px] font-semibold">{f.name}</h3>
@@ -140,31 +139,27 @@ export function FeaturesPage() {
         </Section>
       ))}
 
-      {/* Capture + conclusion */}
+      {/* Synthèse pratique */}
       <Section className="bg-secondary/40">
-        <div className="grid items-center gap-10 lg:grid-cols-2">
-          <div>
-            <SectionHeading
-              align="left"
-              eyebrow="En pratique"
-              title="Du fichier Excel au bulletin imprimé, sans ressaisie"
-              description="Importez vos listes d'élèves, saisissez les notes au clavier, générez les bulletins et imprimez. Chaque étape est pensée pour vous faire gagner du temps."
-            />
-            <ul className="mt-6 space-y-2.5">
-              {[
-                "Import intelligent avec détection des colonnes et contrôle des doublons",
-                "Saisie des notes optimisée clavier, sans jamais quitter le pavé numérique",
-                "Bulletins et rapports générés pour toute une classe en un clic",
-                "Export PDF archivé automatiquement avec un nom de fichier clair",
-              ].map((t) => (
-                <li key={t} className="flex items-start gap-2 text-sm">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-                  {t}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <AppMockup variant="bulletin" />
+        <div className="mx-auto max-w-4xl">
+          <SectionHeading
+            eyebrow="En pratique"
+            title="Du fichier Excel au bulletin imprimé, sans ressaisie"
+            description="Importez vos listes d'élèves, saisissez les notes au clavier, générez les bulletins et imprimez. Chaque étape est pensée pour vous faire gagner du temps."
+          />
+          <ul className="mt-8 grid gap-3 sm:grid-cols-2">
+            {[
+              "Import intelligent avec détection des colonnes et contrôle des doublons",
+              "Saisie des notes optimisée clavier, sans jamais quitter le pavé numérique",
+              "Bulletins et rapports générés pour toute une classe en un clic",
+              "Export PDF archivé automatiquement avec un nom de fichier clair",
+            ].map((t) => (
+              <li key={t} className="flex items-start gap-2 rounded-2xl border bg-card p-4 text-sm">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-orange-600 dark:text-orange-400" aria-hidden="true" />
+                {t}
+              </li>
+            ))}
+          </ul>
         </div>
       </Section>
 

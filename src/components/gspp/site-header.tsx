@@ -21,7 +21,7 @@ import {
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <Link to="/" className="flex items-center gap-2.5 shrink-0" ariaLabel="Accueil — Gestion Scolaire Pro Plus">
-      <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-700 shadow-sm">
+      <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-600 to-orange-700 shadow-sm">
         <GraduationCap className="h-5 w-5 text-white" aria-hidden="true" />
       </span>
       {!compact && (
@@ -87,7 +87,7 @@ export function SiteHeader() {
         <Logo />
 
         {/* Navigation bureau */}
-        <nav className="hidden lg:flex items-center gap-1" aria-label="Navigation principale">
+        <nav className="hidden 2xl:flex items-center gap-1" aria-label="Navigation principale">
           {MAIN_NAV.map((item) => (
             <Link
               key={item.route}
@@ -168,7 +168,7 @@ export function SiteHeader() {
           {/* Menu mobile */}
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden rounded-full" aria-label="Ouvrir le menu">
+              <Button variant="ghost" size="icon" className="2xl:hidden rounded-full" aria-label="Ouvrir le menu">
                 <Menu className="h-5 w-5" aria-hidden="true" />
               </Button>
             </SheetTrigger>

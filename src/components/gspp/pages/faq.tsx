@@ -66,7 +66,7 @@ export function FaqPage() {
             <div className="mt-10 space-y-10">
               {Object.entries(grouped).map(([category, items]) => (
                 <div key={category}>
-                  <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.12em] text-emerald-600 dark:text-emerald-400">
+                  <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.12em] text-orange-600 dark:text-orange-400">
                     {CATEGORY_LABELS[category] ?? category}
                   </h2>
                   <Accordion type="single" collapsible>

@@ -81,16 +81,16 @@ export function LibraryPage() {
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {documents.map((item) => (
               <article key={item.id} className="group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
-                <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-900 via-emerald-700 to-amber-500 p-5">
+                <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-gradient-to-br from-orange-900 via-orange-700 to-amber-500 p-5">
                   {item.coverUrl ? (
                     <img src={item.coverUrl} alt={`Couverture de ${item.title}`} className="h-full w-full object-contain drop-shadow-xl" />
                   ) : (
-                    <div className="flex h-32 w-24 flex-col items-center justify-center rounded-md bg-white/95 p-2 text-center text-emerald-900 shadow-xl">
+                    <div className="flex h-32 w-24 flex-col items-center justify-center rounded-md bg-white/95 p-2 text-center text-orange-900 shadow-xl">
                       <BookOpen className="h-8 w-8" aria-hidden="true" />
                       <span className="mt-2 line-clamp-3 text-[10px] font-bold uppercase">{item.title}</span>
                     </div>
                   )}
-                  <Badge className="absolute left-3 top-3 rounded-full bg-white/90 text-emerald-800 hover:bg-white/90">{item.level}</Badge>
+                  <Badge className="absolute left-3 top-3 rounded-full bg-white/90 text-orange-800 hover:bg-white/90">{item.level}</Badge>
                 </div>
                 <div className="flex flex-1 flex-col p-5">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -117,7 +117,7 @@ export function LibraryPage() {
 
       <Section className="bg-secondary/40">
         <div className="mx-auto flex max-w-3xl items-start gap-4 rounded-2xl border bg-card p-5">
-          <CalendarDays className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" aria-hidden="true" />
+          <CalendarDays className="mt-0.5 h-5 w-5 shrink-0 text-orange-600" aria-hidden="true" />
           <p className="text-sm leading-relaxed text-muted-foreground">La bibliothèque est enrichie progressivement avec des ressources adaptées aux niveaux du primaire. Les documents sont publiés et retirés par l&apos;administrateur du site.</p>
         </div>
       </Section>

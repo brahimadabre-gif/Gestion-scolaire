@@ -10,6 +10,7 @@ import { PageHero } from "../page-hero";
 import { Section, SectionHeading, Spinner } from "../ui-bits";
 import { formatDate } from "@/lib/site";
 import { Button } from "@/components/ui/button";
+import { DeveloperContact } from "../developer-contact";
 import ReactMarkdown from "react-markdown";
 import {
   LogIn, Monitor, Smartphone, Download as DownloadIcon,
@@ -65,7 +66,7 @@ export function DownloadPage() {
       <PageHero
         eyebrow="Téléchargement"
         title="Télécharger Gestion Scolaire Pro Plus"
-        description="Gestion Scolaire Pro Plus est disponible sur Windows et Android. L'accès complet coûte 15 000 FCFA pour 12 mois après activation de l'abonnement."
+        description="Gestion Scolaire Pro Plus est disponible sur Windows et Android. Téléchargez le logiciel et contactez le développeur pour obtenir une clé d’activation."
       />
 
       {/* Bloc de téléchargement principal */}
@@ -77,7 +78,7 @@ export function DownloadPage() {
             <div className="rounded-3xl border bg-card p-8 shadow-lg sm:p-10">
               <div className="flex flex-col items-center gap-6 text-center">
                 <div
-                  className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-600 to-emerald-800 text-white shadow-xl shadow-emerald-600/25"
+                  className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-orange-600 to-orange-800 text-white shadow-xl shadow-orange-600/25"
                   aria-hidden="true"
                 >
                   <PackageCheck className="h-10 w-10" />
@@ -107,7 +108,7 @@ export function DownloadPage() {
                         aria-pressed={os === o.id}
                         className={`flex flex-col items-center gap-1.5 rounded-2xl border px-3 py-3.5 text-xs font-semibold transition ${
                           os === o.id
-                            ? "border-emerald-600 bg-emerald-600/10 text-emerald-700 dark:text-emerald-400"
+                            ? "border-orange-600 bg-orange-600/10 text-orange-700 dark:text-orange-400"
                             : "bg-background text-muted-foreground hover:border-ring/50"
                         }`}
                       >
@@ -169,7 +170,7 @@ export function DownloadPage() {
                   { icon: HardDrive, label: "Espace disque", value: "500 Mo disponibles" },
                 ].map((c) => (
                   <div key={c.label} className="flex items-start gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-secondary text-emerald-700 dark:text-emerald-400">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-secondary text-orange-700 dark:text-orange-400">
                       <c.icon className="h-4.5 w-4.5" aria-hidden="true" />
                     </span>
                     <div>
@@ -206,8 +207,8 @@ export function DownloadPage() {
             </div>
 
             {subscription?.status === "ACTIVE" && (
-              <div className="mt-6 rounded-2xl border border-emerald-600/30 bg-emerald-600/5 p-5 text-sm">
-                <p className="flex items-center gap-2 font-semibold text-emerald-700 dark:text-emerald-400">
+              <div className="mt-6 rounded-2xl border border-orange-600/30 bg-orange-600/5 p-5 text-sm">
+                <p className="flex items-center gap-2 font-semibold text-orange-700 dark:text-orange-400">
                   <ShieldCheck className="h-4 w-4" aria-hidden="true" />
                   Votre abonnement « {subscription.plan.name} » est actif
                 </p>
@@ -216,6 +217,9 @@ export function DownloadPage() {
                 </p>
               </div>
             )}
+            <div className="mt-6">
+              <DeveloperContact compact />
+            </div>
           </div>
         )}
       </Section>
@@ -255,10 +259,10 @@ export function DownloadPage() {
               { t: "Lancez l'installateur", d: "Ouvrez le fichier téléchargé. Si Windows affiche un avertissement de sécurité, cliquez sur « Informations complémentaires » puis « Exécuter quand même »." },
               { t: "Suivez l'assistant", d: "Acceptez la licence d'utilisation et conservez le dossier d'installation par défaut, puis cliquez sur « Installer »." },
               { t: "Ouvrez le logiciel", d: "Au premier lancement, Gestion Scolaire Pro Plus prépare sa base de données locale sur votre ordinateur." },
-              { t: "Activez votre licence", d: "Copiez la clé de licence depuis votre tableau de bord et collez-la dans l'écran d'activation du logiciel." },
+              { t: "Activez votre licence", d: "Contactez le développeur pour obtenir votre clé d’activation. Si une clé est déjà disponible dans votre tableau de bord, copiez-la dans l’écran d’activation du logiciel." },
             ].map((s, i) => (
               <li key={s.t} className="flex gap-4">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-600 text-sm font-bold text-white">
                   {i + 1}
                 </span>
                 <div>
@@ -270,7 +274,7 @@ export function DownloadPage() {
           </ol>
           <div className="mt-10 rounded-2xl bg-secondary/70 p-5 text-sm">
             <p className="flex items-center gap-2 font-semibold">
-              <Smartphone className="h-4 w-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+              <Smartphone className="h-4 w-4 text-orange-600 dark:text-orange-400" aria-hidden="true" />
               Sur tablette ou téléphone ?
             </p>
             <p className="mt-1.5 text-muted-foreground">

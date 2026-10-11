@@ -103,7 +103,7 @@ export function SupportPage() {
             { icon: Search, title: "FAQ", text: "Les réponses les plus fréquentes.", href: "/faq", cta: "Parcourir la FAQ" },
           ].map((c) => (
             <Link key={c.title} to={c.href} className="card-hover rounded-2xl border bg-card p-6">
-              <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">
+              <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-orange-600/10 text-orange-700 dark:text-orange-400">
                 <c.icon className="h-5.5 w-5.5" aria-hidden="true" />
               </span>
               <h2 className="text-[15px] font-semibold">{c.title}</h2>
@@ -125,8 +125,8 @@ export function SupportPage() {
               description="Décrivez votre demande avec le plus de détails possible : plus elle est précise, plus la réponse est rapide."
             />
             {submittedRef ? (
-              <div className="mt-8 rounded-3xl border border-emerald-600/30 bg-emerald-600/5 p-8 text-center">
-                <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+              <div className="mt-8 rounded-3xl border border-orange-600/30 bg-orange-600/5 p-8 text-center">
+                <CheckCircle2 className="mx-auto h-12 w-12 text-orange-600 dark:text-orange-400" aria-hidden="true" />
                 <h3 className="mt-4 text-lg font-bold">Demande enregistrée !</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   Votre référence de suivi : <span className="font-mono font-bold text-foreground">{submittedRef}</span>.
@@ -238,8 +238,8 @@ export function SupportPage() {
                       <h3 className="mt-2 text-[15px] font-semibold">{t.subject}</h3>
                       <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{t.message}</p>
                       {t.response && (
-                        <div className="mt-3 rounded-xl border-l-4 border-emerald-500 bg-emerald-500/5 px-4 py-3">
-                          <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Réponse du support</p>
+                        <div className="mt-3 rounded-xl border-l-4 border-orange-500 bg-orange-500/5 px-4 py-3">
+                          <p className="text-xs font-bold text-orange-700 dark:text-orange-400">Réponse du support</p>
                           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t.response}</p>
                         </div>
                       )}

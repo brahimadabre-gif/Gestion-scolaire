@@ -160,7 +160,7 @@ function EntityCrud({ entity, title, fields, description }: {
                   {tableFields.map((f) => (
                     <td key={f.name} className="max-w-[280px] px-4 py-3">
                       {f.type === "boolean" ? (
-                        item[f.name] ? <span className="text-emerald-600 dark:text-emerald-400">●</span> : <span className="text-muted-foreground/40">○</span>
+                        item[f.name] ? <span className="text-orange-600 dark:text-orange-400">●</span> : <span className="text-muted-foreground/40">○</span>
                       ) : f.type === "list" && Array.isArray(item[f.name]) ? (
                         (item[f.name] as string[]).length + " élément(s)"
                       ) : (
@@ -283,7 +283,7 @@ function Overview() {
         {cards.map((c) => (
           <button key={c.label} className="card-hover rounded-2xl border bg-card p-5 text-left" onClick={() => document.getElementById(`tab-${c.href}`)?.click()}>
             <div className="flex items-center justify-between">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-600/10 text-orange-700 dark:text-orange-400">
                 <c.icon className="h-5 w-5" aria-hidden="true" />
               </span>
               {c.label === "Revenus totaux" && stats.version && (
@@ -302,13 +302,13 @@ function Overview() {
       <div className="grid gap-5 lg:grid-cols-2">
         <div className="rounded-2xl border bg-card p-5">
           <h3 className="flex items-center gap-2 text-[15px] font-semibold">
-            <Activity className="h-4 w-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+            <Activity className="h-4 w-4 text-orange-600 dark:text-orange-400" aria-hidden="true" />
             Journal d&apos;activité (sécurité & audit)
           </h3>
           <ul className="mt-4 max-h-80 space-y-2.5 overflow-y-auto gspp-scrollbar pr-2">
             {stats.recentLogs.map((l) => (
               <li key={l.id} className="flex items-start gap-3 text-sm">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" aria-hidden="true" />
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-500" aria-hidden="true" />
                 <div className="min-w-0">
                   <p className="truncate">
                     <span className="font-mono text-xs font-bold text-primary">{l.action}</span>{" "}
@@ -323,7 +323,7 @@ function Overview() {
         </div>
         <div className="rounded-2xl border bg-card p-5">
           <h3 className="flex items-center gap-2 text-[15px] font-semibold">
-            <UserCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+            <UserCheck className="h-4 w-4 text-orange-600 dark:text-orange-400" aria-hidden="true" />
             Derniers inscrits
           </h3>
           <ul className="mt-4 space-y-3">
@@ -412,7 +412,7 @@ function AdminUsers() {
                     </td>
                     <td className="px-4 py-3">
                       {u.active ? (
-                        <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400"><UserCheck className="h-3.5 w-3.5" aria-hidden="true" /> Actif</span>
+                        <span className="inline-flex items-center gap-1.5 text-orange-600 dark:text-orange-400"><UserCheck className="h-3.5 w-3.5" aria-hidden="true" /> Actif</span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 text-rose-600 dark:text-rose-400"><UserX className="h-3.5 w-3.5" aria-hidden="true" /> Désactivé</span>
                       )}
@@ -802,7 +802,7 @@ function AdminTickets() {
                 <span>{String(t.name)} — {String(t.email)} · {formatDate(String(t.createdAt))}</span>
                 <div className="flex gap-2">
                   {t.response ? (
-                    <span className="rounded-full bg-emerald-600/10 px-2.5 py-1 font-semibold text-emerald-700 dark:text-emerald-400">
+                    <span className="rounded-full bg-orange-600/10 px-2.5 py-1 font-semibold text-orange-700 dark:text-orange-400">
                       Répondu
                     </span>
                   ) : (
@@ -814,7 +814,7 @@ function AdminTickets() {
                 </div>
               </div>
               {Boolean(t.response) && (
-                <div className="mt-3 rounded-xl border-l-4 border-emerald-500 bg-emerald-500/5 px-4 py-3 text-sm text-muted-foreground">
+                <div className="mt-3 rounded-xl border-l-4 border-orange-500 bg-orange-500/5 px-4 py-3 text-sm text-muted-foreground">
                   {String(t.response)}
                 </div>
               )}
@@ -953,7 +953,7 @@ function AdminAmbassadors() {
   return <div>
     <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-lg font-bold">Ambassadeurs</h2><p className="text-sm text-muted-foreground">Créez les comptes, suivez les recommandations et fixez la commission par abonnement confirmé.</p></div><Button className="rounded-full" onClick={() => setOpen(!open)}><Plus className="mr-1.5 h-4 w-4" aria-hidden="true" /> Créer un ambassadeur</Button></div>
     {open && <form onSubmit={create} className="mt-5 grid gap-4 rounded-2xl border bg-card p-5 sm:grid-cols-2 lg:grid-cols-3"><Input value={form.firstName} onChange={set("firstName")} placeholder="Prénom" required /><Input value={form.lastName} onChange={set("lastName")} placeholder="Nom" required /><Input type="email" value={form.email} onChange={set("email")} placeholder="E-mail" required /><Input value={form.phone} onChange={set("phone")} placeholder="Téléphone" /><Input type="password" value={form.password} onChange={set("password")} placeholder="Mot de passe temporaire" required minLength={8} /><Input type="number" value={form.commissionAmount} onChange={set("commissionAmount")} placeholder="Commission (FCFA)" min={0} required /><div className="flex gap-2 sm:col-span-2 lg:col-span-3"><Button type="submit" disabled={saving}>{saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}Créer le compte</Button><Button type="button" variant="outline" onClick={() => setOpen(false)}>Annuler</Button></div></form>}
-    {isLoading ? <Spinner /> : <div className="mt-5 overflow-x-auto rounded-2xl border"><table className="w-full min-w-[800px] text-sm"><thead><tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground"><th className="px-4 py-3">Ambassadeur</th><th className="px-4 py-3">Code</th><th className="px-4 py-3">Abonnements confirmés</th><th className="px-4 py-3">Commission</th><th className="px-4 py-3">Gains</th></tr></thead><tbody className="divide-y">{(ambassadors ?? []).map((a) => { const u = a.user as Record<string, unknown>; return <tr key={String(a.id)}><td className="px-4 py-3"><strong>{String(u?.firstName ?? "")} {String(u?.lastName ?? "")}</strong><span className="block text-xs text-muted-foreground">{String(u?.email ?? "")}</span></td><td className="px-4 py-3 font-mono text-xs">{String(a.code)}</td><td className="px-4 py-3">{String(a.totalConfirmed ?? 0)}</td><td className="px-4 py-3"><Input className="w-32" type="number" defaultValue={String(a.commissionAmount ?? 1500)} min={0} onBlur={(e) => updateCommission(String(a.id), e.target.value)} /></td><td className="px-4 py-3 font-semibold text-emerald-700">{formatFcfa(Number(a.totalCommissions ?? 0) + Number(a.totalBonuses ?? 0))}</td></tr>; })}{!ambassadors?.length && <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">Aucun ambassadeur enregistré.</td></tr>}</tbody></table></div>}
+    {isLoading ? <Spinner /> : <div className="mt-5 overflow-x-auto rounded-2xl border"><table className="w-full min-w-[800px] text-sm"><thead><tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground"><th className="px-4 py-3">Ambassadeur</th><th className="px-4 py-3">Code</th><th className="px-4 py-3">Abonnements confirmés</th><th className="px-4 py-3">Commission</th><th className="px-4 py-3">Gains</th></tr></thead><tbody className="divide-y">{(ambassadors ?? []).map((a) => { const u = a.user as Record<string, unknown>; return <tr key={String(a.id)}><td className="px-4 py-3"><strong>{String(u?.firstName ?? "")} {String(u?.lastName ?? "")}</strong><span className="block text-xs text-muted-foreground">{String(u?.email ?? "")}</span></td><td className="px-4 py-3 font-mono text-xs">{String(a.code)}</td><td className="px-4 py-3">{String(a.totalConfirmed ?? 0)}</td><td className="px-4 py-3"><Input className="w-32" type="number" defaultValue={String(a.commissionAmount ?? 1500)} min={0} onBlur={(e) => updateCommission(String(a.id), e.target.value)} /></td><td className="px-4 py-3 font-semibold text-orange-700">{formatFcfa(Number(a.totalCommissions ?? 0) + Number(a.totalBonuses ?? 0))}</td></tr>; })}{!ambassadors?.length && <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">Aucun ambassadeur enregistré.</td></tr>}</tbody></table></div>}
   </div>;
 }
 
@@ -1003,7 +1003,7 @@ export function AdminPage() {
     <main id="contenu" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600 dark:text-emerald-400">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-600 dark:text-orange-400">
             Administration
           </p>
           <h1 className="mt-1 text-3xl font-extrabold tracking-tight">Gestion de la plateforme</h1>
@@ -1016,7 +1016,7 @@ export function AdminPage() {
       <Tabs defaultValue="overview" className="mt-8">
         <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 overflow-x-auto rounded-2xl p-1.5 gspp-scrollbar">
           {TABS.map((t) => (
-            <TabsTrigger key={t.id} id={`tab-${t.id === "overview" ? "users" : t.id}`} value={t.id} className="gap-1.5 rounded-xl px-3.5 py-2 text-[13px] data-[state=active]:bg-emerald-600 data-[state=active]:text-white">
+            <TabsTrigger key={t.id} id={`tab-${t.id === "overview" ? "users" : t.id}`} value={t.id} className="gap-1.5 rounded-xl px-3.5 py-2 text-[13px] data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               <t.icon className="h-3.5 w-3.5" aria-hidden="true" />
               {t.label}
             </TabsTrigger>

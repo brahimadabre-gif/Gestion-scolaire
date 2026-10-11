@@ -3,17 +3,14 @@
 // ── Page Tarifs — comparaison des offres + FAQ abonnements ──
 import { useQuery } from "@tanstack/react-query";
 import { api, FaqItem, Plan } from "../api";
-import { navigate } from "../router";
-import { useAuth } from "../auth-context";
 import { PageHero } from "../page-hero";
 import { Section, SectionHeading, Spinner } from "../ui-bits";
 import { formatFcfa } from "@/lib/site";
-import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Check, Minus, ShieldCheck, RefreshCcw, Smartphone } from "lucide-react";
+import { Check, Minus, ShieldCheck, RefreshCcw, KeyRound } from "lucide-react";
+import { DeveloperContact, developerWhatsAppHref } from "../developer-contact";
 
 export function PricingPage() {
-  const { user } = useAuth();
   const { data: plans, isLoading } = useQuery<Plan[]>({
     queryKey: ["plans"],
     queryFn: () => api.get<Plan[]>("/api/plans"),
@@ -32,9 +29,9 @@ export function PricingPage() {
       <PageHero
         eyebrow="Nos abonnements"
         title="Des tarifs simples, sans surprise"
-        description="L'abonnement coûte 15 000 FCFA pour 12 mois. Payez par Wave ou Orange Money, puis envoyez la preuve du dépôt."
+        description="Découvrez les formules et contactez le développeur pour obtenir votre clé d’activation."
       >
-        <p className="text-center text-sm font-semibold text-emerald-700 dark:text-emerald-400">15 000 FCFA pour 12 mois</p>
+        <p className="text-center text-sm font-semibold text-orange-700 dark:text-orange-400">Clé d’activation sur demande</p>
       </PageHero>
 
       {/* Cartes de formules */}
@@ -51,12 +48,12 @@ export function PricingPage() {
                   key={plan.slug}
                   className={`relative flex w-full max-w-xl flex-col rounded-2xl border bg-card p-7 ${
                     plan.highlighted
-                      ? "border-emerald-600 shadow-xl shadow-emerald-600/10 ring-1 ring-emerald-600"
+                      ? "border-orange-600 shadow-xl shadow-orange-600/10 ring-1 ring-orange-600"
                       : "card-hover"
                   }`}
                 >
                   {plan.highlighted && (
-                    <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-emerald-600 px-4 py-1 text-xs font-bold text-white shadow">
+                    <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-orange-600 px-4 py-1 text-xs font-bold text-white shadow">
                       Recommandée
                     </span>
                   )}
@@ -66,29 +63,25 @@ export function PricingPage() {
                     <span className="text-4xl font-extrabold tracking-tight">{formatFcfa(price)}</span>
                     <span className="text-sm text-muted-foreground"> {period}</span>
                   </p>
-                  <p className="mt-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                  <p className="mt-1 text-xs font-semibold text-orange-700 dark:text-orange-400">
                     Accès pendant 12 mois
                   </p>
 
                   <ul className="mt-5 flex-1 space-y-2.5">
                     {plan.features.map((f) => (
                       <li key={f} className="flex items-start gap-2 text-sm">
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-orange-600 dark:text-orange-400" aria-hidden="true" />
                         {f}
                       </li>
                     ))}
                   </ul>
-                  <Button
-                    className="mt-7 w-full rounded-full"
-                    size="lg"
-                    variant={plan.highlighted ? "default" : "outline"}
-                    onClick={() => {
-                      if (user) navigate(`/compte/abonnement?formule=${plan.slug}&cycle=annual`);
-                      else navigate(`/inscription?formule=${plan.slug}`);
-                    }}
+                  <a
+                    className={`mt-7 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2 ${plan.highlighted ? "bg-orange-600 text-white hover:bg-orange-700" : "border hover:bg-secondary"}`}
+                    href={developerWhatsAppHref(`Bonjour, je souhaite obtenir une clé d’activation pour la formule ${plan.name} de Gestion Scolaire Pro Plus.`)}
+                    target="_blank" rel="noopener noreferrer"
                   >
-                    Choisir cette offre
-                  </Button>
+                    <KeyRound className="h-4 w-4" aria-hidden="true" /> Contacter pour obtenir une clé
+                  </a>
                 </article>
               );
             })}
@@ -100,12 +93,12 @@ export function PricingPage() {
       <Section className="bg-secondary/40 py-14">
         <div className="grid gap-6 sm:grid-cols-3">
           {[
-            { icon: Smartphone, title: "Paiement Wave ou Orange Money", text: "Payez 15 000 FCFA par QR Wave ou dépôt sur le +225 07 09 93 33 64, puis envoyez la preuve." },
+            { icon: KeyRound, title: "Clé d’activation", text: "Contactez le développeur pour connaître les étapes d’obtention de votre clé." },
             { icon: RefreshCcw, title: "Renouvellement simple", text: "Chaque renouvellement ajoute 12 mois à la durée restante : aucun jour perdu." },
             { icon: ShieldCheck, title: "Garantie satisfait", text: "Une question ? Le support répond sous 24 h ouvrées. Vos données restent sur votre poste." },
           ].map((r) => (
             <div key={r.title} className="flex items-start gap-4 rounded-2xl border bg-card p-5">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-600/10 text-orange-700 dark:text-orange-400">
                 <r.icon className="h-5 w-5" aria-hidden="true" />
               </span>
               <div>
@@ -115,6 +108,10 @@ export function PricingPage() {
             </div>
           ))}
         </div>
+      </Section>
+
+      <Section>
+        <DeveloperContact compact />
       </Section>
 
       {/* Tableau comparatif */}
@@ -171,7 +168,7 @@ export function PricingPage() {
                     return (
                       <td key={p.slug} className="px-4 py-3 text-center">
                         {included ? (
-                          <Check className="mx-auto h-4 w-4 text-emerald-600 dark:text-emerald-400" aria-label="Inclus" />
+                          <Check className="mx-auto h-4 w-4 text-orange-600 dark:text-orange-400" aria-label="Inclus" />
                         ) : (
                           <Minus className="mx-auto h-4 w-4 text-muted-foreground/40" aria-label="Non inclus" />
                         )}
