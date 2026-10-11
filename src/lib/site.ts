@@ -38,7 +38,6 @@ export type Route =
 export const MAIN_NAV: { label: string; route: Route }[] = [
   { label: "Accueil", route: "/" },
   { label: "Fonctionnalités", route: "/fonctionnalites" },
-  { label: "Tarifs", route: "/tarifs" },
   { label: "Télécharger", route: "/telecharger" },
   { label: "Notice", route: "/notice" },
   { label: "Bibliothèque", route: "/bibliotheque" },
