@@ -41,6 +41,7 @@ const ANDROID_INSTALLER_URL = "/downloads/APK-Gestion-Scolaire-Pro-v1.5.1.apk";
 const ANDROID_INSTALLER_NAME = "APK-Gestion-Scolaire-Pro-v1.5.1.apk";
 const ANDROID_VERSION = "1.5.1";
 const ANDROID_FILE_SIZE = "8,5 Mo";
+const WINDOWS_STORE_URL = "https://apps.microsoft.com/detail/9N71Q8PTCPCZ?hl=fr-011&gl=CI&ocid=pdpshare";
 
 export function DownloadPage() {
   const { user, subscription } = useAuth();
@@ -53,8 +54,6 @@ export function DownloadPage() {
     queryFn: () => api.get<SoftwareVersion>("/api/versions"),
     staleTime: 60_000,
   });
-  const hasInstaller = Boolean(version?.downloadUrl?.trim());
-
   const osLabel: Record<OS, string> = {
     windows: "Windows",
     android: "Android",
@@ -66,7 +65,7 @@ export function DownloadPage() {
       <PageHero
         eyebrow="Téléchargement"
         title="Télécharger Gestion Scolaire Pro Plus"
-        description="Gestion Scolaire Pro Plus est disponible sur Windows et Android. Téléchargez le logiciel et contactez le développeur pour obtenir une clé d’activation."
+        description="Gestion Scolaire Pro Plus est disponible sur Windows via Microsoft Store et sur Android. Téléchargez le logiciel et contactez le développeur pour obtenir une clé d’activation."
       />
 
       {/* Bloc de téléchargement principal */}
@@ -118,19 +117,15 @@ export function DownloadPage() {
                     ))}
                   </div>
 
-                  {/* Lien de téléchargement configurable (SoftwareVersion.downloadUrl en base) */}
-                  {os === "windows" && hasInstaller ? (
+                  {/* La version Windows est distribuée via la page Microsoft Store officielle. */}
+                  {os === "windows" ? (
                     <Button
                       size="lg"
                       className="w-full rounded-full text-base"
-                      onClick={() => {
-                        if (version.downloadUrl) {
-                          window.open(version.downloadUrl, "_blank", "noopener");
-                        }
-                      }}
+                      onClick={() => window.open(WINDOWS_STORE_URL, "_blank", "noopener,noreferrer")}
                     >
                       <DownloadIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-                      Télécharger pour Windows ({version.fileSizeMb} Mo)
+                      Télécharger depuis Microsoft Store
                     </Button>
                   ) : os === "android" ? (
                     <Button
@@ -155,9 +150,9 @@ export function DownloadPage() {
                   <p className="mt-3 text-xs text-muted-foreground">
                     {os === "android"
                       ? `Fichier : ${ANDROID_INSTALLER_NAME} · Installer pour Android`
-                      : hasInstaller
-                        ? `Fichier : ${version.installerName} · Installer pour Windows`
-                        : "Aucun installateur ajouté pour le moment"}
+                      : os === "windows"
+                        ? "Version Windows officielle · Microsoft Store"
+                        : "Choisissez Windows ou Android pour accéder au téléchargement"}
                   </p>
                 </div>
               </div>
@@ -256,8 +251,8 @@ export function DownloadPage() {
           />
           <ol className="mt-10 space-y-5">
             {[
-              { t: "Lancez l'installateur", d: "Ouvrez le fichier téléchargé. Si Windows affiche un avertissement de sécurité, cliquez sur « Informations complémentaires » puis « Exécuter quand même »." },
-              { t: "Suivez l'assistant", d: "Acceptez la licence d'utilisation et conservez le dossier d'installation par défaut, puis cliquez sur « Installer »." },
+              { t: os === "windows" ? "Ouvrez la page Microsoft Store" : "Téléchargez l’application", d: os === "windows" ? "Cliquez sur le bouton ci-dessus pour consulter la fiche officielle de Gestion Scolaire Pro Plus sur Microsoft Store." : "Utilisez le bouton Android ci-dessus pour télécharger le fichier APK." },
+              { t: "Installez le logiciel", d: os === "windows" ? "Sur Microsoft Store, cliquez sur « Obtenir » ou « Installer », puis laissez le Store terminer l’installation." : "Ouvrez le fichier APK téléchargé et suivez les instructions affichées par Android." },
               { t: "Ouvrez le logiciel", d: "Au premier lancement, Gestion Scolaire Pro Plus prépare sa base de données locale sur votre ordinateur." },
               { t: "Activez votre licence", d: "Contactez le développeur pour obtenir votre clé d’activation. Si une clé est déjà disponible dans votre tableau de bord, copiez-la dans l’écran d’activation du logiciel." },
             ].map((s, i) => (

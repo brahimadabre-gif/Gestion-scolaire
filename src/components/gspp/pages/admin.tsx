@@ -1057,7 +1057,7 @@ export function AdminPage() {
           <EntityCrud
             entity="versions"
             title="Versions du logiciel"
-            description="Le lien de téléchargement pointe vers downloadUrl — remplacez-le à chaque nouvelle version."
+            description="Les utilisateurs Windows sont dirigés vers la fiche Microsoft Store. Le téléchargement Android reste disponible sur la page publique."
             fields={[
               { name: "version", label: "Numéro de version", type: "text", placeholder: "3.2.1" },
               { name: "channel", label: "Canal", type: "select", options: ["stable", "beta"] },
