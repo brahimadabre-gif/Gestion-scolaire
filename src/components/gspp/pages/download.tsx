@@ -119,13 +119,11 @@ export function DownloadPage() {
 
                   {/* La version Windows est distribuée via la page Microsoft Store officielle. */}
                   {os === "windows" ? (
-                    <Button
-                      size="lg"
-                      className="w-full rounded-full text-base"
-                      onClick={() => window.open(WINDOWS_STORE_URL, "_blank", "noopener,noreferrer")}
-                    >
-                      <DownloadIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-                      Télécharger depuis Microsoft Store
+                    <Button asChild size="lg" className="w-full rounded-full text-base">
+                      <a href={WINDOWS_STORE_URL} target="_blank" rel="noopener noreferrer">
+                        <DownloadIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+                        Télécharger depuis Microsoft Store
+                      </a>
                     </Button>
                   ) : os === "android" ? (
                     <Button
