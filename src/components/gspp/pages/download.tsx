@@ -37,10 +37,10 @@ function getClientOs(): OS {
 const subscribeNoop = () => () => {};
 const getServerOs = () => "other" as OS;
 
-const ANDROID_INSTALLER_URL = "/downloads/APK-Gestion-Scolaire-Pro-v1.5.1.apk";
-const ANDROID_INSTALLER_NAME = "APK-Gestion-Scolaire-Pro-v1.5.1.apk";
-const ANDROID_VERSION = "1.5.1";
-const ANDROID_FILE_SIZE = "8,5 Mo";
+const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.15.apk";
+const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.15.apk";
+const ANDROID_VERSION = "2.3.15";
+const ANDROID_FILE_SIZE = "8,0 Mo";
 const WINDOWS_STORE_URL = "https://apps.microsoft.com/detail/9N71Q8PTCPCZ?hl=fr-011&gl=CI&ocid=pdpshare";
 
 export function DownloadPage() {
@@ -84,7 +84,7 @@ export function DownloadPage() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold">
-                    Gestion Scolaire Pro Plus {version.version}
+                    Gestion Scolaire Pro Plus {os === "android" ? ANDROID_VERSION : version.version}
                   </h2>
                 </div>
 
@@ -126,13 +126,11 @@ export function DownloadPage() {
                       </a>
                     </Button>
                   ) : os === "android" ? (
-                    <Button
-                      size="lg"
-                      className="w-full rounded-full text-base"
-                      onClick={() => window.open(ANDROID_INSTALLER_URL, "_blank", "noopener")}
-                    >
-                      <DownloadIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-                      Télécharger pour Android v{ANDROID_VERSION} ({ANDROID_FILE_SIZE})
+                    <Button asChild size="lg" className="w-full rounded-full text-base">
+                      <a href={ANDROID_INSTALLER_URL} download={ANDROID_INSTALLER_NAME}>
+                        <DownloadIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+                        Télécharger pour Android v{ANDROID_VERSION} ({ANDROID_FILE_SIZE})
+                      </a>
                     </Button>
                   ) : (
                     <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-800 dark:text-amber-300">
@@ -251,7 +249,7 @@ export function DownloadPage() {
             {[
               { t: os === "windows" ? "Ouvrez la page Microsoft Store" : "Téléchargez l’application", d: os === "windows" ? "Cliquez sur le bouton ci-dessus pour consulter la fiche officielle de Gestion Scolaire Pro Plus sur Microsoft Store." : "Utilisez le bouton Android ci-dessus pour télécharger le fichier APK." },
               { t: "Installez le logiciel", d: os === "windows" ? "Sur Microsoft Store, cliquez sur « Obtenir » ou « Installer », puis laissez le Store terminer l’installation." : "Ouvrez le fichier APK téléchargé et suivez les instructions affichées par Android." },
-              { t: "Ouvrez le logiciel", d: "Au premier lancement, Gestion Scolaire Pro Plus prépare sa base de données locale sur votre ordinateur." },
+              { t: "Ouvrez le logiciel", d: os === "android" ? "Au premier lancement, Gestion Scolaire Pro Plus prépare sa base de données locale sur votre téléphone ou tablette." : "Au premier lancement, Gestion Scolaire Pro Plus prépare sa base de données locale sur votre ordinateur." },
               { t: "Activez votre licence", d: "Contactez le développeur pour obtenir votre clé d’activation. Si une clé est déjà disponible dans votre tableau de bord, copiez-la dans l’écran d’activation du logiciel." },
             ].map((s, i) => (
               <li key={s.t} className="flex gap-4">
