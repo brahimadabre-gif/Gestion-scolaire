@@ -2,7 +2,7 @@ import { MessageCircle, Phone } from "lucide-react";
 import { SITE } from "@/lib/site";
 
 const phoneDigits = SITE.phone.replace(/\D/g, "");
-const formattedPhone = phoneDigits.startsWith("225") && phoneDigits.length === 13
+export const formattedPhone = phoneDigits.startsWith("225") && phoneDigits.length === 13
   ? `+225 ${phoneDigits.slice(3, 5)} ${phoneDigits.slice(5, 7)} ${phoneDigits.slice(7, 9)} ${phoneDigits.slice(9, 11)} ${phoneDigits.slice(11, 13)}`
   : SITE.phone;
 

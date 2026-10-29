@@ -68,10 +68,11 @@ function Hero() {
 // ── Statistiques ─────────────────────────────────────────────
 function StatsBand() {
   const stats = [
-      { value: "25", label: "écoles primaires équipées" },
-      { value: "5000+", label: "élèves gérés chaque année" },
-      { value: "200+", label: "enseignants utilisateurs" },
-      { value: "99 %", label: "de clients satisfaits" },
+      // Chiffres vérifiables (caractéristiques du logiciel), pas d'estimations.
+      { value: "CP1 → CM2", label: "les 6 niveaux du primaire" },
+      { value: "100 %", label: "utilisable hors connexion" },
+      { value: "2", label: "plateformes : Windows et Android" },
+      { value: "24 h", label: "réponse du support (jours ouvrés)" },
   ];
   return (
     <section className="border-y bg-secondary/40">
@@ -349,6 +350,9 @@ function Testimonials() {
     queryFn: () => api.get<Testimonial[]>("/api/testimonials"),
     staleTime: 5 * 60_000,
   });
+
+  // Aucun témoignage publié : la section n'est pas affichée (pas de titre seul).
+  if (!isLoading && (!items || items.length === 0)) return null;
 
   return (
     <Section className="bg-secondary/40">

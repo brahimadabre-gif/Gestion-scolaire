@@ -146,11 +146,11 @@ function Shell() {
   );
 }
 
-export function AppShell() {
+export function AppShell({ initialPath = "/" }: { initialPath?: string }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider>
+        <RouterProvider initialPath={initialPath}>
           <AuthProvider>
             <Shell />
           </AuthProvider>

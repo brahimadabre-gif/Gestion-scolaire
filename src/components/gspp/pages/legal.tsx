@@ -7,6 +7,8 @@ import { SITE } from "@/lib/site";
 import { formatDate } from "@/lib/site";
 
 const LAST_UPDATE = "1er septembre 2026";
+// Mentions légales complétées (éditeur, hébergeur) le 29 octobre 2026.
+const LAST_UPDATE_BY_KIND: Record<string, string> = { mentions: "29 octobre 2026" };
 
 function LegalSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -37,7 +39,7 @@ export function LegalPage({ kind }: { kind: "cgu" | "confidentialite" | "cookies
       <Section>
         <div className="mx-auto max-w-3xl space-y-8 rounded-3xl border bg-card p-7 sm:p-10">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Dernière mise à jour : {LAST_UPDATE}
+            Dernière mise à jour : {LAST_UPDATE_BY_KIND[kind] ?? LAST_UPDATE}
           </p>
 
           {kind === "cgu" && (
@@ -168,17 +170,23 @@ export function LegalPage({ kind }: { kind: "cgu" | "confidentialite" | "cookies
 
           {kind === "mentions" && (
             <>
-              <LegalSection title="Éditeur du site">
+              <LegalSection title="Éditeur du site et du logiciel">
                 <p>
-                  {SITE.name} — {SITE.addressLine}<br />
+                  {SITE.name} est édité par {SITE.publisher}.<br />
+                  {SITE.city}<br />
                   Contact : {SITE.email} · {SITE.phone}
                 </p>
+                <p>Directeur de la publication : {SITE.publisher}.</p>
               </LegalSection>
               <LegalSection title="Hébergement">
                 <p>
-                  Le site est hébergé sur une infrastructure cloud sécurisée (HTTPS, pare-feu, sauvegardes
-                  quotidiennes). Les coordonnées complètes de l&apos;hébergeur seront insérées ici lors
-                  de la mise en production définitive.
+                  Le site est hébergé par Netlify, Inc., 101 2nd Street, San Francisco, CA 94105,
+                  États-Unis — https://www.netlify.com.
+                </p>
+                <p>
+                  Le logiciel {SITE.name} fonctionne sur votre ordinateur ou votre téléphone : les données
+                  de votre école (élèves, notes, bulletins) y restent enregistrées et ne sont pas
+                  hébergées sur ce site.
                 </p>
               </LegalSection>
               <LegalSection title="Propriété intellectuelle">

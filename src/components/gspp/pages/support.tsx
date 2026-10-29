@@ -9,6 +9,7 @@ import { useAuth } from "../auth-context";
 import { PageHero } from "../page-hero";
 import { Section, SectionHeading, Spinner, StatusBadge, ErrorNote } from "../ui-bits";
 import { formatDate } from "@/lib/site";
+import { developerWhatsAppHref, formattedPhone } from "../developer-contact";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -180,11 +181,20 @@ export function SupportPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="s-file" className="flex items-center gap-1.5">
-                    <Paperclip className="h-3.5 w-3.5" aria-hidden="true" /> Pièce jointe (nom du fichier, si nécessaire)
+                    <Paperclip className="h-3.5 w-3.5" aria-hidden="true" /> Capture d&apos;écran ou fichier (facultatif)
                   </Label>
                   <Input id="s-file" value={form.attachment} onChange={(e) => setForm({ ...form, attachment: e.target.value })} placeholder="Ex. : capture-erreur-impression.png" />
                   <p className="text-xs text-muted-foreground">
-                    Le transfert de fichiers sécurisé sera activé avec la mise en production du stockage.
+                    Indiquez ici le nom du fichier, puis envoyez la capture d&apos;écran ou le document{" "}
+                    <a
+                      className="font-medium text-primary underline underline-offset-2"
+                      href={developerWhatsAppHref("Bonjour, j'envoie un fichier pour ma demande au support : ")}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      sur WhatsApp au {formattedPhone}
+                    </a>{" "}
+                    en rappelant le sujet de votre demande.
                   </p>
                 </div>
                 <Button type="submit" size="lg" className="w-full rounded-full sm:w-auto" disabled={submitting}>

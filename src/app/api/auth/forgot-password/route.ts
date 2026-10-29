@@ -13,7 +13,7 @@ async function sendResetEmail(email: string, rawToken: string) {
 
   if (!apiKey) throw new Error("RESEND_API_KEY non configurée");
 
-  const resetUrl = `${appUrl}/#/mot-de-passe-oublie?token=${encodeURIComponent(rawToken)}`;
+  const resetUrl = `${appUrl}/mot-de-passe-oublie?token=${encodeURIComponent(rawToken)}`;
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {

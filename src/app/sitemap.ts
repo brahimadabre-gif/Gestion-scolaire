@@ -1,22 +1,20 @@
 import type { MetadataRoute } from "next";
 import { SITE } from "@/lib/site";
+import { ROUTE_META } from "@/lib/routes";
 
-// Sitemap — les ancres hash sont conservées pour le routeur client historique.
-// L'URL canonique reste la page publique principale.
+// Sitemap : une vraie adresse par page publique (les pages privées en sont exclues).
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = SITE.url;
   const now = new Date();
   return [
     { url: base, lastModified: now, changeFrequency: "weekly", priority: 1 },
-    { url: `${base}/#/fonctionnalites`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
-    { url: `${base}/#/tarifs`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
-    { url: `${base}/#/telecharger`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${base}/#/notice`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${base}/#/bibliotheque`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${base}/#/tutoriel-compte`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${base}/#/actualites`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${base}/#/faq`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${base}/#/support`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${base}/#/inscription`, lastModified: now, changeFrequency: "yearly", priority: 0.5 },
+    ...Object.entries(ROUTE_META)
+      .filter(([, meta]) => meta.index)
+      .map(([path, meta]) => ({
+        url: `${base}${path}`,
+        lastModified: now,
+        changeFrequency: meta.changeFrequency ?? "monthly",
+        priority: meta.priority ?? 0.5,
+      })),
   ];
 }

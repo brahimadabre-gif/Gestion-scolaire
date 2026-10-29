@@ -12,6 +12,9 @@ export const SITE = {
   email: "brahimadabre@yahoo.com",
   phone: "+2250709933364",
   city: "Abidjan, Côte d'Ivoire",
+  // Éditeur légal (mentions légales). Ajoutez ici votre statut et vos numéros
+  // RCCM / NCC si vous en disposez, par ex. "Brahima Dabre, entreprise individuelle — RCCM CI-ABJ-…".
+  publisher: "Brahima Dabre",
   keywords: [
     "gestion scolaire",
     "logiciel de gestion scolaire",
@@ -24,6 +27,22 @@ export const SITE = {
     "CP1 CP2 CE1 CE2 CM1 CM2",
     "logiciel éducation",
   ],
+};
+
+// Image d'aperçu des liens partagés (WhatsApp, Facebook, LinkedIn…) — 1200 × 630
+export const OG_IMAGE = {
+  url: "/og-image.jpg",
+  width: 1200,
+  height: 630,
+  alt: "Gestion Scolaire Pro Plus — Toute la gestion de l'école, plus simplement",
+};
+
+// Champs Open Graph communs (Next remplace le bloc openGraph entier sur chaque page)
+export const OG_BASE = {
+  type: "website" as const,
+  locale: "fr_FR",
+  siteName: SITE.name,
+  images: [OG_IMAGE],
 };
 
 // Types de routes de l'application (routeur par hash côté client)
@@ -52,9 +71,8 @@ export const FOOTER_NAV = {
     { label: "Fonctionnalités", route: "/fonctionnalites" },
     { label: "Tarifs", route: "/tarifs" },
     { label: "Télécharger", route: "/telecharger" },
-    { label: "Documentation", route: "/notice" },
+    { label: "Notice", route: "/notice" },
     { label: "Bibliothèque", route: "/bibliotheque" },
-    { label: "Tutoriels", route: "/tutoriel-compte" },
     { label: "FAQ", route: "/faq" },
     { label: "Contact", route: "/support" },
   ] as { label: string; route: Route }[],

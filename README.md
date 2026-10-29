@@ -41,7 +41,7 @@ gestion-scolaire-pro-plus/
     │   └── site.ts            # Configuration centrale éditable (nom, nav, mots-clés SEO)
     └── components/gspp/
         ├── app-shell.tsx      # Aiguillage SPA + providers (Query, Theme, Auth)
-        ├── router.tsx         # Routeur par hash (useSyncExternalStore)
+        ├── router.tsx         # Routeur par adresse réelle (History API, anciens liens #/ redirigés)
         ├── auth-context.tsx   # Session utilisateur (cookie httpOnly)
         ├── site-header|site-footer.tsx
         ├── app-mockup.tsx     # Captures d'écran vivantes du logiciel (CSS pur)
@@ -50,7 +50,7 @@ gestion-scolaire-pro-plus/
                                # admin, legal
 ```
 
-**Pourquoi une SPA à routeur hash ?** L'environnement d'exécution du sandbox expose une seule page. Pour la **mise en production**, chaque composant de `components/gspp/pages/` se déplace tel quel vers une route du App Router Next.js (`app/fonctionnalites/page.tsx`, etc.) pour obtenir des URLs propres — la logique est 100 % réutilisable.
+**Adresses des pages.** Chaque page a sa vraie adresse (`/tarifs`, `/telecharger`, `/legal/mentions`…), générée par `src/app/[...slug]/page.tsx` avec son titre et sa description (liste dans `src/lib/routes.ts`). La navigation reste instantanée côté client (`router.tsx`, History API). Les anciens liens en `#/…` sont redirigés automatiquement vers la nouvelle adresse.
 
 ## 2. Technologies
 

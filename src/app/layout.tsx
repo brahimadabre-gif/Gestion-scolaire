@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { SITE } from "@/lib/site";
+import { OG_BASE, OG_IMAGE, SITE } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,15 +35,14 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.webmanifest",
   openGraph: {
-    type: "website",
-    locale: "fr_FR",
+    ...OG_BASE,
     url: SITE.url,
-    siteName: SITE.name,
     title: "Gestion Scolaire Pro Plus — La solution complète pour simplifier la gestion scolaire",
     description: SITE.description,
   },
   twitter: {
     card: "summary_large_image",
+    images: [OG_IMAGE.url],
     title: "Gestion Scolaire Pro Plus — Logiciel de gestion scolaire",
     description: SITE.description,
   },

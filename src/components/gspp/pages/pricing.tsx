@@ -95,7 +95,7 @@ export function PricingPage() {
           {[
             { icon: KeyRound, title: "Clé d’activation", text: "Contactez le développeur pour connaître les étapes d’obtention de votre clé." },
             { icon: RefreshCcw, title: "Renouvellement simple", text: "Chaque renouvellement ajoute 12 mois à la durée restante : aucun jour perdu." },
-            { icon: ShieldCheck, title: "Garantie satisfait", text: "Une question ? Le support répond sous 24 h ouvrées. Vos données restent sur votre poste." },
+            { icon: ShieldCheck, title: "Support réactif", text: "Une question ? Le support répond sous 24 h ouvrées. Vos données restent sur votre poste." },
           ].map((r) => (
             <div key={r.title} className="flex items-start gap-4 rounded-2xl border bg-card p-5">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-600/10 text-orange-700 dark:text-orange-400">
@@ -148,23 +148,13 @@ export function PricingPage() {
                   <td key={p.slug} className="px-4 py-3 text-center">{p.maxStudents.toLocaleString("fr-FR")}</td>
                 ))}
               </tr>
-              {[
-                "Gestion des élèves et classes",
-                "Notes et moyennes automatiques",
-                "Bulletins scolaires",
-                "Classements et compositions",
-                "Import intelligent de documents",
-                "Signatures électroniques",
-                "Rapports et statistiques",
-                "Multi-établissements",
-                "Support prioritaire",
-              ].map((feature) => (
+              {/* Lignes = fonctionnalités réellement saisies dans les formules
+                  (administration → Formules), sans deviner à partir de mots-clés. */}
+              {Array.from(new Set((plans ?? []).flatMap((p) => p.features))).map((feature) => (
                 <tr key={feature}>
                   <td className="px-5 py-3 font-medium">{feature}</td>
                   {(plans ?? []).map((p) => {
-                    const included =
-                      p.features.some((f) => f.toLowerCase().includes(feature.toLowerCase().split(" ")[0])) ||
-                      (feature === "Multi-établissements" && p.maxSchools > 1);
+                    const included = p.features.includes(feature);
                     return (
                       <td key={p.slug} className="px-4 py-3 text-center">
                         {included ? (
