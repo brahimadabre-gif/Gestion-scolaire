@@ -170,16 +170,16 @@ async function main() {
 
   // ── Version logicielle ─────────────────────────────────────
   const versionData = {
-    version: "2.3.12",
+    version: "2.3.15",
     channel: "stable",
-    releaseDate: new Date("2026-10-10"),
+    releaseDate: new Date("2026-10-29"),
     fileSizeMb: 8.69,
     minOs: "Windows 10 64 bits (ou supérieur), 4 Go de RAM, 500 Mo d'espace disque",
-    installerName: "Gestion_Scolaire_Pro_Plus_v2.3.12_x64_Setup.exe",
-    downloadUrl: "https://gestionscolaire.pro/downloads/Gestion_Scolaire_Pro_Plus_v2.3.12_x64_Setup.exe",
+    installerName: "Microsoft Store",
+    downloadUrl: "https://apps.microsoft.com/detail/9N71Q8PTCPCZ?hl=fr-011&gl=CI&ocid=pdpshare",
     changelog: [
-      "## Version 2.3.12",
-      "- Nouvel installateur Windows fourni pour cette mise à jour.",
+      "## Version 2.3.15",
+      "- Mise à jour de la version PC.",
     ].join("\n"),
     active: true,
   };
