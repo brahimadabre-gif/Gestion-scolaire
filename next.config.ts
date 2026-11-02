@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
+const isNetlifyBuild = process.env.NETLIFY === "true" || Boolean(process.env.NETLIFY_DB_URL);
+
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // Netlify's Next.js runtime packages the server function itself. Keep the
+  // standalone bundle for local/Tauri runs, but do not feed it to Netlify.
+  ...(isNetlifyBuild ? {} : { output: "standalone" as const }),
   distDir: process.env.NEXT_DIST_DIR ?? ".next",
   devIndicators: false,
   async headers() {
