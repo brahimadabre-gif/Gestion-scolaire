@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 
 const runNpx = (args, options) => {
   if (process.platform === "win32") {
@@ -21,6 +21,9 @@ if (process.env.NETLIFY || process.env.NETLIFY_DB_URL) {
   }
 }
 
+// Netlify peut conserver un cache `.next` entre deux déploiements. Une
+// compilation propre évite de servir un ancien bundle client après une mise à jour.
+rmSync(".next", { recursive: true, force: true });
 runNpx(["next", "build"], { stdio: "inherit", env });
 mkdirSync(".next/standalone/.next", { recursive: true });
 cpSync(".next/static", ".next/standalone/.next/static", { recursive: true });
