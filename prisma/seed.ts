@@ -170,16 +170,17 @@ async function main() {
 
   // ── Version logicielle ─────────────────────────────────────
   const versionData = {
-    version: "2.3.15",
+    version: "2.3.19",
     channel: "stable",
-    releaseDate: new Date("2026-10-29"),
-    fileSizeMb: 8.69,
+    releaseDate: new Date("2026-11-02"),
+    fileSizeMb: 9.63,
     minOs: "Windows 10 64 bits (ou supérieur), 4 Go de RAM, 500 Mo d'espace disque",
     installerName: "Microsoft Store",
-    downloadUrl: "https://apps.microsoft.com/detail/9N71Q8PTCPCZ?hl=fr-011&gl=CI&ocid=pdpshare",
+    downloadUrl: "/downloads/Gestion-Scolaire-Pro-v2.3.19.apk",
     changelog: [
-      "## Version 2.3.15",
-      "- Mise à jour de la version PC.",
+      "## Version 2.3.19",
+      "- Nouvelle mise à jour Android de Gestion Scolaire Pro Plus.",
+      "- Correctifs et améliorations inclus dans l’APK fourni.",
     ].join("\n"),
     active: true,
   };

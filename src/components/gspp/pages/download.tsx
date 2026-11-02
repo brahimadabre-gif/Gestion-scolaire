@@ -37,10 +37,10 @@ function getClientOs(): OS {
 const subscribeNoop = () => () => {};
 const getServerOs = () => "other" as OS;
 
-const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.15.apk";
-const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.15.apk";
-const ANDROID_VERSION = "2.3.15";
-const ANDROID_FILE_SIZE = "8,0 Mo";
+const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.19.apk";
+const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.19.apk";
+const ANDROID_VERSION = "2.3.19";
+const ANDROID_FILE_SIZE = "9,6 Mo";
 const WINDOWS_STORE_URL = "https://apps.microsoft.com/detail/9N71Q8PTCPCZ?hl=fr-011&gl=CI&ocid=pdpshare";
 
 export function DownloadPage() {
