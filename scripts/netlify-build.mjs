@@ -25,6 +25,8 @@ if (process.env.NETLIFY || process.env.NETLIFY_DB_URL) {
 // compilation propre évite de servir un ancien bundle client après une mise à jour.
 rmSync(".next", { recursive: true, force: true });
 runNpx(["next", "build"], { stdio: "inherit", env });
-mkdirSync(".next/standalone/.next", { recursive: true });
-cpSync(".next/static", ".next/standalone/.next/static", { recursive: true });
-if (existsSync("public")) cpSync("public", ".next/standalone/public", { recursive: true });
+if (existsSync(".next/standalone")) {
+  mkdirSync(".next/standalone/.next", { recursive: true });
+  cpSync(".next/static", ".next/standalone/.next/static", { recursive: true });
+  if (existsSync("public")) cpSync("public", ".next/standalone/public", { recursive: true });
+}
