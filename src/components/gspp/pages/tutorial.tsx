@@ -44,7 +44,7 @@ const STEPS = [
   {
     icon: Download,
     title: "Étape 6 — Télécharger et activer le logiciel",
-    text: "Téléchargez l'installateur depuis la page « Télécharger », installez-le sur votre ordinateur Windows, puis copiez votre clé de licence depuis le tableau de bord pour activer le logiciel. Vous êtes prêt à gérer votre établissement !",
+    text: "Depuis la page « Télécharger », installez le logiciel depuis Microsoft Store sur votre ordinateur Windows, ou téléchargez l'application Android (fichier APK) sur votre téléphone ou tablette. Copiez ensuite votre clé de licence depuis le tableau de bord pour activer le logiciel. Vous êtes prêt à gérer votre établissement !",
     mock: "dashboard" as const,
   },
 ];

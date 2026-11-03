@@ -92,7 +92,9 @@ export function LegalPage({ kind }: { kind: "cgu" | "confidentialite" | "cookies
               </LegalSection>
               <LegalSection title="7. Résiliation">
                 <p>
-                  L&apos;abonnement est proposé pour une durée de 12 mois au tarif de 15 000 FCFA.
+                  L&apos;abonnement est proposé pour une durée de 12 mois, par appareil, au tarif de
+                  15 000 FCFA pour un ordinateur Windows et de 5 000 FCFA pour un téléphone ou une
+                  tablette Android.
                   L&apos;utilisateur peut supprimer son compte à tout moment en contactant le support.
                 </p>
               </LegalSection>

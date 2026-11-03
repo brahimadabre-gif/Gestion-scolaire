@@ -16,6 +16,8 @@ import { DownloadPage } from "./pages/download";
 import { DocsPage } from "./pages/docs";
 import { LibraryPage } from "./pages/library";
 import { TutorialPage } from "./pages/tutorial";
+import { GuidePage } from "./pages/guide";
+import { DocumentsPage } from "./pages/documents";
 import { FaqPage } from "./pages/faq";
 import { SupportPage } from "./pages/support";
 import { NewsListPage, NewsArticlePage } from "./pages/news";
@@ -80,6 +82,10 @@ function Routes() {
       return <LibraryPage />;
     case "/tutoriel-compte":
       return <TutorialPage />;
+    case "/tutoriel":
+      return <GuidePage />;
+    case "/documents":
+      return <DocumentsPage />;
     case "/faq":
       return <FaqPage />;
     case "/support":

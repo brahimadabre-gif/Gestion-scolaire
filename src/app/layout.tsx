@@ -73,7 +73,8 @@ const jsonLd = {
   description: SITE.description,
   slogan: SITE.slogan,
   offers: [
-    { "@type": "Offer", name: "Gestion Scolaire Pro Plus", price: "15000", priceCurrency: "XOF", description: "Accès pendant 12 mois sur Windows et Android" },
+    { "@type": "Offer", name: "Gestion Scolaire Pro Plus — Ordinateur Windows", price: "15000", priceCurrency: "XOF", description: "Accès pendant 12 mois sur un ordinateur Windows" },
+    { "@type": "Offer", name: "Gestion Scolaire Pro Plus — Téléphone et tablette Android", price: "5000", priceCurrency: "XOF", description: "Accès pendant 12 mois sur un téléphone ou une tablette Android" },
   ],
 };
 

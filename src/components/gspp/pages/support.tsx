@@ -100,7 +100,7 @@ export function SupportPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           {[
             { icon: BookOpen, title: "Notice d'utilisation", text: "Le guide complet en 19 sections.", href: "/notice", cta: "Consulter la documentation" },
-            { icon: GraduationCap, title: "Tutoriels", text: "Créer un compte, premier bulletin…", href: "/tutoriel-compte", cta: "Voir les tutoriels" },
+            { icon: GraduationCap, title: "Tutoriel illustré", text: "Compte principal, élèves, notes, bulletins… en images.", href: "/tutoriel", cta: "Voir le tutoriel" },
             { icon: Search, title: "FAQ", text: "Les réponses les plus fréquentes.", href: "/faq", cta: "Parcourir la FAQ" },
           ].map((c) => (
             <Link key={c.title} to={c.href} className="card-hover rounded-2xl border bg-card p-6">

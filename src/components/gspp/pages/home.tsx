@@ -290,7 +290,7 @@ function PricingPreview() {
       {isLoading ? (
         <Spinner />
       ) : (
-        <div className="mt-12 flex justify-center gap-6">
+        <div className="mt-12 flex flex-col items-center gap-6 md:flex-row md:items-stretch md:justify-center">
           {(plans ?? []).map((plan) => (
             <article
               key={plan.slug}

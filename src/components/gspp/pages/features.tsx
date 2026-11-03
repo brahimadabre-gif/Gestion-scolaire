@@ -1,6 +1,7 @@
 "use client";
 
 // ── Page Fonctionnalités — organisées par catégories ─────────
+import { useEffect } from "react";
 import { Link, navigate } from "../router";
 import { PageHero } from "../page-hero";
 import { Section, SectionHeading } from "../ui-bits";
@@ -10,6 +11,7 @@ import {
   Users, BookOpen, Calculator, Trophy, FileText, Printer, BarChart3,
   ClipboardList, Import, ArrowUpCircle, PenLine, Zap, FolderDown,
   Layers, GraduationCap, Building2, CheckCircle2, Download, UserPlus,
+  Wallet, Phone, RefreshCw, Bot, Repeat, Smartphone, Camera, Fingerprint, WifiOff, Images,
 } from "lucide-react";
 
 const GROUPS = [
@@ -22,12 +24,14 @@ const GROUPS = [
       { icon: Users, name: "Élèves", text: "Fiches complètes, matricules, photos, tuteurs et historique scolaire de chaque élève." },
       { icon: Layers, name: "Classes", text: "Création des niveaux CP1, CP2, CE1, CE2, CM1 et CM2, effectifs et classes parallèles." },
       { icon: BookOpen, name: "Matières", text: "Coefficients, barèmes adaptés au primaire, sous-matières et enseignants affectés." },
-      { icon: PenLine, name: "Notes", text: "Saisie rapide au clavier avec contrôles automatiques et navigation sans souris." },
+      { icon: PenLine, name: "Notes", text: "Saisie rapide au clavier, notes à virgule (12,50), contrôle du barème et navigation sans souris." },
       { icon: Calculator, name: "Moyennes", text: "Calcul pondéré automatique, transparence du détail matière par matière." },
       { icon: Trophy, name: "Classements", text: "Rangs automatiques, ex æquo, mentions, distinctions et progression des élèves." },
       { icon: ClipboardList, name: "Compositions", text: "Organisation des compositions et examens internes, avec reconstitution instantanée des résultats." },
       { icon: Users, name: "Groupes d'EPS", text: "Répartition équilibrée des élèves par classe, selon l'effectif et l'ordre prévu, avec groupes colorés et impression prête à l'emploi." },
       { icon: FileText, name: "Bulletins", text: "Génération complète à votre logo, appréciations automatiques et modèles personnalisables." },
+      { icon: BookOpen, name: "Fiches pédagogiques", text: "Progressions et fiches de préparation pré-remplies d'après les programmes officiels, consultables hors connexion." },
+      { icon: GraduationCap, name: "Cours de renforcement", text: "Inscription des élèves, catalogue des cours avec tarif mensuel, mois dispensés et suivi des paiements par mois avec la Caisse." },
     ],
   },
   {
@@ -43,6 +47,8 @@ const GROUPS = [
       { icon: ClipboardList, name: "Documents administratifs", text: "Certificats de scolarité, correspondances types et documents officiels pré-remplis." },
       { icon: PenLine, name: "Signatures", text: "Signature du directeur et cachet appliqués automatiquement sur les documents émis." },
       { icon: BarChart3, name: "Rapports", text: "Statistiques d'école primaire, comparaisons entre classes et suivi des résultats." },
+      { icon: Wallet, name: "Caisse", text: "Encaissements, reçus imprimables, suivi des impayés, relances, dépenses et clôture de caisse." },
+      { icon: Phone, name: "Contacts parents", text: "Coordonnées des parents et tuteurs regroupées par classe, prêtes à consulter ou à imprimer." },
     ],
   },
   {
@@ -53,8 +59,11 @@ const GROUPS = [
     features: [
       { icon: Calculator, name: "Calcul automatique", text: "Moyennes, coefficients, rangs : tout est recalculé instantanément après chaque saisie." },
       { icon: FileText, name: "Génération de documents", text: "Bulletins, listes et relevés générés pour une classe entière en un clic." },
-      { icon: Import, name: "Import intelligent", text: "Glissez vos fichiers Excel : colonnes détectées, doublons signalés, import contrôlé." },
+      { icon: Import, name: "Import intelligent", text: "Importez vos listes d'élèves depuis Excel, CSV, Word, PDF ou une photo : noms et prénoms reconnus, doublons signalés, relecture avant import." },
       { icon: FolderDown, name: "Sauvegarde et restauration", text: "Exportez, importez et restaurez les données de l'établissement pour sécuriser votre travail." },
+      { icon: RefreshCw, name: "Synchronisation", text: "La direction et les enseignants échangent leurs données par Wi-Fi local ou par fichier .gspp chiffré." },
+      { icon: Bot, name: "Assistant Brahima", text: "Un assistant intégré qui répond à vos questions sur le logiciel et vous guide pas à pas." },
+      { icon: Repeat, name: "Convertisseur de fichiers", text: "PDF vers Word et extraction de texte sans connexion, avec reconnaissance des pages scannées (OCR). Aucun fichier n'est envoyé sur Internet." },
       { icon: Trophy, name: "Classement automatique", text: "Classements et mentions mis à jour en continu selon vos seuils personnalisés." },
       { icon: BarChart3, name: "Génération des rapports", text: "Rapports de résultats prêts à imprimer pour le directeur et les enseignants." },
     ],
@@ -75,9 +84,27 @@ const GROUPS = [
       { icon: FolderDown, name: "Documents administratifs", text: "Tous les modèles officiels de l'établissement, pré-remplis et personnalisables." },
     ],
   },
+  {
+    id: "android",
+    icon: Smartphone,
+    title: "Sur Android",
+    intro: "L'application complète sur téléphone et tablette, pensée pour le terrain.",
+    features: [
+      { icon: Camera, name: "Photo de l'élève", text: "La photo se prend directement dans l'application, qui reste ouverte, même sur les téléphones à mémoire limitée." },
+      { icon: Fingerprint, name: "Empreinte digitale", text: "Connexion rapide et sécurisée par empreinte, sans retaper le mot de passe." },
+      { icon: WifiOff, name: "Hors connexion", text: "Notes, appel, bulletins et documents restent disponibles sans Internet." },
+      { icon: RefreshCw, name: "Synchronisation", text: "Échangez les données avec l'ordinateur de l'école par Wi-Fi local ou par fichier .gspp." },
+    ],
+  },
 ];
 
 export function FeaturesPage() {
+  // Lien direct vers une catégorie (ex. /fonctionnalites#documents depuis la galerie)
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (id) setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }), 80);
+  }, []);
+
   return (
     <main id="contenu">
       <PageHero
@@ -97,7 +124,7 @@ export function FeaturesPage() {
 
       {/* Sommaire des catégories */}
       <Section className="pb-0">
-        <div className="mx-auto grid max-w-4xl grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {GROUPS.map((g) => (
             <a
               key={g.id}
@@ -114,6 +141,22 @@ export function FeaturesPage() {
               {g.title}
             </a>
           ))}
+        </div>
+        <div className="mx-auto mt-6 grid max-w-5xl gap-3 sm:grid-cols-2">
+          <Link to="/documents" className="card-hover flex items-center gap-4 rounded-2xl border border-orange-600/30 bg-orange-600/5 p-5">
+            <Images className="h-8 w-8 shrink-0 text-orange-600 dark:text-orange-400" aria-hidden="true" />
+            <span>
+              <span className="block font-semibold">Voir les documents imprimés</span>
+              <span className="text-sm text-muted-foreground">Bulletins, listes, certificats, statistiques et reçus, avec des données fictives.</span>
+            </span>
+          </Link>
+          <Link to="/tutoriel" className="card-hover flex items-center gap-4 rounded-2xl border border-orange-600/30 bg-orange-600/5 p-5">
+            <BookOpen className="h-8 w-8 shrink-0 text-orange-600 dark:text-orange-400" aria-hidden="true" />
+            <span>
+              <span className="block font-semibold">Suivre le tutoriel illustré</span>
+              <span className="text-sm text-muted-foreground">Du compte principal à la fin d&apos;année, chaque étape en images.</span>
+            </span>
+          </Link>
         </div>
       </Section>
 

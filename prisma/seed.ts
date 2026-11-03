@@ -88,20 +88,43 @@ async function main() {
     },
     {
       slug: "professionnel",
-      name: "Professionnel",
-      description: "La formule complète pour les établissements qui veulent automatiser toute leur gestion.",
+      name: "Ordinateur Windows",
+      description: "La formule complète pour gérer toute l'école sur un ordinateur Windows, installé depuis Microsoft Store.",
       monthlyPrice: 0, annualPrice: 15000,
       maxUsers: 5, maxSchools: 1, maxStudents: 1000,
       features: JSON.stringify([
-        "Tout le contenu de la formule Essentiel",
+        "Élèves, classes, notes, moyennes et bulletins",
         "Compositions et rapports de résultats",
         "Import intelligent de documents",
+        "Caisse, reçus et suivi des paiements",
         "Signatures électroniques",
         "Promotion automatique des élèves",
         "Gestion administrative et documents officiels",
+        "Synchronisation entre les postes de l'école",
         "Support prioritaire (e-mail + téléphone)",
       ]),
       highlighted: true, active: true, sortOrder: 2,
+    },
+    {
+      slug: "mobile",
+      name: "Téléphone et tablette",
+      description: "L'application Android pour gérer votre classe ou votre école depuis un téléphone ou une tablette.",
+      monthlyPrice: 0, annualPrice: 5000,
+      maxUsers: 5, maxSchools: 1, maxStudents: 1000,
+      features: JSON.stringify([
+        "Élèves, classes, notes, moyennes et bulletins",
+        "Compositions et rapports de résultats",
+        "Import intelligent de documents",
+        "Caisse, reçus et suivi des paiements",
+        "Signatures électroniques",
+        "Promotion automatique des élèves",
+        "Gestion administrative et documents officiels",
+        "Synchronisation entre les postes de l'école",
+        "Photo de l'élève prise avec le téléphone",
+        "Connexion par empreinte digitale",
+        "Support prioritaire (e-mail + téléphone)",
+      ]),
+      highlighted: false, active: true, sortOrder: 3,
     },
     {
       slug: "etablissement",
@@ -174,13 +197,15 @@ async function main() {
     channel: "stable",
     releaseDate: new Date("2026-11-02"),
     fileSizeMb: 9.63,
-    minOs: "Windows 10 64 bits (ou supérieur), 4 Go de RAM, 500 Mo d'espace disque",
-    installerName: "Microsoft Store",
+    minOs: "Android 5.1 ou supérieur, téléphone ou tablette",
+    installerName: "APK Android",
     downloadUrl: "/downloads/Gestion-Scolaire-Pro-v2.3.19.apk",
     changelog: [
-      "## Version 2.3.19",
-      "- Nouvelle mise à jour Android de Gestion Scolaire Pro Plus.",
-      "- Correctifs et améliorations inclus dans l’APK fourni.",
+      "## Version 2.3.19 (Android)",
+      "- Photo de l’élève prise directement dans l’application, sans la fermer.",
+      "- Notes à virgule conservées telles quelles, jusqu’à deux décimales.",
+      "- Moyennes de composition calculées sur le total des barèmes.",
+      "- Connexion par empreinte digitale fiabilisée.",
     ].join("\n"),
     active: true,
   };
@@ -256,14 +281,39 @@ async function main() {
     },
     {
       question: "Quelle est la configuration requise ?",
-      answer: "Un PC sous Windows 10 64 bits ou supérieur, 4 Go de RAM (8 Go recommandés), 500 Mo d'espace disque et une imprimante pour les documents. Le logiciel est optimisé pour fonctionner sur des ordinateurs modestes, courants dans les établissements.",
+      answer: "Sur ordinateur : Windows 10 64 bits ou supérieur, 4 Go de RAM (8 Go recommandés), 500 Mo d'espace disque et une imprimante pour les documents. Sur téléphone ou tablette : Android 5.1 ou supérieur. Le logiciel est optimisé pour fonctionner sur des appareils modestes, courants dans les établissements.",
       category: "logiciel", sortOrder: 12,
+    },
+    {
+      question: "Combien coûte l'abonnement ?",
+      answer: "L'abonnement dure 12 mois et s'active appareil par appareil : 15 000 FCFA par an pour un ordinateur Windows, 5 000 FCFA par an pour un téléphone ou une tablette Android. Contactez le développeur par WhatsApp ou par appel au +225 07 09 93 33 64 pour obtenir votre clé.",
+      category: "abonnement", sortOrder: 4,
+    },
+    {
+      question: "Comment installer l'application sur Android ?",
+      answer: "Sur votre téléphone ou votre tablette, ouvrez la page « Télécharger » et appuyez sur « Télécharger pour Android ». Ouvrez ensuite le fichier APK téléchargé. Si Android le demande, autorisez l'installation depuis votre navigateur, puis suivez les instructions. Pour une mise à jour, installez le nouveau fichier par-dessus l'ancien : vos données sont conservées.",
+      category: "logiciel", sortOrder: 13,
+    },
+    {
+      question: "Comment échanger les données entre la direction et les enseignants ?",
+      answer: "Le module « Synchronisation » permet à la direction et aux enseignants d'échanger leurs données, soit par Wi-Fi local, soit par un fichier .gspp chiffré transmis par clé USB, e-mail ou WhatsApp. Les données restent sur vos appareils : rien ne passe par nos serveurs.",
+      category: "logiciel", sortOrder: 14,
+    },
+    {
+      question: "Puis-je me connecter avec mon empreinte digitale ?",
+      answer: "Oui, sur Android. Activez l'empreinte une fois dans les Paramètres en confirmant votre mot de passe : les connexions suivantes se font d'un simple appui sur le capteur du téléphone.",
+      category: "logiciel", sortOrder: 15,
+    },
+    {
+      question: "Avec quels identifiants se connecter au logiciel après la création du compte principal ?",
+      answer: "Pour vous connecter, utilisez le nom d'utilisateur principal et le mot de passe choisis lors de la création du compte. Le code de récupération propriétaire ne sert pas à se connecter : il permet uniquement de récupérer le compte si le mot de passe est oublié, avec le lien « Mot de passe oublié ? » de l'écran de connexion. Le tutoriel illustré du site détaille chaque étape.",
+      category: "logiciel", sortOrder: 16,
     },
   ];
   for (const f of faqs) {
     const exists = await db.faqItem.findFirst({ where: { question: f.question } });
     if (!exists) await db.faqItem.create({ data: f });
-    else if (["Comment télécharger le logiciel ?", "Comment activer mon abonnement ?", "Comment renouveler mon abonnement ?", "Comment changer de formule ?"].includes(f.question)) {
+    else if (["Comment télécharger le logiciel ?", "Comment activer mon abonnement ?", "Comment renouveler mon abonnement ?", "Comment changer de formule ?", "Quelle est la configuration requise ?"].includes(f.question)) {
       await db.faqItem.update({ where: { id: exists.id }, data: { answer: f.answer } });
     }
   }
@@ -308,6 +358,21 @@ async function main() {
 
   // ── Articles (actualités) ──────────────────────────────────
   const articles = [
+    {
+      slug: "versions-2-3-21-windows-2-3-19-android",
+      title: "Nouvelles versions : 2.3.21 sur Windows et 2.3.19 sur Android",
+      excerpt: "Notes à virgule conservées telles quelles, moyennes de composition corrigées, photo de l'élève prise directement dans l'application Android et nouveau tarif mobile à 5 000 FCFA par an.",
+      category: "version", coverEmoji: "🚀",
+      content: [
+        "Deux nouvelles versions de Gestion Scolaire Pro Plus sont disponibles : la 2.3.21 sur Windows, via Microsoft Store, et la 2.3.19 sur Android, depuis la page Télécharger.",
+        "Notes : la note saisie est conservée telle quelle, avec le point ou la virgule (12,50 reste 12,50), jusqu'à deux décimales. Une note négative, illisible ou supérieure au barème est refusée avec un message, et l'ancienne note est gardée. Une note de 0 s'affiche désormais 0 sur les bulletins.",
+        "Moyennes : la moyenne d'une composition est calculée sur le total des barèmes, dans toutes les classes, ce qui corrige l'écart constaté en CM1 et CM2.",
+        "Sur Android, la photo de l'élève se prend directement dans l'application, qui reste ouverte : fini le redémarrage sur les téléphones à mémoire limitée. La connexion par empreinte digitale a aussi été fiabilisée, et les informations de l'école et des enseignants se remplissent dans Paramètres, comme sur ordinateur.",
+        "Nouveau tarif : l'abonnement pour téléphone ou tablette Android passe à 5 000 FCFA par an. L'abonnement pour ordinateur Windows reste à 15 000 FCFA par an.",
+        "Les mises à jour sont gratuites et conservent vos données : sur Windows, Microsoft Store installe la nouvelle version ; sur Android, installez le nouveau fichier APK par-dessus l'ancien.",
+      ].join("\n\n"),
+      publishedAt: new Date("2026-11-03"),
+    },
     {
       slug: "version-2-2-4",
       title: "Gestion Scolaire Pro Plus 2.2.4",

@@ -2,12 +2,10 @@
 
 // ── Page Télécharger — détection OS, version, installation ──
 import { useState, useSyncExternalStore } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { api, SoftwareVersion } from "../api";
 import { navigate } from "../router";
 import { useAuth } from "../auth-context";
 import { PageHero } from "../page-hero";
-import { Section, SectionHeading, Spinner } from "../ui-bits";
+import { Section, SectionHeading } from "../ui-bits";
 import { formatDate } from "@/lib/site";
 import { Button } from "@/components/ui/button";
 import { DeveloperContact } from "../developer-contact";
@@ -41,7 +39,30 @@ const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.19.apk";
 const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.19.apk";
 const ANDROID_VERSION = "2.3.19";
 const ANDROID_FILE_SIZE = "9,6 Mo";
+const WINDOWS_VERSION = "2.3.21";
 const WINDOWS_STORE_URL = "https://apps.microsoft.com/detail/9N71Q8PTCPCZ?hl=fr-011&gl=CI&ocid=pdpshare";
+
+// Chaque plateforme a sa propre version : la page n'affiche plus la version
+// Windows avec le fichier Android (ou l'inverse).
+const CHANGELOG: Record<"windows" | "android", string> = {
+  windows: [
+    `## Version ${WINDOWS_VERSION} — Windows`,
+    "- **Mise à jour** : les correctifs s'affichent dès le premier lancement après l'installation, sans toucher aux données de l'école.",
+    "- **Notes** : la note saisie est conservée telle quelle, avec le point ou la virgule (12,50 reste 12,50), jusqu'à deux décimales. Une note négative, illisible ou supérieure au barème est refusée avec un message.",
+    "- **Bulletins** : une note de 0 s'affiche 0. Le rangement, le classeur et les totaux affichent les notes au même format.",
+    "- **Moyennes** : la moyenne d'une composition est calculée sur le total des barèmes, dans toutes les classes.",
+    "- **Certificat de fréquentation** : commune et date de délivrance de l'acte de naissance ajoutées.",
+    "- **Statistiques** : les tableaux des âges, des effectifs et des nationalités sont réservés au directeur.",
+  ].join("\n"),
+  android: [
+    `## Version ${ANDROID_VERSION} — Android`,
+    "- **Photo de l'élève** : la photo se prend directement dans l'application, qui reste ouverte. Plus de redémarrage sur les téléphones à mémoire limitée.",
+    "- **Empreinte digitale** : activation et connexion par empreinte fiabilisées.",
+    "- **Notes** : la note saisie est conservée telle quelle, avec le point ou la virgule (12,50 reste 12,50), jusqu'à deux décimales.",
+    "- **Paramètres** : les informations de l'école et des enseignants se remplissent dans Paramètres, comme sur ordinateur.",
+    "- **Import intelligent** : meilleure reconnaissance des listes d'élèves.",
+  ].join("\n"),
+};
 
 export function DownloadPage() {
   const { user, subscription } = useAuth();
@@ -49,11 +70,19 @@ export function DownloadPage() {
   const detectedOs = useSyncExternalStore(subscribeNoop, getClientOs, getServerOs);
   const [selectedOs, setSelectedOs] = useState<OS | null>(null);
   const os: OS = selectedOs ?? detectedOs;
-  const { data: version, isLoading } = useQuery<SoftwareVersion>({
-    queryKey: ["version"],
-    queryFn: () => api.get<SoftwareVersion>("/api/versions"),
-    staleTime: 60_000,
-  });
+  const platform = os === "android" ? "android" : "windows";
+  const currentVersion = platform === "android" ? ANDROID_VERSION : WINDOWS_VERSION;
+  const requirements = platform === "android"
+    ? [
+        { icon: Smartphone, label: "Système", value: "Android 5.1 ou supérieur, téléphone ou tablette" },
+        { icon: HardDrive, label: "Fichier", value: `APK de ${ANDROID_FILE_SIZE}` },
+        { icon: ShieldCheck, label: "Abonnement", value: "5 000 FCFA par an et par appareil" },
+      ]
+    : [
+        { icon: Monitor, label: "Système", value: "Windows 10 64 bits ou supérieur" },
+        { icon: MemoryStick, label: "Mémoire", value: "4 Go de RAM (8 Go recommandés)" },
+        { icon: HardDrive, label: "Espace disque", value: "500 Mo disponibles" },
+      ];
   const osLabel: Record<OS, string> = {
     windows: "Windows",
     android: "Android",
@@ -70,9 +99,6 @@ export function DownloadPage() {
 
       {/* Bloc de téléchargement principal */}
       <Section>
-        {isLoading || !version ? (
-          <Spinner />
-        ) : (
           <div className="mx-auto max-w-4xl">
             <div className="rounded-3xl border bg-card p-8 shadow-lg sm:p-10">
               <div className="flex flex-col items-center gap-6 text-center">
@@ -84,7 +110,7 @@ export function DownloadPage() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold">
-                    Gestion Scolaire Pro Plus {os === "android" ? ANDROID_VERSION : version.version}
+                    Gestion Scolaire Pro Plus {currentVersion}
                   </h2>
                 </div>
 
@@ -155,11 +181,7 @@ export function DownloadPage() {
 
               {/* Configuration minimale */}
               <div className="mt-8 grid gap-4 border-t pt-8 sm:grid-cols-3">
-                {[
-                  { icon: Monitor, label: "Système", value: version.minOs },
-                  { icon: MemoryStick, label: "Mémoire", value: "4 Go de RAM (8 Go recommandés)" },
-                  { icon: HardDrive, label: "Espace disque", value: "500 Mo disponibles" },
-                ].map((c) => (
+                {requirements.map((c) => (
                   <div key={c.label} className="flex items-start gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-secondary text-orange-700 dark:text-orange-400">
                       <c.icon className="h-4.5 w-4.5" aria-hidden="true" />
@@ -212,16 +234,14 @@ export function DownloadPage() {
               <DeveloperContact compact />
             </div>
           </div>
-        )}
       </Section>
 
       {/* Journal des modifications */}
-      {version && (
         <Section className="bg-secondary/40">
           <div className="mx-auto max-w-3xl">
             <SectionHeading
               eyebrow="Historique"
-              title={`Nouveautés de la version ${version.version}`}
+              title={`Nouveautés de la version ${currentVersion}`}
             />
             <div className="prose-neutral mt-10 rounded-2xl border bg-card p-7">
               <ReactMarkdown
@@ -231,12 +251,11 @@ export function DownloadPage() {
                   strong: (p) => <strong className="font-semibold text-foreground" {...p} />,
                 }}
               >
-                {version.changelog}
+                {CHANGELOG[platform]}
               </ReactMarkdown>
             </div>
           </div>
         </Section>
-      )}
 
       {/* Instructions d'installation */}
       <Section>
@@ -270,7 +289,8 @@ export function DownloadPage() {
             </p>
             <p className="mt-1.5 text-muted-foreground">
               Gestion Scolaire Pro Plus est disponible sur ordinateur Windows et sur Android.
-              Le même compte et la même licence permettent de retrouver votre accès sur vos appareils compatibles.
+              Chaque appareil s&apos;active avec sa propre clé : 15 000 FCFA par an pour un ordinateur
+              Windows, 5 000 FCFA par an pour un téléphone ou une tablette Android.
             </p>
           </div>
         </div>

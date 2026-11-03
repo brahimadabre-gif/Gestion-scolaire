@@ -45,6 +45,18 @@ export const ROUTE_META: Record<Exclude<Route, "/">, RouteMeta> = {
       "Programmes éducatifs et guides d'exécution du primaire (CP1 à CM2) à télécharger gratuitement.",
     index: true, priority: 0.8, changeFrequency: "weekly",
   },
+  "/tutoriel": {
+    title: "Tutoriel d'utilisation illustré",
+    description:
+      "Utiliser Gestion Scolaire Pro Plus pas à pas, en images : créer le compte principal, se connecter, activer la licence, inscrire les élèves, saisir les notes, imprimer les bulletins, la caisse et la sauvegarde.",
+    index: true, priority: 0.9, changeFrequency: "monthly",
+  },
+  "/documents": {
+    title: "Documents du logiciel",
+    description:
+      "Bulletins, rangements, listes de classe, certificats, registres, statistiques et reçus de caisse : les vrais documents imprimés par Gestion Scolaire Pro Plus, avec des données fictives.",
+    index: true, priority: 0.8, changeFrequency: "monthly",
+  },
   "/tutoriel-compte": {
     title: "Tutoriel : créer un compte",
     description:
