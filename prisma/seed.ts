@@ -193,19 +193,19 @@ async function main() {
 
   // ── Version logicielle ─────────────────────────────────────
   const versionData = {
-    version: "2.3.19",
+    version: "2.3.20",
     channel: "stable",
-    releaseDate: new Date("2026-11-02"),
-    fileSizeMb: 9.63,
+    releaseDate: new Date("2026-11-03"),
+    fileSizeMb: 9.65,
     minOs: "Android 5.1 ou supérieur, téléphone ou tablette",
     installerName: "APK Android",
-    downloadUrl: "/downloads/Gestion-Scolaire-Pro-v2.3.19.apk",
+    downloadUrl: "/downloads/Gestion-Scolaire-Pro-v2.3.20.apk",
     changelog: [
-      "## Version 2.3.19 (Android)",
-      "- Photo de l’élève prise directement dans l’application, sans la fermer.",
-      "- Notes à virgule conservées telles quelles, jusqu’à deux décimales.",
-      "- Moyennes de composition calculées sur le total des barèmes.",
-      "- Connexion par empreinte digitale fiabilisée.",
+      "## Version 2.3.20 (Android)",
+      "- Tableau de bord entièrement refait : toute l’école d’un coup d’œil pour le directeur, sa classe uniquement pour l’enseignant.",
+      "- Nouvelles icônes modernes pour chaque module et pour l’école.",
+      "- Présentation adaptée à tous les téléphones et tablettes.",
+      "- Reprend les correctifs de la 2.3.19 (photo, empreinte digitale, notes à virgule).",
     ].join("\n"),
     active: true,
   };

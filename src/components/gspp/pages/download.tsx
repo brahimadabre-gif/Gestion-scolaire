@@ -35,10 +35,10 @@ function getClientOs(): OS {
 const subscribeNoop = () => () => {};
 const getServerOs = () => "other" as OS;
 
-const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.19.apk";
-const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.19.apk";
-const ANDROID_VERSION = "2.3.19";
-const ANDROID_FILE_SIZE = "9,6 Mo";
+const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.20.apk";
+const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.20.apk";
+const ANDROID_VERSION = "2.3.20";
+const ANDROID_FILE_SIZE = "9,7 Mo";
 const WINDOWS_VERSION = "2.3.21";
 const WINDOWS_STORE_URL = "https://apps.microsoft.com/detail/9N71Q8PTCPCZ?hl=fr-011&gl=CI&ocid=pdpshare";
 
@@ -56,11 +56,11 @@ const CHANGELOG: Record<"windows" | "android", string> = {
   ].join("\n"),
   android: [
     `## Version ${ANDROID_VERSION} — Android`,
-    "- **Photo de l'élève** : la photo se prend directement dans l'application, qui reste ouverte. Plus de redémarrage sur les téléphones à mémoire limitée.",
-    "- **Empreinte digitale** : activation et connexion par empreinte fiabilisées.",
-    "- **Notes** : la note saisie est conservée telle quelle, avec le point ou la virgule (12,50 reste 12,50), jusqu'à deux décimales.",
-    "- **Paramètres** : les informations de l'école et des enseignants se remplissent dans Paramètres, comme sur ordinateur.",
-    "- **Import intelligent** : meilleure reconnaissance des listes d'élèves.",
+    "- **Tableau de bord** : entièrement refait. Le directeur voit tout de suite toute l'école, sans choisir de niveau : élèves inscrits, taux de réussite, moyenne et son évolution, présence du jour, caisse, résultats par classe, moyennes par matière, liste « À faire » et meilleurs élèves.",
+    "- **Enseignant** : le tableau de bord montre uniquement sa classe, avec la progression de chaque élève et ses tâches (notes à saisir, appel du jour), sans aucun montant de la caisse.",
+    "- **Icônes** : nouvelles icônes modernes pour chaque module, dans le menu et en tête de chaque page, et nouvelle icône de l'école.",
+    "- **Écrans** : présentation adaptée à tous les téléphones et tablettes, en thème clair comme sombre.",
+    "- Reprend tous les correctifs de la 2.3.19 : photo de l'élève, empreinte digitale, notes à virgule.",
   ].join("\n"),
 };
 
