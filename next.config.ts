@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
   // standalone bundle for local/Tauri runs, but do not feed it to Netlify.
   ...(isNetlifyBuild ? {} : { output: "standalone" as const }),
   distDir: process.env.NEXT_DIST_DIR ?? ".next",
+  // /api/library/[id] lit des fichiers de public/ : sans cette exclusion, le
+  // traçage embarque aussi les installateurs (APK, EXE) dans la fonction serveur,
+  // qui dépasse alors la taille acceptée par Netlify. Ils restent servis par le CDN.
+  outputFileTracingExcludes: {
+    "*": ["public/downloads/**"],
+  },
   devIndicators: false,
   async headers() {
     return [
