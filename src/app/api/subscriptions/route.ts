@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     const data = createSubscriptionSchema.parse(await req.json());
 
     if (data.billingCycle !== "annual") {
-      return fail("L'abonnement est disponible uniquement pour 12 mois au prix de 15 000 FCFA.", 400);
+      return fail("Choisissez une formule à durée fixe (cycle « annual »).", 400);
     }
 
     const plan = await db.subscriptionPlan.findUnique({ where: { slug: data.planSlug } });

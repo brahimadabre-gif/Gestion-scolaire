@@ -2,6 +2,7 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
+import { PLATFORM_KEY_PREFIX, type LicensePlatform } from "@/lib/license-platform";
 
 const rawJwtSecret = process.env.JWT_SECRET ?? "gspp-dev-secret-change-in-production-min-32-chars";
 
@@ -131,10 +132,11 @@ export function hashToken(raw: string) {
 }
 
 // ── Clés de licence ──────────────────────────────────────────
-export function generateLicenseKey(): string {
+// Le préfixe identifie la plateforme : GSPC- (PC Windows) ou GSAN- (Android).
+export function generateLicenseKey(platform: LicensePlatform): string {
   const bytes = crypto.randomBytes(16);
   const hex = bytes.toString("hex").toUpperCase();
-  return `GSPP-${hex.slice(0, 5)}-${hex.slice(5, 10)}-${hex.slice(10, 15)}-${hex.slice(15, 20)}`;
+  return `${PLATFORM_KEY_PREFIX[platform]}-${hex.slice(0, 5)}-${hex.slice(5, 10)}-${hex.slice(10, 15)}-${hex.slice(15, 20)}`;
 }
 
 export function generateReference(prefix: string): string {

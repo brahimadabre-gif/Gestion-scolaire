@@ -62,7 +62,7 @@ export function AccountSubscriptionPage() {
             {plan.highlighted && <span className="mb-3 inline-block rounded-full bg-orange-600 px-3 py-1 text-xs font-bold text-white">Recommandée</span>}
             <h2 className="text-xl font-bold">{plan.name}</h2>
             <p className="mt-2 text-sm text-muted-foreground">{plan.description}</p>
-            <p className="mt-4 text-2xl font-extrabold">{formatFcfa(plan.annualPrice)}<span className="text-sm font-normal text-muted-foreground"> / 12 mois</span></p>
+            <p className="mt-4 text-2xl font-extrabold">{formatFcfa(plan.annualPrice)}<span className="text-sm font-normal text-muted-foreground"> / {plan.durationMonths || 12} mois · {plan.platform === "ANDROID" ? "Android" : "PC Windows"}</span></p>
             <ul className="mt-4 space-y-2">
               {plan.features.slice(0, 4).map((feature) => <li key={feature} className="flex gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />{feature}</li>)}
             </ul>

@@ -2,7 +2,8 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { ok, fail, handle, getClientIp, logAction, assertSameOrigin } from "@/lib/api-helpers";
 import { requireAdmin, generateLicenseKey } from "@/lib/auth";
-import { confirmPaymentAndActivate } from "@/lib/billing";
+import { confirmPaymentAndActivate, subscriptionEndDate } from "@/lib/billing";
+import { platformFromPlan } from "@/lib/license-platform";
 
 // ── Mise à jour d'un enregistrement d'administration ─────────
 // PATCH /api/admin/[entity]/[id]  —  liste blanche stricte d'entités
@@ -43,7 +44,7 @@ const libraryPatchSchema = z.object({
 });
 
 const ALLOWED_FIELDS: Record<string, string[]> = {
-  plans: ["slug", "name", "description", "monthlyPrice", "annualPrice", "maxUsers", "maxSchools", "maxStudents", "features", "highlighted", "active", "sortOrder"],
+  plans: ["slug", "name", "description", "monthlyPrice", "annualPrice", "platform", "durationMonths", "maxUsers", "maxSchools", "maxStudents", "features", "highlighted", "active", "sortOrder"],
   articles: ["slug", "title", "excerpt", "content", "category", "coverEmoji", "published", "publishedAt"],
   faqs: ["question", "answer", "category", "sortOrder", "published"],
   testimonials: ["name", "role", "establishment", "content", "rating", "initials", "color", "published", "sortOrder"],
@@ -75,10 +76,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ entity
           if (!sub) return fail("Abonnement introuvable.", 404);
           const { status, extendDays, endDate: requestedEndDate, decisionNote } = subPatchSchema.parse(body);
           const now = new Date();
-          const days = sub.billingCycle === "monthly" ? 30 : 365;
           const baseEndDate = sub.endDate && sub.endDate > now
             ? sub.endDate
-            : new Date(now.getTime() + days * 86_400_000);
+            : subscriptionEndDate(now, sub.billingCycle, sub.plan.durationMonths);
           let endDate = requestedEndDate
             ? new Date(`${requestedEndDate}T23:59:59.999Z`)
             : baseEndDate;
@@ -95,9 +95,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ entity
           });
           const license = await db.licenseKey.findFirst({ where: { subscriptionId: id } });
           if (nextStatus === "ACTIVE" && !license) {
+            const platform = platformFromPlan(sub.plan) ?? "PC";
             await db.licenseKey.create({
               data: {
-                key: generateLicenseKey(),
+                key: generateLicenseKey(platform),
+                platform,
                 userId: sub.userId,
                 subscriptionId: sub.id,
                 status: "INACTIVE",
@@ -138,6 +140,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ entity
           }
           if (entity === "plans" && Array.isArray(data.features)) {
             data.features = JSON.stringify(data.features);
+          }
+          if (entity === "plans" && "platform" in data && data.platform !== "PC" && data.platform !== "ANDROID") {
+            return fail("platform: choisissez PC ou ANDROID.", 422);
+          }
+          if (entity === "plans" && "durationMonths" in data) {
+            const months = Number(data.durationMonths);
+            if (!Number.isInteger(months) || months < 1 || months > 600) return fail("durationMonths: durée entre 1 et 600 mois.", 422);
+            data.durationMonths = months;
           }
           if (Object.keys(data).length === 0) return fail("Aucune modification valide fournie.", 400);
           const delegate = {

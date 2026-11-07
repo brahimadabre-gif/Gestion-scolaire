@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { ok, fail, handle, rateLimit, getClientIp, withPublicLicenseCors } from "@/lib/api-helpers";
+import { checkLicensePlatform, detectDevicePlatform, resolveLicensePlatform } from "@/lib/license-platform";
 
 /** POST /api/license/status — statut de l'abonnement ou de la licence directe. */
 export async function POST(req: Request) {
@@ -27,6 +28,27 @@ export async function POST(req: Request) {
     });
     if (!license || license.status === "REVOKED") return ok({ valid: false, reason: "LICENSE_INVALID" });
     if (license.status !== "ACTIVE") return ok({ valid: false, reason: "LICENSE_NOT_ACTIVATED" });
+
+    // Même règle qu'à l'activation : une licence ne reste valide que sur sa plateforme.
+    // L'application envoie toujours x-gspp-client; un serveur de confiance peut omettre la plateforme.
+    const devicePlatform = detectDevicePlatform({
+      userAgent: req.headers.get("user-agent"),
+      clientHeader: publicClient,
+      bodyPlatform: body.platform,
+      trustedServer,
+    });
+    if (devicePlatform) {
+      const platformCheck = checkLicensePlatform(resolveLicensePlatform(license), devicePlatform);
+      if (!platformCheck.ok) {
+        return ok({ valid: false, reason: platformCheck.reason, message: platformCheck.message, license: { platform: platformCheck.expected } });
+      }
+      if (platformCheck.bind) {
+        // Ancienne licence GSPP- déjà active : sa plateforme est figée au premier contrôle.
+        await db.licenseKey.updateMany({ where: { id: license.id, platform: null }, data: { platform: platformCheck.platform } });
+      }
+    } else if (!trustedServer) {
+      return ok({ valid: false, reason: "PLATFORM_REQUIRED" });
+    }
     if (license.user && !license.user.active) return ok({ valid: false, reason: "ACCOUNT_DISABLED" });
 
     const now = new Date();
@@ -47,7 +69,7 @@ export async function POST(req: Request) {
       await db.licenseKey.update({ where: { id: license.id }, data: { lastCheckAt: now } });
       return ok({
         valid: true,
-        license: { key: license.key, status: license.status, maxDevices: license.maxDevices },
+        license: { key: license.key, status: license.status, platform: resolveLicensePlatform(license) ?? devicePlatform, maxDevices: license.maxDevices },
         subscription: {
           status: "ACTIVE",
           plan: sub.plan.name,
@@ -65,7 +87,7 @@ export async function POST(req: Request) {
     await db.licenseKey.update({ where: { id: license.id }, data: { lastCheckAt: now } });
     return ok({
       valid: true,
-      license: { key: license.key, status: license.status, maxDevices: license.maxDevices, expiresAt: license.expiresAt },
+      license: { key: license.key, status: license.status, platform: resolveLicensePlatform(license) ?? devicePlatform, maxDevices: license.maxDevices, expiresAt: license.expiresAt },
       subscription: {
         status: "ACTIVE",
         plan: "Licence directe",

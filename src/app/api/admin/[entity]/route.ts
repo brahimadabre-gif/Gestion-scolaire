@@ -10,6 +10,8 @@ const planSchema = z.object({
   description: z.string().trim().max(300),
   monthlyPrice: z.coerce.number().min(0),
   annualPrice: z.coerce.number().min(0),
+  platform: z.enum(["PC", "ANDROID"]).default("PC"),
+  durationMonths: z.coerce.number().int().min(1).max(600).default(12),
   maxUsers: z.coerce.number().int().min(1),
   maxSchools: z.coerce.number().int().min(1),
   maxStudents: z.coerce.number().int().min(1),

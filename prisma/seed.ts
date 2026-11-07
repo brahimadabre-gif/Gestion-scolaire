@@ -7,6 +7,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import crypto from "node:crypto";
+import { PC_QUARTER_PLAN } from "./pc-quarter-plan.ts";
 
 const db = new PrismaClient();
 
@@ -74,7 +75,7 @@ async function main() {
       slug: "essentiel",
       name: "Essentiel",
       description: "Pour l'enseignant indépendant ou la petite structure qui veut gagner du temps dès maintenant.",
-      monthlyPrice: 0, annualPrice: 15000,
+      monthlyPrice: 0, annualPrice: 15000, platform: "PC", durationMonths: 12,
       maxUsers: 1, maxSchools: 1, maxStudents: 200,
       features: JSON.stringify([
         "Gestion des élèves et des classes",
@@ -90,7 +91,7 @@ async function main() {
       slug: "professionnel",
       name: "Ordinateur Windows",
       description: "La formule complète pour gérer toute l'école sur un ordinateur Windows, installé depuis Microsoft Store.",
-      monthlyPrice: 0, annualPrice: 15000,
+      monthlyPrice: 0, annualPrice: 15000, platform: "PC", durationMonths: 12,
       maxUsers: 5, maxSchools: 1, maxStudents: 1000,
       features: JSON.stringify([
         "Élèves, classes, notes, moyennes et bulletins",
@@ -109,7 +110,7 @@ async function main() {
       slug: "mobile",
       name: "Téléphone et tablette",
       description: "L'application Android pour gérer votre classe ou votre école depuis un téléphone ou une tablette.",
-      monthlyPrice: 0, annualPrice: 5000,
+      monthlyPrice: 0, annualPrice: 5000, platform: "ANDROID", durationMonths: 12,
       maxUsers: 5, maxSchools: 1, maxStudents: 1000,
       features: JSON.stringify([
         "Élèves, classes, notes, moyennes et bulletins",
@@ -130,7 +131,7 @@ async function main() {
       slug: "etablissement",
       name: "Établissement",
       description: "Pour les groupes scolaires et complexes multi-sites avec des besoins avancés.",
-      monthlyPrice: 0, annualPrice: 15000,
+      monthlyPrice: 0, annualPrice: 15000, platform: "PC", durationMonths: 12,
       maxUsers: 20, maxSchools: 3, maxStudents: 5000,
       features: JSON.stringify([
         "Tout le contenu de la formule Professionnel",
@@ -143,6 +144,7 @@ async function main() {
       ]),
       highlighted: false, active: false, sortOrder: 3,
     },
+    PC_QUARTER_PLAN,
   ];
 
   for (const p of plans) {
@@ -183,6 +185,7 @@ async function main() {
         update: {},
         create: {
           key: "GSPP-DEMO1-PRO22-KEY33-XXXXX",
+          platform: "PC",
           userId: demo.id, subscriptionId: sub.id,
           status: "ACTIVE", activatedAt: new Date("2026-01-20"),
           maxDevices: 1,
@@ -193,19 +196,20 @@ async function main() {
 
   // ── Version logicielle ─────────────────────────────────────
   const versionData = {
-    version: "2.3.20",
+    version: "2.3.26",
     channel: "stable",
-    releaseDate: new Date("2026-11-03"),
-    fileSizeMb: 9.65,
+    releaseDate: new Date("2026-11-07"),
+    fileSizeMb: 9.79,
     minOs: "Android 5.1 ou supérieur, téléphone ou tablette",
     installerName: "APK Android",
-    downloadUrl: "/downloads/Gestion-Scolaire-Pro-v2.3.20.apk",
+    downloadUrl: "/downloads/Gestion-Scolaire-Pro-v2.3.26.apk",
     changelog: [
-      "## Version 2.3.20 (Android)",
-      "- Tableau de bord entièrement refait : toute l’école d’un coup d’œil pour le directeur, sa classe uniquement pour l’enseignant.",
-      "- Nouvelles icônes modernes pour chaque module et pour l’école.",
-      "- Présentation adaptée à tous les téléphones et tablettes.",
-      "- Reprend les correctifs de la 2.3.19 (photo, empreinte digitale, notes à virgule).",
+      "## Version 2.3.26 (Android)",
+      "- Fenêtres de confirmation modernes dans tout le logiciel.",
+      "- Réinitialisation complète en trois étapes de sécurité numérotées.",
+      "- Documents de l’élève regroupés dans une seule entrée, avec aperçus.",
+      "- Groupe d’EPS : saisie des tailles et rangement du plus petit au plus grand.",
+      "- EPS grandes classes (CE2, CM1, CM2) : nouveau tableau de bord.",
     ].join("\n"),
     active: true,
   };

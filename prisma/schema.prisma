@@ -67,6 +67,8 @@ model SubscriptionPlan {
   maxSchools    Int            @default(1) // Nombre d'établissements
   maxStudents   Int            @default(200) // Limite d'élèves
   features      String         @default("[]") // JSON array des fonctionnalités incluses
+  platform      String         @default("PC") // PC | ANDROID — plateforme des licences émises pour cette formule
+  durationMonths Int           @default(12) // Durée d'accès achetée (le prix affiché est annualPrice pour cette durée)
   highlighted   Boolean        @default(false) // Formule mise en avant
   active        Boolean        @default(true)
   sortOrder     Int            @default(0)
@@ -161,6 +163,10 @@ model LicenseKey {
   subscriptionId    String?
   subscription      Subscription? @relation(fields: [subscriptionId], references: [id])
   status            String        @default("INACTIVE") // INACTIVE | ACTIVE | REVOKED
+  // PC | ANDROID. Les nouvelles clés portent aussi la plateforme dans leur préfixe
+  // (GSPC- / GSAN-). null = ancienne clé GSPP- : rattachée à la plateforme de
+  // l'appareil au premier contact (voir prisma/backfill-license-platform.ts).
+  platform          String?
   validityMonths    Int?          // défini pour les codes à durée différée créés par l'administration
   activatedAt       DateTime?
   expiresAt         DateTime?     // fixé à la première activation pour les licences directes
@@ -171,6 +177,8 @@ model LicenseKey {
   updatedAt         DateTime      @updatedAt
 
   @@index([status, createdAt])
+  @@index([platform, status])
+  @@index([activatedAt])
 }
 
 // ─────────────────────────────────────────────────────────────

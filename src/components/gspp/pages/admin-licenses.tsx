@@ -8,12 +8,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Check, Clipboard, Download, Eye, KeyRound, Loader2, Search, ShieldAlert, X } from "lucide-react";
+import { Check, Clipboard, Download, Eye, KeyRound, Loader2, Monitor, Search, ShieldAlert, Smartphone, X } from "lucide-react";
 
 type LicenseStatus = "AVAILABLE" | "ACTIVE" | "EXPIRED" | "REVOKED";
+type Platform = "PC" | "ANDROID";
+const platformLabels: Record<Platform, string> = { PC: "PC Windows", ANDROID: "Android" };
+export function PlatformBadge({ platform }: { platform: Platform | null }) {
+  if (!platform) return <span className="inline-flex rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground" title="Ancienne clé : rattachée au premier appareil qui l’utilise">À rattacher</span>;
+  const Icon = platform === "ANDROID" ? Smartphone : Monitor;
+  return <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${platform === "ANDROID" ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300"}`}><Icon className="h-3.5 w-3.5" aria-hidden="true" />{platformLabels[platform]}</span>;
+}
 interface LicenseRow {
   id: string;
   key: string;
+  platform: Platform | null;
   status: LicenseStatus;
   createdAt: string;
   validityMonths: number | null;
@@ -48,6 +56,8 @@ export function AdminLicenses() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
+  const [platformFilter, setPlatformFilter] = useState("all");
+  const [platform, setPlatform] = useState<Platform>("PC");
   const [sort, setSort] = useState("createdAt");
   const [direction, setDirection] = useState("desc");
   const [count, setCount] = useState("1");
@@ -60,9 +70,9 @@ export function AdminLicenses() {
   const [details, setDetails] = useState<LicenseRow | null>(null);
 
   const durationMonths = duration === "custom" ? Number(customMonths) : Number(duration);
-  const query = new URLSearchParams({ q: search, status, sort, direction });
+  const query = new URLSearchParams({ q: search, status, platform: platformFilter, sort, direction });
   const { data, isLoading, isError, refetch } = useQuery<LicenseResponse>({
-    queryKey: ["admin", "licenses", search, status, sort, direction],
+    queryKey: ["admin", "licenses", search, status, platformFilter, sort, direction],
     queryFn: () => api.get<LicenseResponse>(`/api/admin/licenses?${query.toString()}`),
   });
   const rows = data?.items ?? [];
@@ -77,7 +87,7 @@ export function AdminLicenses() {
   const generate = async () => {
     setGenerating(true);
     try {
-      const result = await api.post<{ codes: string[] }>("/api/admin/licenses", { count: Number(count), durationMonths });
+      const result = await api.post<{ codes: string[] }>("/api/admin/licenses", { count: Number(count), durationMonths, platform });
       setGeneratedCodes(result.codes);
       setSelected([]);
       await queryClient.invalidateQueries({ queryKey: ["admin", "licenses"] });
@@ -97,9 +107,19 @@ export function AdminLicenses() {
     } catch (error) { toast.error(error instanceof Error ? error.message : "Révocation impossible."); }
   };
 
+  const assignPlatform = async (license: LicenseRow, value: Platform) => {
+    if (!window.confirm(`Rattacher ${license.key} à ${platformLabels[value]} ? La clé sera ensuite refusée sur l’autre plateforme.`)) return;
+    try {
+      await api.patch(`/api/admin/licenses/${license.id}`, { action: "set-platform", platform: value });
+      toast.success(`Clé rattachée à ${platformLabels[value]}.`);
+      await queryClient.invalidateQueries({ queryKey: ["admin"] });
+      setDetails(null);
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Rattachement impossible."); }
+  };
+
   const exportCsv = (items: LicenseRow[]) => {
-    const header = ["Code d'activation", "Création", "Durée", "Client", "E-mail", "Activation", "Expiration", "Statut", "Installation"];
-    const lines = items.map((item) => [item.key, item.createdAt, durationLabel(item.validityMonths), item.user ? `${item.user.firstName} ${item.user.lastName}` : "", item.user?.email ?? "", item.activatedAt ?? "", item.expiresAt ?? "", statusLabels[item.status], item.deviceFingerprint ?? ""].map(csvCell).join(","));
+    const header = ["Code d'activation", "Plateforme", "Création", "Durée", "Client", "E-mail", "Activation", "Expiration", "Statut", "Installation"];
+    const lines = items.map((item) => [item.key, item.platform ? platformLabels[item.platform] : "À rattacher", item.createdAt, durationLabel(item.validityMonths), item.user ? `${item.user.firstName} ${item.user.lastName}` : "", item.user?.email ?? "", item.activatedAt ?? "", item.expiresAt ?? "", statusLabels[item.status], item.deviceFingerprint ?? ""].map(csvCell).join(","));
     const blob = new Blob(["\uFEFF", [header.map(csvCell).join(","), ...lines].join("\r\n")], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -116,9 +136,12 @@ export function AdminLicenses() {
     <section className="rounded-2xl border bg-card p-5 sm:p-6">
       <div className="flex items-start gap-3">
         <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500/10 text-orange-700 dark:text-orange-300"><KeyRound className="h-5 w-5" aria-hidden="true" /></span>
-        <div><h2 className="text-lg font-bold">Générer des codes d’activation</h2><p className="mt-1 text-sm text-muted-foreground">Les codes commencent leur durée à la première activation dans le logiciel. Chaque code est limité à une installation.</p></div>
+        <div><h2 className="text-lg font-bold">Générer des codes d’activation</h2><p className="mt-1 text-sm text-muted-foreground">Les codes commencent leur durée à la première activation dans le logiciel. Chaque code est limité à une installation et à sa plateforme : GSPC- pour le PC, GSAN- pour Android.</p></div>
       </div>
-      <div className="mt-5 grid gap-4 sm:grid-cols-3">
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <fieldset className="space-y-1.5 text-sm font-medium"><legend className="mb-1.5">Plateforme</legend>
+          <div className="grid grid-cols-2 gap-2">{(["PC", "ANDROID"] as Platform[]).map((value) => { const Icon = value === "ANDROID" ? Smartphone : Monitor; return <button key={value} type="button" aria-pressed={platform === value} onClick={() => setPlatform(value)} className={`flex h-10 items-center justify-center gap-1.5 rounded-md border text-sm font-semibold transition ${platform === value ? "border-orange-600 bg-orange-600 text-white" : "border-input bg-background hover:bg-secondary"}`}><Icon className="h-4 w-4" aria-hidden="true" />{value === "PC" ? "PC" : "Android"}</button>; })}</div>
+        </fieldset>
         <label className="space-y-1.5 text-sm font-medium">Durée de validité
           <select value={duration} onChange={(event) => setDuration(event.target.value)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
             {durationPresets.map((preset) => <option key={preset.value} value={preset.value}>{preset.label}</option>)}
@@ -143,9 +166,10 @@ export function AdminLicenses() {
           <Button variant="outline" className="rounded-full" disabled={!rows.length} onClick={() => exportCsv(exportRows)}><Download className="mr-2 h-4 w-4" aria-hidden="true" />Exporter CSV {selected.length ? `(${selected.length})` : ""}</Button>
         </div>
       </div>
-      <div className="mt-4 grid gap-2 sm:grid-cols-[minmax(220px,1fr)_180px_180px_auto]">
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1fr)_170px_170px_170px_auto]">
         <div className="relative"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" /><Input className="pl-9" value={search} onChange={(event) => { setSelected([]); setSearch(event.target.value); }} placeholder="Rechercher un code ou un client" /></div>
         <select aria-label="Filtrer par statut" value={status} onChange={(event) => { setSelected([]); setStatus(event.target.value); }} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="all">Tous les statuts</option>{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
+        <select aria-label="Filtrer par plateforme" value={platformFilter} onChange={(event) => { setSelected([]); setPlatformFilter(event.target.value); }} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="all">Toutes plateformes</option><option value="PC">PC Windows</option><option value="ANDROID">Android</option><option value="unknown">À rattacher</option></select>
         <select aria-label="Trier les codes" value={sort} onChange={(event) => { setSelected([]); setSort(event.target.value); }} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="createdAt">Date de création</option><option value="activatedAt">Date d’activation</option><option value="expiresAt">Date d’expiration</option><option value="status">Statut</option><option value="key">Code</option></select>
         <Button variant="outline" className="rounded-full" onClick={() => { setSelected([]); setDirection((value) => value === "asc" ? "desc" : "asc"); }}>{direction === "asc" ? "Croissant" : "Décroissant"}</Button>
       </div>
@@ -153,31 +177,32 @@ export function AdminLicenses() {
       {isLoading ? <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-orange-600" aria-label="Chargement" /></div>
         : isError ? <div className="flex items-center justify-between gap-3 py-10 text-sm text-destructive"><span>Impossible de charger les licences.</span><Button variant="outline" onClick={() => void refetch()}>Réessayer</Button></div>
         : <div className="mt-4 overflow-x-auto rounded-xl border"><table className="w-full min-w-[980px] text-left text-sm">
-          <thead><tr className="border-b bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground"><th className="w-10 px-3 py-3"><input aria-label="Tout sélectionner" type="checkbox" checked={allSelected} onChange={() => setSelected(allSelected ? selected.filter((id) => !selectableRows.includes(id)) : [...new Set([...selected, ...selectableRows])])} /></th><th className="px-3 py-3">Code d’activation</th><th className="px-3 py-3">Création · durée</th><th className="px-3 py-3">Client</th><th className="px-3 py-3">Activation · expiration</th><th className="px-3 py-3">Statut</th><th className="px-3 py-3 text-right">Actions</th></tr></thead>
+          <thead><tr className="border-b bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground"><th className="w-10 px-3 py-3"><input aria-label="Tout sélectionner" type="checkbox" checked={allSelected} onChange={() => setSelected(allSelected ? selected.filter((id) => !selectableRows.includes(id)) : [...new Set([...selected, ...selectableRows])])} /></th><th className="px-3 py-3">Code d’activation</th><th className="px-3 py-3">Plateforme</th><th className="px-3 py-3">Création · durée</th><th className="px-3 py-3">Client</th><th className="px-3 py-3">Activation · expiration</th><th className="px-3 py-3">Statut</th><th className="px-3 py-3 text-right">Actions</th></tr></thead>
           <tbody className="divide-y">{rows.map((item) => <tr key={item.id} className="hover:bg-secondary/30">
             <td className="px-3 py-3"><input aria-label={`Sélectionner ${item.key}`} type="checkbox" checked={selected.includes(item.id)} onChange={() => toggleRow(item.id)} /></td>
             <td className="px-3 py-3 font-mono text-xs font-semibold">{item.key}</td>
+            <td className="px-3 py-3"><PlatformBadge platform={item.platform} /></td>
             <td className="px-3 py-3">{dateLabel(item.createdAt)}<span className="block text-xs text-muted-foreground">{durationLabel(item.validityMonths)}</span></td>
             <td className="px-3 py-3">{item.user ? <><span>{item.user.firstName} {item.user.lastName}</span><span className="block text-xs text-muted-foreground">{item.user.email}</span></> : <span className="text-muted-foreground">Non associé</span>}</td>
             <td className="px-3 py-3">{dateLabel(item.activatedAt)}<span className="block text-xs text-muted-foreground">{dateLabel(item.expiresAt)}</span></td>
             <td className="px-3 py-3"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${item.status === "AVAILABLE" ? "bg-sky-500/10 text-sky-700 dark:text-sky-300" : item.status === "ACTIVE" ? "bg-orange-500/10 text-orange-700 dark:text-orange-300" : item.status === "EXPIRED" ? "bg-amber-500/10 text-amber-700 dark:text-amber-300" : "bg-destructive/10 text-destructive"}`}>{statusLabels[item.status]}</span></td>
             <td className="px-3 py-3"><div className="flex justify-end gap-1"><Button variant="ghost" size="icon" aria-label={`Copier ${item.key}`} onClick={() => void copy(item.key)}><Clipboard className="h-4 w-4" aria-hidden="true" /></Button><Button variant="ghost" size="icon" aria-label={`Détails ${item.key}`} onClick={() => setDetails(item)}><Eye className="h-4 w-4" aria-hidden="true" /></Button>{(item.status === "AVAILABLE" || item.status === "ACTIVE") && <Button variant="ghost" size="icon" aria-label={`Révoquer ${item.key}`} className="text-destructive" onClick={() => void revoke(item)}><ShieldAlert className="h-4 w-4" aria-hidden="true" /></Button>}</div></td>
-          </tr>)}{!rows.length && <tr><td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">Aucun code ne correspond à ces critères.</td></tr>}</tbody>
+          </tr>)}{!rows.length && <tr><td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">Aucun code ne correspond à ces critères.</td></tr>}</tbody>
         </table></div>}
     </section>
 
     <Dialog open={confirmOpen} onOpenChange={(open) => { if (!generating) setConfirmOpen(open); }}>
       <DialogContent className="max-h-[85vh] overflow-y-auto">
-        <DialogHeader><DialogTitle>{generatedCodes.length ? "Codes générés" : "Confirmer la génération"}</DialogTitle><DialogDescription>{generatedCodes.length ? "Copiez ou exportez les codes; ils sont aussi consultables dans la liste des licences." : `Vous allez générer ${count} code(s) à usage unique, valable(s) ${durationLabel(durationMonths)} à partir de la première activation.`}</DialogDescription></DialogHeader>
-        {generatedCodes.length ? <div className="max-h-64 overflow-auto rounded-lg border bg-muted/30 p-3 font-mono text-sm">{generatedCodes.map((code) => <div key={code} className="py-1">{code}</div>)}</div> : <div className="rounded-xl bg-orange-500/5 p-4 text-sm"><strong>{count} code(s)</strong><span className="block text-muted-foreground">Durée de validité : {durationLabel(durationMonths)}. L’expiration sera calculée par le serveur au premier démarrage autorisé.</span></div>}
-        <DialogFooter>{generatedCodes.length ? <><Button variant="outline" onClick={() => { const generatedRows: LicenseRow[] = generatedCodes.map((key) => ({ id: key, key, status: "AVAILABLE", createdAt: new Date().toISOString(), validityMonths: durationMonths, activatedAt: null, expiresAt: null, deviceFingerprint: null, maxDevices: 1, user: null, subscription: null })); exportCsv(generatedRows); }}><Download className="mr-2 h-4 w-4" aria-hidden="true" />Télécharger CSV</Button><Button onClick={() => void copy(generatedCodes.join("\n"), `${generatedCodes.length} codes copiés.`)}><Clipboard className="mr-2 h-4 w-4" aria-hidden="true" />Copier les codes</Button></> : <><Button variant="outline" onClick={() => setConfirmOpen(false)}>Annuler</Button><Button onClick={() => void generate()} disabled={generating}>{generating && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}Confirmer et générer</Button></>}</DialogFooter>
+        <DialogHeader><DialogTitle>{generatedCodes.length ? "Codes générés" : "Confirmer la génération"}</DialogTitle><DialogDescription>{generatedCodes.length ? "Copiez ou exportez les codes; ils sont aussi consultables dans la liste des licences." : `Vous allez générer ${count} code(s) ${platformLabels[platform]} à usage unique, valable(s) ${durationLabel(durationMonths)} à partir de la première activation.`}</DialogDescription></DialogHeader>
+        {generatedCodes.length ? <div className="max-h-64 overflow-auto rounded-lg border bg-muted/30 p-3 font-mono text-sm">{generatedCodes.map((code) => <div key={code} className="py-1">{code}</div>)}</div> : <div className="rounded-xl bg-orange-500/5 p-4 text-sm"><strong>{count} code(s) · {platformLabels[platform]}</strong><span className="block text-muted-foreground">Durée de validité : {durationLabel(durationMonths)}. L’expiration sera calculée par le serveur au premier démarrage autorisé.</span></div>}
+        <DialogFooter>{generatedCodes.length ? <><Button variant="outline" onClick={() => { const generatedRows: LicenseRow[] = generatedCodes.map((key) => ({ id: key, key, platform, status: "AVAILABLE", createdAt: new Date().toISOString(), validityMonths: durationMonths, activatedAt: null, expiresAt: null, deviceFingerprint: null, maxDevices: 1, user: null, subscription: null })); exportCsv(generatedRows); }}><Download className="mr-2 h-4 w-4" aria-hidden="true" />Télécharger CSV</Button><Button onClick={() => void copy(generatedCodes.join("\n"), `${generatedCodes.length} codes copiés.`)}><Clipboard className="mr-2 h-4 w-4" aria-hidden="true" />Copier les codes</Button></> : <><Button variant="outline" onClick={() => setConfirmOpen(false)}>Annuler</Button><Button onClick={() => void generate()} disabled={generating}>{generating && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}Confirmer et générer</Button></>}</DialogFooter>
       </DialogContent>
     </Dialog>
 
     <Dialog open={!!details} onOpenChange={(open) => { if (!open) setDetails(null); }}>
       <DialogContent>
         <DialogHeader><DialogTitle>Détails de la licence</DialogTitle><DialogDescription>Informations de création, d’activation et d’installation.</DialogDescription></DialogHeader>
-        {details && <dl className="grid grid-cols-[minmax(120px,0.7fr)_1fr] gap-x-4 gap-y-3 text-sm"><dt className="text-muted-foreground">Code</dt><dd className="break-all font-mono">{details.key}</dd><dt className="text-muted-foreground">Statut</dt><dd>{statusLabels[details.status]}</dd><dt className="text-muted-foreground">Durée</dt><dd>{durationLabel(details.validityMonths)}</dd><dt className="text-muted-foreground">Création</dt><dd>{dateLabel(details.createdAt)}</dd><dt className="text-muted-foreground">Première activation</dt><dd>{dateLabel(details.activatedAt)}</dd><dt className="text-muted-foreground">Expiration</dt><dd>{dateLabel(details.expiresAt)}</dd><dt className="text-muted-foreground">Client</dt><dd>{details.user ? `${details.user.firstName} ${details.user.lastName} · ${details.user.email}` : "Non associé"}</dd><dt className="text-muted-foreground">Installation</dt><dd className="break-all font-mono text-xs">{details.deviceFingerprint ?? "Non activée"}</dd></dl>}
+        {details && <dl className="grid grid-cols-[minmax(120px,0.7fr)_1fr] gap-x-4 gap-y-3 text-sm"><dt className="text-muted-foreground">Code</dt><dd className="break-all font-mono">{details.key}</dd><dt className="text-muted-foreground">Plateforme</dt><dd><PlatformBadge platform={details.platform} />{!details.platform && <span className="mt-2 flex flex-wrap gap-2"><Button size="sm" variant="outline" onClick={() => void assignPlatform(details, "PC")}><Monitor className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />Rattacher au PC</Button><Button size="sm" variant="outline" onClick={() => void assignPlatform(details, "ANDROID")}><Smartphone className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />Rattacher à Android</Button></span>}</dd><dt className="text-muted-foreground">Statut</dt><dd>{statusLabels[details.status]}</dd><dt className="text-muted-foreground">Durée</dt><dd>{durationLabel(details.validityMonths)}</dd><dt className="text-muted-foreground">Création</dt><dd>{dateLabel(details.createdAt)}</dd><dt className="text-muted-foreground">Première activation</dt><dd>{dateLabel(details.activatedAt)}</dd><dt className="text-muted-foreground">Expiration</dt><dd>{dateLabel(details.expiresAt)}</dd><dt className="text-muted-foreground">Client</dt><dd>{details.user ? `${details.user.firstName} ${details.user.lastName} · ${details.user.email}` : "Non associé"}</dd><dt className="text-muted-foreground">Installation</dt><dd className="break-all font-mono text-xs">{details.deviceFingerprint ?? "Non activée"}</dd></dl>}
         <DialogFooter>{details && (details.status === "AVAILABLE" || details.status === "ACTIVE") && <Button variant="destructive" onClick={() => void revoke(details)}><X className="mr-2 h-4 w-4" aria-hidden="true" />Révoquer</Button>}<Button variant="outline" onClick={() => setDetails(null)}><Check className="mr-2 h-4 w-4" aria-hidden="true" />Fermer</Button></DialogFooter>
       </DialogContent>
     </Dialog>

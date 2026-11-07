@@ -7,7 +7,7 @@ import { PageHero } from "../page-hero";
 import { Section, SectionHeading, Spinner } from "../ui-bits";
 import { formatFcfa } from "@/lib/site";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Check, Minus, ShieldCheck, RefreshCcw, KeyRound } from "lucide-react";
+import { Check, Minus, ShieldCheck, RefreshCcw, KeyRound, Monitor, Smartphone } from "lucide-react";
 import { DeveloperContact, developerWhatsAppHref } from "../developer-contact";
 
 export function PricingPage() {
@@ -42,7 +42,9 @@ export function PricingPage() {
           <div className="flex flex-col items-center gap-6 md:flex-row md:items-stretch md:justify-center">
             {(plans ?? []).map((plan) => {
               const price = plan.annualPrice;
-              const period = " / 12 mois";
+              const months = plan.durationMonths || 12;
+              const period = ` / ${months} mois`;
+              const PlatformIcon = plan.platform === "ANDROID" ? Smartphone : Monitor;
               return (
                 <article
                   key={plan.slug}
@@ -57,14 +59,18 @@ export function PricingPage() {
                       Recommandée
                     </span>
                   )}
-                  <h2 className="text-xl font-bold">{plan.name}</h2>
+                  <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                    <PlatformIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                    {plan.platform === "ANDROID" ? "Android" : "PC Windows"}
+                  </span>
+                  <h2 className="mt-3 text-xl font-bold">{plan.name}</h2>
                   <p className="mt-1.5 min-h-10 text-sm text-muted-foreground">{plan.description}</p>
                   <p className="mt-5">
                     <span className="text-4xl font-extrabold tracking-tight">{formatFcfa(price)}</span>
                     <span className="text-sm text-muted-foreground"> {period}</span>
                   </p>
                   <p className="mt-1 text-xs font-semibold text-orange-700 dark:text-orange-400">
-                    Accès pendant 12 mois
+                    Accès pendant {months} mois · clé réservée {plan.platform === "ANDROID" ? "à Android" : "au PC"}
                   </p>
 
                   <ul className="mt-5 flex-1 space-y-2.5">
@@ -94,7 +100,7 @@ export function PricingPage() {
         <div className="grid gap-6 sm:grid-cols-3">
           {[
             { icon: KeyRound, title: "Clé d’activation", text: "Contactez le développeur pour connaître les étapes d’obtention de votre clé." },
-            { icon: RefreshCcw, title: "Renouvellement simple", text: "Chaque renouvellement ajoute 12 mois à la durée restante : aucun jour perdu." },
+            { icon: RefreshCcw, title: "Renouvellement simple", text: "Chaque renouvellement s’ajoute à la durée restante : aucun jour perdu. Une clé PC reste sur PC, une clé Android sur Android." },
             { icon: ShieldCheck, title: "Support réactif", text: "Une question ? Le support répond sous 24 h ouvrées. Vos données restent sur votre poste." },
           ].map((r) => (
             <div key={r.title} className="flex items-start gap-4 rounded-2xl border bg-card p-5">
@@ -129,7 +135,7 @@ export function PricingPage() {
                   <th key={p.slug} className="px-4 py-3.5 text-center font-semibold">
                     {p.name}
                     <p className="mt-0.5 text-xs font-normal text-muted-foreground">
-              {formatFcfa(p.annualPrice)} / 12 mois
+              {formatFcfa(p.annualPrice)} / {p.durationMonths || 12} mois
                     </p>
                   </th>
                 ))}

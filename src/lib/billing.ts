@@ -5,6 +5,18 @@
 // ─────────────────────────────────────────────────────────────
 import { db } from "@/lib/db";
 import { generateLicenseKey } from "@/lib/auth";
+import { addCalendarMonths } from "@/lib/license-duration";
+import { platformFromKey, platformFromPlan } from "@/lib/license-platform";
+
+/**
+ * Fin d'abonnement : la durée de la formule (12 mois, 3 mois…) fait foi;
+ * l'ancien cycle mensuel reste à 30 jours.
+ */
+export function subscriptionEndDate(base: Date, billingCycle: string, durationMonths: number | null | undefined): Date {
+  if (billingCycle === "monthly") return new Date(base.getTime() + 30 * 86_400_000);
+  if (durationMonths && durationMonths !== 12) return addCalendarMonths(base, durationMonths);
+  return new Date(base.getTime() + 365 * 86_400_000);
+}
 
 export async function nextInvoiceNumber(): Promise<string> {
   const year = new Date().getFullYear();
@@ -48,9 +60,13 @@ export async function confirmPaymentAndActivate(
     const invoiceNumber = `FA-${new Date().getFullYear()}-${String(invoiceCount + 1).padStart(4, "0")}`;
     const now = new Date();
     const sub = payment.subscription;
-    const days = sub.billingCycle === "monthly" ? 30 : 365;
     const base = sub.status === "ACTIVE" && sub.endDate && sub.endDate > now ? sub.endDate : now;
-    const endDate = new Date(base.getTime() + days * 24 * 60 * 60 * 1000);
+    const endDate = subscriptionEndDate(base, sub.billingCycle, sub.plan.durationMonths);
+    const platform = platformFromPlan(sub.plan) ?? "PC";
+    const requestedPlatform = requestedKey ? platformFromKey(requestedKey) : null;
+    if (requestedPlatform && requestedPlatform !== platform) {
+      throw new Error(`Ce code d'activation est prévu pour ${requestedPlatform === "ANDROID" ? "Android" : "PC"}, mais la formule « ${sub.plan.name} » est pour ${platform === "ANDROID" ? "Android" : "PC"}.`);
+    }
 
     const updatedPayment = await tx.payment.update({
       where: { id: payment.id },
@@ -67,7 +83,8 @@ export async function confirmPaymentAndActivate(
 
     const license = existingLicense ?? await tx.licenseKey.create({
       data: {
-        key: requestedKey ?? generateLicenseKey(),
+        key: requestedKey ?? generateLicenseKey(platform),
+        platform,
         userId: payment.userId,
         subscriptionId: sub.id,
         status: "INACTIVE",

@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AdminLicenses } from "./admin-licenses";
+import { AdminDashboard } from "./admin-dashboard";
 import {
   LayoutDashboard, Users, CreditCard, Receipt, LifeBuoy, Package, Download, BookOpen,
   Newspaper, HelpCircle, MessageSquareQuote, Settings, Plus, Pencil, Trash2,
@@ -239,106 +240,6 @@ function EntityCrud({ entity, title, fields, description }: {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
-
-// ═════════════════════════════════════════════════════════════
-// Résumé
-// ═════════════════════════════════════════════════════════════
-interface AdminStats {
-  users: { total: number; active: number };
-  subscriptions: { total: number; active: number };
-  payments: { completed: number; pending: number };
-  tickets: { open: number };
-  articles: { total: number };
-  revenue: { total: number; thisMonth: number };
-  version: { version: string; releaseDate: string; downloads: number } | null;
-  recentLogs: { id: string; action: string; details: string | null; createdAt: string; user?: { firstName: string; lastName: string } | null }[];
-  recentUsers: { id: string; firstName: string; lastName: string; email: string; createdAt: string }[];
-}
-
-function Overview() {
-  const { data: stats, isLoading, error } = useQuery<AdminStats>({
-    queryKey: ["admin", "stats"],
-    queryFn: () => api.get<AdminStats>("/api/admin/stats"),
-    refetchInterval: 30_000,
-  });
-
-  if (error) return <ErrorNote message="Impossible de charger les statistiques." />;
-  if (isLoading || !stats) return <Spinner />;
-
-  const cards = [
-    { icon: Users, label: "Utilisateurs", value: stats.users.total, sub: `${stats.users.active} actifs`, href: "users" },
-    { icon: ArrowUpCircle, label: "Abonnements actifs", value: stats.subscriptions.active, sub: `${stats.subscriptions.total} au total`, href: "subscriptions" },
-    { icon: TrendingUp, label: "Revenus totaux", value: formatFcfa(stats.revenue.total), sub: `${formatFcfa(stats.revenue.thisMonth)} ce mois`, href: "payments" },
-    { icon: LifeBuoy, label: "Tickets ouverts", value: stats.tickets.open, sub: "à traiter", href: "tickets" },
-    { icon: Receipt, label: "Paiements", value: stats.payments.completed, sub: `${stats.payments.pending} en attente`, href: "payments" },
-    { icon: Newspaper, label: "Articles publiés", value: stats.articles.total, sub: "actualités", href: "articles" },
-  ];
-
-  return (
-    <div className="space-y-8">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {cards.map((c) => (
-          <button key={c.label} className="card-hover rounded-2xl border bg-card p-5 text-left" onClick={() => document.getElementById(`tab-${c.href}`)?.click()}>
-            <div className="flex items-center justify-between">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-600/10 text-orange-700 dark:text-orange-400">
-                <c.icon className="h-5 w-5" aria-hidden="true" />
-              </span>
-              {c.label === "Revenus totaux" && stats.version && (
-                <span className="rounded-full bg-secondary px-2.5 py-1 text-[11px] font-bold">
-                  v{stats.version.version}
-                </span>
-              )}
-            </div>
-            <p className="mt-3 text-2xl font-extrabold tracking-tight">{c.value}</p>
-            <p className="text-sm font-semibold">{c.label}</p>
-            <p className="text-xs text-muted-foreground">{c.sub}</p>
-          </button>
-        ))}
-      </div>
-
-      <div className="grid gap-5 lg:grid-cols-2">
-        <div className="rounded-2xl border bg-card p-5">
-          <h3 className="flex items-center gap-2 text-[15px] font-semibold">
-            <Activity className="h-4 w-4 text-orange-600 dark:text-orange-400" aria-hidden="true" />
-            Journal d&apos;activité (sécurité & audit)
-          </h3>
-          <ul className="mt-4 max-h-80 space-y-2.5 overflow-y-auto gspp-scrollbar pr-2">
-            {stats.recentLogs.map((l) => (
-              <li key={l.id} className="flex items-start gap-3 text-sm">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-500" aria-hidden="true" />
-                <div className="min-w-0">
-                  <p className="truncate">
-                    <span className="font-mono text-xs font-bold text-primary">{l.action}</span>{" "}
-                    {l.details}
-                    {l.user && <span className="text-muted-foreground"> — {l.user.firstName} {l.user.lastName}</span>}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{new Date(l.createdAt).toLocaleString("fr-FR")}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="rounded-2xl border bg-card p-5">
-          <h3 className="flex items-center gap-2 text-[15px] font-semibold">
-            <UserCheck className="h-4 w-4 text-orange-600 dark:text-orange-400" aria-hidden="true" />
-            Derniers inscrits
-          </h3>
-          <ul className="mt-4 space-y-3">
-            {stats.recentUsers.map((u) => (
-              <li key={u.id} className="flex items-center justify-between gap-3 text-sm">
-                <div className="min-w-0">
-                  <p className="truncate font-semibold">{u.firstName} {u.lastName}</p>
-                  <p className="truncate text-xs text-muted-foreground">{u.email}</p>
-                </div>
-                <span className="shrink-0 text-xs text-muted-foreground">{formatDate(u.createdAt)}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
     </div>
   );
 }
@@ -983,7 +884,7 @@ export function AdminPage() {
   }
 
   const TABS = [
-    { id: "overview", label: "Résumé", icon: LayoutDashboard },
+    { id: "overview", label: "Tableau de bord", icon: LayoutDashboard },
     { id: "users", label: "Utilisateurs", icon: Users },
     { id: "subscriptions", label: "Abonnements", icon: ArrowUpCircle },
     { id: "licenses", label: "Gestion des licences", icon: KeyRound },
@@ -1023,7 +924,7 @@ export function AdminPage() {
           ))}
         </TabsList>
 
-        <TabsContent value="overview" className="mt-6"><Overview /></TabsContent>
+        <TabsContent value="overview" className="mt-6"><AdminDashboard /></TabsContent>
         <TabsContent value="users" className="mt-6"><AdminUsers /></TabsContent>
         <TabsContent value="subscriptions" className="mt-6"><AdminSubscriptions /></TabsContent>
         <TabsContent value="licenses" className="mt-6"><AdminLicenses /></TabsContent>
@@ -1041,7 +942,9 @@ export function AdminPage() {
               { name: "slug", label: "Identifiant (slug)", type: "text", placeholder: "professionnel" },
               { name: "description", label: "Description", type: "textarea" },
               { name: "monthlyPrice", label: "Prix mensuel (FCFA)", type: "number" },
-              { name: "annualPrice", label: "Prix annuel (FCFA)", type: "number" },
+              { name: "annualPrice", label: "Prix de la période (FCFA)", type: "number" },
+              { name: "durationMonths", label: "Durée (mois)", type: "number" },
+              { name: "platform", label: "Plateforme des clés", type: "select", options: ["PC", "ANDROID"] },
               { name: "maxUsers", label: "Utilisateurs max", type: "number" },
               { name: "maxSchools", label: "Établissements max", type: "number" },
               { name: "maxStudents", label: "Élèves max", type: "number" },

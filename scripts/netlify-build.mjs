@@ -17,6 +17,8 @@ if (onNetlify) {
   // Prisma doit être généré avant le push et le seed de la base.
   runNpx(["prisma", "generate"], { stdio: "inherit", env });
   runNpx(["prisma", "db", "push", "--skip-generate"], { stdio: "inherit", env });
+  // Migration idempotente : plateforme (PC / Android) des formules et des licences existantes.
+  execFileSync(process.execPath, ["--experimental-strip-types", "prisma/backfill-license-platform.ts"], { stdio: "inherit", env });
   if (env.SITE_ADMIN_PASSWORD) {
     execFileSync(process.execPath, ["--experimental-strip-types", "prisma/seed.ts"], { stdio: "inherit", env });
   }

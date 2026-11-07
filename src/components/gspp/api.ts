@@ -77,7 +77,9 @@ export interface Plan {
   name: string;
   description: string;
   monthlyPrice: number;
-  annualPrice: number;
+  annualPrice: number; // prix de la période entière (durationMonths)
+  platform: "PC" | "ANDROID";
+  durationMonths: number;
   maxUsers: number;
   maxSchools: number;
   maxStudents: number;

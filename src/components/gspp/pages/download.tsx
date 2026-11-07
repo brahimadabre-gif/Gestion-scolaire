@@ -35,10 +35,10 @@ function getClientOs(): OS {
 const subscribeNoop = () => () => {};
 const getServerOs = () => "other" as OS;
 
-const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.20.apk";
-const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.20.apk";
-const ANDROID_VERSION = "2.3.20";
-const ANDROID_FILE_SIZE = "9,7 Mo";
+const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.26.apk";
+const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.26.apk";
+const ANDROID_VERSION = "2.3.26";
+const ANDROID_FILE_SIZE = "9,8 Mo";
 const WINDOWS_VERSION = "2.3.21";
 const WINDOWS_STORE_URL = "https://apps.microsoft.com/detail/9N71Q8PTCPCZ?hl=fr-011&gl=CI&ocid=pdpshare";
 
@@ -56,11 +56,12 @@ const CHANGELOG: Record<"windows" | "android", string> = {
   ].join("\n"),
   android: [
     `## Version ${ANDROID_VERSION} — Android`,
-    "- **Tableau de bord** : entièrement refait. Le directeur voit tout de suite toute l'école, sans choisir de niveau : élèves inscrits, taux de réussite, moyenne et son évolution, présence du jour, caisse, résultats par classe, moyennes par matière, liste « À faire » et meilleurs élèves.",
-    "- **Enseignant** : le tableau de bord montre uniquement sa classe, avec la progression de chaque élève et ses tâches (notes à saisir, appel du jour), sans aucun montant de la caisse.",
-    "- **Icônes** : nouvelles icônes modernes pour chaque module, dans le menu et en tête de chaque page, et nouvelle icône de l'école.",
-    "- **Écrans** : présentation adaptée à tous les téléphones et tablettes, en thème clair comme sombre.",
-    "- Reprend tous les correctifs de la 2.3.19 : photo de l'élève, empreinte digitale, notes à virgule.",
+    "- **Fenêtres de confirmation modernes** dans tout le logiciel : titre clair, bouton rouge nommé selon l'action pour les opérations dangereuses, « Annuler » sélectionné par défaut, mode sombre et téléphone pris en charge.",
+    "- **Réinitialisation complète** : trois étapes de sécurité numérotées ; annuler à n'importe quelle étape ne modifie rien.",
+    "- **Documents de l'élève** : une seule entrée dans le menu, avec des aperçus et une barre d'outils qui ne chevauche plus le contenu.",
+    "- **Groupe d'EPS** : champ « Taille (cm) » et saisie des tailles pour toute la classe ; élèves rangés du plus petit au plus grand.",
+    "- **EPS grandes classes (CE2, CM1, CM2)** : nouveau tableau de bord (5 étapes, prochaine action, séances, clubs, Équipe I et Équipe II).",
+    "- Reprend les nouveautés des versions 2.3.21 à 2.3.25 : tableau de bord refait, bulletin de salaire A4 dans la Caisse, convertisseur PDF ↔ Word/Excel plus fidèle, nouvelles icônes.",
   ].join("\n"),
 };
 

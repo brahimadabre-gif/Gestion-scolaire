@@ -3,10 +3,12 @@ import { db } from "@/lib/db";
 import { assertSameOrigin, fail, getClientIp, handle, logAction, rateLimit, ok } from "@/lib/api-helpers";
 import { generateLicenseKey, requireAdmin } from "@/lib/auth";
 import { getLicenseStatus } from "@/lib/license-duration";
+import { LICENSE_PLATFORMS, resolveLicensePlatform } from "@/lib/license-platform";
 
 const createSchema = z.object({
   count: z.number().int().min(1).max(100),
   durationMonths: z.number().int().min(1).max(600),
+  platform: z.enum(LICENSE_PLATFORMS, { error: "Choisissez la plateforme : PC ou Android." }),
 });
 
 // GET /api/admin/licenses — Liste réservée aux administrateurs.
@@ -16,6 +18,7 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const q = (url.searchParams.get("q") ?? "").trim().slice(0, 120).toLocaleLowerCase();
     const requestedStatus = url.searchParams.get("status") ?? "all";
+    const requestedPlatform = (url.searchParams.get("platform") ?? "all").toUpperCase();
     const sort = url.searchParams.get("sort") ?? "createdAt";
     const direction = url.searchParams.get("direction") === "asc" ? 1 : -1;
     const now = new Date();
@@ -23,7 +26,7 @@ export async function GET(req: Request) {
     const records = await db.licenseKey.findMany({
       include: {
         user: { select: { id: true, firstName: true, lastName: true, email: true, establishment: true } },
-        subscription: { select: { id: true, status: true, startDate: true, endDate: true, plan: { select: { name: true } } } },
+        subscription: { select: { id: true, status: true, startDate: true, endDate: true, plan: { select: { name: true, slug: true, platform: true } } } },
       },
       orderBy: { createdAt: "desc" },
       take: 2000,
@@ -32,6 +35,8 @@ export async function GET(req: Request) {
     const items = records.map((license) => ({
       id: license.id,
       key: license.key,
+      // null = ancienne clé GSPP- pas encore rattachée à une plateforme
+      platform: resolveLicensePlatform(license),
       status: getLicenseStatus({ status: license.status, expiresAt: license.expiresAt, subscriptionEndDate: license.subscription?.endDate ?? null, subscriptionStatus: license.subscription?.status ?? null }, now),
       createdAt: license.createdAt,
       validityMonths: license.validityMonths,
@@ -43,6 +48,8 @@ export async function GET(req: Request) {
       subscription: license.subscription,
     })).filter((license) => {
       if (requestedStatus !== "all" && license.status !== requestedStatus.toUpperCase()) return false;
+      if (requestedPlatform === "UNKNOWN" && license.platform !== null) return false;
+      if ((requestedPlatform === "PC" || requestedPlatform === "ANDROID") && license.platform !== requestedPlatform) return false;
       if (!q) return true;
       const searchable = [license.key, license.user?.email, license.user?.firstName, license.user?.lastName, license.user?.establishment].filter(Boolean).join(" ").toLocaleLowerCase();
       return searchable.includes(q);
@@ -74,8 +81,8 @@ export async function POST(req: Request) {
     const rl = rateLimit(`admin-license-generate:${admin.id}`, 10, 15 * 60 * 1000);
     if (!rl.allowed) return fail("Trop de générations. Réessayez plus tard.", 429);
 
-    const { count, durationMonths } = createSchema.parse(await req.json());
-    const codes = Array.from({ length: count }, () => generateLicenseKey());
+    const { count, durationMonths, platform } = createSchema.parse(await req.json());
+    const codes = Array.from({ length: count }, () => generateLicenseKey(platform));
     if (new Set(codes).size !== codes.length) return fail("La génération a rencontré un doublon. Réessayez.", 409);
 
     try {
@@ -86,6 +93,7 @@ export async function POST(req: Request) {
             userId: null,
             subscriptionId: null,
             status: "INACTIVE",
+            platform,
             validityMonths: durationMonths,
             maxDevices: 1,
           })),
@@ -98,7 +106,7 @@ export async function POST(req: Request) {
       throw error;
     }
 
-    await logAction("LICENSE_CODES_GENERATED", admin.id, `${count} code(s), durée ${durationMonths} mois`, ip);
-    return ok({ codes, count, durationMonths }, 201);
+    await logAction("LICENSE_CODES_GENERATED", admin.id, `${count} code(s) ${platform}, durée ${durationMonths} mois`, ip);
+    return ok({ codes, count, durationMonths, platform }, 201);
   });
 }

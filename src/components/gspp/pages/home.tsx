@@ -307,10 +307,10 @@ function PricingPreview() {
               <p className="mt-1.5 min-h-10 text-sm text-muted-foreground">{plan.description}</p>
               <p className="mt-5">
                 <span className="text-3xl font-extrabold tracking-tight">{formatFcfa(plan.annualPrice)}</span>
-                <span className="text-sm text-muted-foreground"> / 12 mois</span>
+                <span className="text-sm text-muted-foreground"> / {plan.durationMonths || 12} mois</span>
               </p>
               <p className="mt-1 text-xs font-medium text-orange-700 dark:text-orange-400">
-                Accès complet pendant 12 mois
+                Accès complet pendant {plan.durationMonths || 12} mois · {plan.platform === "ANDROID" ? "Android" : "PC Windows"}
               </p>
               <ul className="mt-6 flex-1 space-y-2.5">
                 {plan.features.slice(0, 5).map((f) => (
