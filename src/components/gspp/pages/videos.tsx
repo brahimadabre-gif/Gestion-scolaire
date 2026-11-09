@@ -83,15 +83,15 @@ export function VideosPage() {
     <main id="contenu">
       {/* En-tête du portail */}
       <section className="bg-[#14201c] text-white">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.1fr_1fr] lg:px-8">
-          <div>
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.1fr_1fr] lg:px-8">
+          <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-orange-300">Portail vidéo</p>
             <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.75rem]">Voyez le logiciel en action</h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">
               Chaque fonction expliquée en {averageMinutes()} minutes, pas à pas, avec des sous-titres en français.
               Idéal pour former un enseignant ou découvrir le logiciel avant de l&apos;installer.
             </p>
-            <dl className="mt-6 flex gap-8">
+            <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
               <div><dt className="sr-only">Vidéos</dt><dd className="text-3xl font-extrabold text-orange-300 tabular-nums">{PUBLISHED_VIDEOS.length}</dd><p className="text-xs text-white/70">vidéos</p></div>
               <div><dt className="sr-only">Durée</dt><dd className="text-3xl font-extrabold text-orange-300">{averageMinutes()} min</dd><p className="text-xs text-white/70">en moyenne</p></div>
               <div><dt className="sr-only">Prix</dt><dd className="text-3xl font-extrabold text-orange-300">100 %</dd><p className="text-xs text-white/70">gratuit</p></div>
