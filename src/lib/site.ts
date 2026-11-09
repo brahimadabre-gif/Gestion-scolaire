@@ -48,7 +48,7 @@ export const OG_BASE = {
 // Types de routes de l'application (routeur par hash côté client)
 export type Route =
   | "/" | "/fonctionnalites" | "/tarifs" | "/telecharger" | "/notice" | "/bibliotheque"
-  | "/tutoriel-compte" | "/tutoriel" | "/documents" | "/faq" | "/support" | "/actualites"
+  | "/tutoriel-compte" | "/tutoriel" | "/videos" | "/documents" | "/faq" | "/support" | "/actualites"
   | "/connexion" | "/inscription" | "/mot-de-passe-oublie"
   | "/compte" | "/compte/abonnement" | "/compte/paiements" | "/compte/support"
   | "/admin"
@@ -57,6 +57,7 @@ export type Route =
 export const MAIN_NAV: { label: string; route: Route }[] = [
   { label: "Accueil", route: "/" },
   { label: "Fonctionnalités", route: "/fonctionnalites" },
+  { label: "Vidéos de démo", route: "/videos" },
   { label: "Documents", route: "/documents" },
   { label: "Télécharger", route: "/telecharger" },
   { label: "Tutoriel", route: "/tutoriel" },
@@ -72,6 +73,7 @@ export const FOOTER_NAV = {
     { label: "Fonctionnalités", route: "/fonctionnalites" },
     { label: "Tarifs", route: "/tarifs" },
     { label: "Télécharger", route: "/telecharger" },
+    { label: "Vidéos de démo", route: "/videos" },
     { label: "Tutoriel d'utilisation", route: "/tutoriel" },
     { label: "Documents du logiciel", route: "/documents" },
     { label: "Notice", route: "/notice" },

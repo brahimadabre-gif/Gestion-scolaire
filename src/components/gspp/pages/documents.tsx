@@ -69,8 +69,8 @@ const DOCS: Doc[] = [
     text: "Deux reçus de cours de renforcement sur une seule feuille A4, à découper, avec les mois payés." },
   { file: "caisse-bon", w: 1588, h: 686, cat: "caisse", title: "Bon de sortie de caisse", feature: "administrative", tuto: "caisse",
     text: "Chaque dépense laisse une trace : motif, bénéficiaire, montant et signatures du caissier, du bénéficiaire et du directeur." },
-  { file: "caisse-bulletin", w: 1588, h: 632, cat: "caisse", title: "Bulletin de paie", feature: "administrative", tuto: "caisse",
-    text: "Salaire de base, retenues et net payé pour le personnel, édités depuis l'onglet Paie de la Caisse." },
+  { file: "caisse-bulletin", w: 1404, h: 1841, cat: "caisse", title: "Bulletin de salaire", feature: "administrative", tuto: "caisse",
+    text: "Bulletin complet pour chaque membre du personnel : employeur et salarié, salaire de base, avances retenues, net à payer en chiffres et en lettres, cumuls de l'année scolaire et signatures." },
 ];
 
 export function DocumentsPage() {

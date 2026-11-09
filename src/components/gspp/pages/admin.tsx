@@ -24,10 +24,11 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AdminLicenses } from "./admin-licenses";
 import { AdminDashboard } from "./admin-dashboard";
+import { AdminVisits } from "./admin-visits";
 import {
   LayoutDashboard, Users, CreditCard, Receipt, LifeBuoy, Package, Download, BookOpen,
   Newspaper, HelpCircle, MessageSquareQuote, Settings, Plus, Pencil, Trash2,
-  Loader2, TrendingUp, UserCheck, UserX, ShieldCheck, ArrowUpCircle, Activity, KeyRound,
+  Loader2, TrendingUp, UserCheck, UserX, ShieldCheck, ArrowUpCircle, Activity, KeyRound, Eye,
 } from "lucide-react";
 
 // ═════════════════════════════════════════════════════════════
@@ -885,6 +886,7 @@ export function AdminPage() {
 
   const TABS = [
     { id: "overview", label: "Tableau de bord", icon: LayoutDashboard },
+    { id: "visits", label: "Statistiques du site", icon: Eye },
     { id: "users", label: "Utilisateurs", icon: Users },
     { id: "subscriptions", label: "Abonnements", icon: ArrowUpCircle },
     { id: "licenses", label: "Gestion des licences", icon: KeyRound },
@@ -925,6 +927,7 @@ export function AdminPage() {
         </TabsList>
 
         <TabsContent value="overview" className="mt-6"><AdminDashboard /></TabsContent>
+        <TabsContent value="visits" className="mt-6"><AdminVisits /></TabsContent>
         <TabsContent value="users" className="mt-6"><AdminUsers /></TabsContent>
         <TabsContent value="subscriptions" className="mt-6"><AdminSubscriptions /></TabsContent>
         <TabsContent value="licenses" className="mt-6"><AdminLicenses /></TabsContent>

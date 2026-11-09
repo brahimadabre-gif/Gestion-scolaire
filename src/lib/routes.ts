@@ -51,6 +51,12 @@ export const ROUTE_META: Record<Exclude<Route, "/">, RouteMeta> = {
       "Utiliser Gestion Scolaire Pro Plus pas à pas, en images : créer le compte principal, se connecter, activer la licence, inscrire les élèves, saisir les notes, imprimer les bulletins, la caisse et la sauvegarde.",
     index: true, priority: 0.9, changeFrequency: "monthly",
   },
+  "/videos": {
+    title: "Vidéos de démo et tutoriels",
+    description:
+      "Tutoriels vidéo gratuits et sous-titrés de Gestion Scolaire Pro Plus : compte, élèves, notes, bulletins, appel, caisse, EPS, administration et sauvegarde.",
+    index: true, priority: 0.9, changeFrequency: "weekly",
+  },
   "/documents": {
     title: "Documents du logiciel",
     description:

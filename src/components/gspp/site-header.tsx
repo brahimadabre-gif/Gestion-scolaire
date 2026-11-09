@@ -95,7 +95,9 @@ export function SiteHeader() {
               className={`rounded-full px-3 py-2 text-[13.5px] font-medium transition-colors ${
                 isActive(item.route)
                   ? "bg-secondary text-primary"
-                  : "text-muted-foreground hover:bg-secondary/70 hover:text-foreground"
+                  : item.route === "/videos"
+                    ? "font-bold text-orange-700 hover:bg-secondary/70 dark:text-orange-400"
+                    : "text-muted-foreground hover:bg-secondary/70 hover:text-foreground"
               }`}
             >
               {item.label}

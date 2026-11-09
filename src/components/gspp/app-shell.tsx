@@ -18,6 +18,9 @@ import { LibraryPage } from "./pages/library";
 import { TutorialPage } from "./pages/tutorial";
 import { GuidePage } from "./pages/guide";
 import { DocumentsPage } from "./pages/documents";
+import { VideosPage } from "./pages/videos";
+import { AnnouncementBar } from "./announcement-bar";
+import { VisitTracker } from "./visit-tracker";
 import { FaqPage } from "./pages/faq";
 import { SupportPage } from "./pages/support";
 import { NewsListPage, NewsArticlePage } from "./pages/news";
@@ -86,6 +89,8 @@ function Routes() {
       return <GuidePage />;
     case "/documents":
       return <DocumentsPage />;
+    case "/videos":
+      return <VideosPage />;
     case "/faq":
       return <FaqPage />;
     case "/support":
@@ -143,6 +148,8 @@ function Routes() {
 function Shell() {
   return (
     <>
+      <VisitTracker />
+      <AnnouncementBar />
       <SiteHeader />
       <div className="flex-1">
         <Routes />

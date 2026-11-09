@@ -324,6 +324,20 @@ model SiteSettings {
   updatedAt          DateTime @updatedAt
 }
 
+// Compteur de visites du site (anonyme : aucune adresse IP ni cookie stockés).
+// Une ligne par page vue ; `video` renseigné quand un tutoriel est lancé.
+model SiteVisit {
+  id        String   @id @default(cuid())
+  visitor   String // Empreinte anonyme du jour (hachage IP + navigateur + date + secret)
+  path      String
+  video     String? // slug du tutoriel lancé depuis /videos
+  source    String   @default("direct") // whatsapp | facebook | google | youtube | autre | direct
+  device    String   @default("mobile") // mobile | ordinateur | tablette
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 // Journal des actions importantes (sécurité & audit)
 model ActivityLog {
   id        String   @id @default(cuid())
