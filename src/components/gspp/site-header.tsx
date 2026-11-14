@@ -18,22 +18,32 @@ import {
 } from "lucide-react";
 
 // ── Logo ─────────────────────────────────────────────────────
+function LogoIcone() {
+  return (
+    <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-600 to-orange-700 shadow-sm">
+      <GraduationCap className="h-5 w-5 text-white" aria-hidden="true" />
+    </span>
+  );
+}
+
+function LogoTexte() {
+  return (
+    <span className="flex flex-col leading-none">
+      <span className="text-[15px] font-bold tracking-tight">
+        Gestion Scolaire <span className="gspp-gradient-text">Pro Plus</span>
+      </span>
+      <span className="text-[10px] font-medium text-muted-foreground tracking-wide">
+        SIMPLIFIEZ VOTRE TRAVAIL
+      </span>
+    </span>
+  );
+}
+
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <Link to="/" className="flex items-center gap-2.5 shrink-0" ariaLabel="Accueil — Gestion Scolaire Pro Plus">
-      <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-600 to-orange-700 shadow-sm">
-        <GraduationCap className="h-5 w-5 text-white" aria-hidden="true" />
-      </span>
-      {!compact && (
-        <span className="flex flex-col leading-none">
-          <span className="text-[15px] font-bold tracking-tight">
-            Gestion Scolaire <span className="gspp-gradient-text">Pro Plus</span>
-          </span>
-          <span className="text-[10px] font-medium text-muted-foreground tracking-wide">
-            SIMPLIFIEZ VOTRE TRAVAIL
-          </span>
-        </span>
-      )}
+      <LogoIcone />
+      {!compact && <LogoTexte />}
     </Link>
   );
 }
@@ -84,7 +94,83 @@ export function SiteHeader() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-        <Logo />
+        {/* L'icône du logo ouvre la barre latérale (à gauche) ; le nom ramène à l'accueil */}
+        <Sheet open={open} onOpenChange={setOpen}>
+          <div className="flex min-w-0 shrink-0 items-center gap-2.5">
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                aria-label="Ouvrir le menu"
+                title="Menu"
+                className="group relative shrink-0 rounded-xl outline-none transition-transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                <LogoIcone />
+                <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm transition-colors group-hover:bg-orange-600 group-hover:text-white" aria-hidden="true">
+                  <Menu className="h-2.5 w-2.5" />
+                </span>
+              </button>
+            </SheetTrigger>
+            <Link to="/" className="min-w-0" ariaLabel="Accueil — Gestion Scolaire Pro Plus">
+              <LogoTexte />
+            </Link>
+          </div>
+          <SheetContent side="left" className="w-80 overflow-y-auto gspp-scrollbar">
+            <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
+            {/* Un clic sur un lien ferme la barre */}
+            <div className="mt-2 flex flex-col gap-1" onClick={(e) => { if ((e.target as HTMLElement).closest("a")) setOpen(false); }}>
+              <Logo />
+              <div className="mt-4 h-px bg-border" />
+              {MAIN_NAV.map((item) => (
+                <Link
+                  key={item.route}
+                  to={item.route}
+                  className={`rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                    isActive(item.route) ? "bg-secondary text-primary" : "text-foreground/80 hover:bg-secondary/60"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <div className="mt-3 h-px bg-border" />
+              {user ? (
+                <>
+                  <Link to="/compte" className="rounded-xl px-3 py-2.5 text-sm font-medium hover:bg-secondary/60">
+                    Mon compte
+                  </Link>
+                  <Link to="/compte/abonnement" className="rounded-xl px-3 py-2.5 text-sm font-medium hover:bg-secondary/60">
+                    Mon abonnement
+                  </Link>
+                  {isAdmin && (
+                    <Link to="/admin" className="rounded-xl px-3 py-2.5 text-sm font-medium hover:bg-secondary/60">
+                      Administration
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => { setOpen(false); logout(); }}
+                    className="rounded-xl px-3 py-2.5 text-left text-sm font-medium text-destructive hover:bg-destructive/10"
+                  >
+                    Se déconnecter
+                  </button>
+                </>
+              ) : (
+                <div className="mt-2 flex flex-col gap-2">
+                  <Button variant="outline" className="w-full" onClick={() => { setOpen(false); navigate("/connexion"); }}>
+                    Se connecter
+                  </Button>
+                  <Button className="w-full" onClick={() => { setOpen(false); navigate("/inscription"); }}>
+                    Créer un compte
+                  </Button>
+                </div>
+              )}
+              <div className="mt-4 rounded-2xl bg-secondary/60 p-4 text-xs leading-relaxed text-muted-foreground">
+                <p className="mb-1 flex items-center gap-1.5 font-semibold text-foreground">
+                  <LifeBuoy className="h-3.5 w-3.5" aria-hidden="true" /> Besoin d&apos;aide ?
+                </p>
+                {SITE.email}
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
 
         {/* Navigation bureau */}
         <nav className="hidden 2xl:flex items-center gap-1" aria-label="Navigation principale">
@@ -166,70 +252,6 @@ export function SiteHeader() {
               </div>
             )
           )}
-
-          {/* Menu mobile */}
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="2xl:hidden rounded-full" aria-label="Ouvrir le menu">
-                <Menu className="h-5 w-5" aria-hidden="true" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-80 overflow-y-auto gspp-scrollbar">
-              <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
-              <div className="mt-2 flex flex-col gap-1">
-                <Logo />
-                <div className="mt-4 h-px bg-border" />
-                {MAIN_NAV.map((item) => (
-                  <Link
-                    key={item.route}
-                    to={item.route}
-                    className={`rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                      isActive(item.route) ? "bg-secondary text-primary" : "text-foreground/80 hover:bg-secondary/60"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-                <div className="mt-3 h-px bg-border" />
-                {user ? (
-                  <>
-                    <Link to="/compte" className="rounded-xl px-3 py-2.5 text-sm font-medium hover:bg-secondary/60">
-                      Mon compte
-                    </Link>
-                    <Link to="/compte/abonnement" className="rounded-xl px-3 py-2.5 text-sm font-medium hover:bg-secondary/60">
-                      Mon abonnement
-                    </Link>
-                    {isAdmin && (
-                      <Link to="/admin" className="rounded-xl px-3 py-2.5 text-sm font-medium hover:bg-secondary/60">
-                        Administration
-                      </Link>
-                    )}
-                    <button
-                      onClick={() => { setOpen(false); logout(); }}
-                      className="rounded-xl px-3 py-2.5 text-left text-sm font-medium text-destructive hover:bg-destructive/10"
-                    >
-                      Se déconnecter
-                    </button>
-                  </>
-                ) : (
-                  <div className="mt-2 flex flex-col gap-2">
-                    <Button variant="outline" className="w-full" onClick={() => { setOpen(false); navigate("/connexion"); }}>
-                      Se connecter
-                    </Button>
-                    <Button className="w-full" onClick={() => { setOpen(false); navigate("/inscription"); }}>
-                      Créer un compte
-                    </Button>
-                  </div>
-                )}
-                <div className="mt-4 rounded-2xl bg-secondary/60 p-4 text-xs leading-relaxed text-muted-foreground">
-                  <p className="mb-1 flex items-center gap-1.5 font-semibold text-foreground">
-                    <LifeBuoy className="h-3.5 w-3.5" aria-hidden="true" /> Besoin d&apos;aide ?
-                  </p>
-                  {SITE.email}
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
         </div>
       </div>
     </header>

@@ -196,20 +196,20 @@ async function main() {
 
   // ── Version logicielle ─────────────────────────────────────
   const versionData = {
-    version: "2.3.26",
+    version: "2.3.31",
     channel: "stable",
-    releaseDate: new Date("2026-11-07"),
-    fileSizeMb: 9.79,
+    releaseDate: new Date("2026-11-13"),
+    fileSizeMb: 9.97,
     minOs: "Android 5.1 ou supérieur, téléphone ou tablette",
     installerName: "APK Android",
-    downloadUrl: "/downloads/Gestion-Scolaire-Pro-v2.3.26.apk",
+    downloadUrl: "/downloads/Gestion-Scolaire-Pro-v2.3.31.apk",
     changelog: [
-      "## Version 2.3.26 (Android)",
-      "- Fenêtres de confirmation modernes dans tout le logiciel.",
-      "- Réinitialisation complète en trois étapes de sécurité numérotées.",
-      "- Documents de l’élève regroupés dans une seule entrée, avec aperçus.",
-      "- Groupe d’EPS : saisie des tailles et rangement du plus petit au plus grand.",
-      "- EPS grandes classes (CE2, CM1, CM2) : nouveau tableau de bord.",
+      "## Version 2.3.31 (Android)",
+      "- Écrans modernisés : bulletins, rangement, liste de classe, élèves, matières, EPS, rapport de fin d’année.",
+      "- Registre d’appel et assiduité refaits, affichage jusqu’à 10 fois plus rapide.",
+      "- Progression : nouvelle vue « Données » en 3 colonnes.",
+      "- Rapport de fin d’année : chiffres modifiables avec recalcul automatique.",
+      "- Signature importée nette et centrée, notifications plus courtes.",
     ].join("\n"),
     active: true,
   };

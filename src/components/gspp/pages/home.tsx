@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { DemoLogiciel } from "../demo/demo-logiciel";
 import {
   Users, BookOpen, GraduationCap, FileText, Building2,
   ShieldCheck, Sparkles, Download, CheckCircle2, Monitor,
@@ -47,6 +48,19 @@ function Hero() {
                 Télécharger le logiciel
               </Button>
             </div>
+            {/* Invitation à essayer la maquette interactive plus bas */}
+            <button
+              type="button"
+              onClick={() => document.getElementById("essai")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              className="animate-fade-up-delay-3 group mx-auto mt-5 flex items-center gap-2 rounded-full border-2 border-dashed border-orange-500/70 bg-orange-50 px-4 py-2 text-sm font-bold text-orange-800 transition hover:bg-orange-100 dark:bg-orange-950/40 dark:text-orange-200 dark:hover:bg-orange-950/70"
+            >
+              <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-500 opacity-75" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-orange-600" />
+              </span>
+              Essayez le logiciel ici, sans rien installer
+              <span className="transition-transform group-hover:translate-y-0.5" aria-hidden="true">↓</span>
+            </button>
             <ul className="animate-fade-up-delay-3 mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-muted-foreground">
               <li className="flex items-center gap-1.5">
                 <Monitor className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" aria-hidden="true" /> Windows 10/11 et Android
@@ -163,16 +177,38 @@ const PRESENTATION_IMAGES = [
   { label: "Bulletin scolaire", src: "/presentation/presentation-pc-5.png", alt: "Bulletin scolaire de Gestion Scolaire Pro Plus" },
 ] as const;
 
+// Bascule « Essayer le logiciel » / « Captures d'écran »
+function ChoixVue({ vue, onChange }: { vue: "demo" | "images"; onChange: (v: "demo" | "images") => void }) {
+  return (
+    <div className="mt-8 flex justify-center">
+      <div className="inline-flex rounded-full border bg-card p-1 shadow-sm" role="group" aria-label="Affichage">
+        {([["demo", "▶️ Essayer le logiciel"], ["images", "🖼️ Captures d'écran"]] as const).map(([v, t]) => (
+          <button key={v} type="button" aria-pressed={vue === v} onClick={() => onChange(v)}
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${vue === v ? "bg-orange-600 text-white shadow" : "text-muted-foreground hover:text-foreground"}`}>
+            {t}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Screenshots() {
   const [selectedImage, setSelectedImage] = useState(0);
+  const [vue, setVue] = useState<"demo" | "images">("demo");
   const image = PRESENTATION_IMAGES[selectedImage];
   return (
-    <Section>
+    <Section id="essai">
       <SectionHeading
-        eyebrow="Le logiciel en images"
-        title="Une interface claire, rapide et agréable"
-        description="Découvrez les écrans réels de Gestion Scolaire Pro Plus, conçus pour les tâches quotidiennes des écoles primaires."
+        eyebrow="Essayez le logiciel ici"
+        title="Cliquez dans l'écran : le logiciel répond"
+        description="Manipulez Gestion Scolaire Pro Plus directement ici, comme si vous l'aviez installé : tous les modules, avec une école fictive."
       />
+      <ChoixVue vue={vue} onChange={setVue} />
+      {vue === "demo" ? (
+        <div className="mt-6"><DemoLogiciel appareil="pc" /></div>
+      ) : (
+      <>
       <Tabs value={String(selectedImage)} onValueChange={(v) => setSelectedImage(Number(v))} className="mt-10">
         <TabsList className="mx-auto flex flex-wrap justify-center gap-1 rounded-full p-1.5 h-auto">
           {PRESENTATION_IMAGES.map((item, index) => (
@@ -193,6 +229,8 @@ function Screenshots() {
           priority={selectedImage === 0}
         />
       </div>
+      </>
+      )}
     </Section>
   );
 }
@@ -206,6 +244,7 @@ const ANDROID_PRESENTATION_IMAGES = [
 
 function AndroidScreenshots() {
   const [selectedImage, setSelectedImage] = useState(0);
+  const [vue, setVue] = useState<"demo" | "images">("demo");
   const image = ANDROID_PRESENTATION_IMAGES[selectedImage];
 
   return (
@@ -213,8 +252,13 @@ function AndroidScreenshots() {
       <SectionHeading
         eyebrow="Présentation Android"
         title="Gestion Scolaire Pro Plus dans votre poche"
-        description="Retrouvez vos élèves, vos résultats et vos documents essentiels depuis votre téléphone Android."
+        description="Touchez l'écran du téléphone pour essayer l'application Android : menu, notes, appel, bulletins, caisse…"
       />
+      <ChoixVue vue={vue} onChange={setVue} />
+      {vue === "demo" ? (
+        <div className="mt-6"><DemoLogiciel appareil="telephone" /></div>
+      ) : (
+      <>
       <Tabs value={String(selectedImage)} onValueChange={(v) => setSelectedImage(Number(v))} className="mt-10">
         <TabsList className="mx-auto flex h-auto flex-wrap justify-center gap-1 rounded-full p-1.5">
           {ANDROID_PRESENTATION_IMAGES.map((item, index) => (
@@ -235,6 +279,8 @@ function AndroidScreenshots() {
           priority={selectedImage === 0}
         />
       </div>
+      </>
+      )}
     </Section>
   );
 }
