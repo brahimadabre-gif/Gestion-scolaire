@@ -39,7 +39,7 @@ const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.31.apk";
 const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.31.apk";
 const ANDROID_VERSION = "2.3.31";
 const ANDROID_FILE_SIZE = "10 Mo";
-const WINDOWS_VERSION = "2.3.21";
+const WINDOWS_VERSION = "2.3.31";
 const WINDOWS_STORE_URL = "https://apps.microsoft.com/detail/9N71Q8PTCPCZ?hl=fr-011&gl=CI&ocid=pdpshare";
 
 // Chaque plateforme a sa propre version : la page n'affiche plus la version
@@ -47,12 +47,15 @@ const WINDOWS_STORE_URL = "https://apps.microsoft.com/detail/9N71Q8PTCPCZ?hl=fr-
 const CHANGELOG: Record<"windows" | "android", string> = {
   windows: [
     `## Version ${WINDOWS_VERSION} — Windows`,
-    "- **Mise à jour** : les correctifs s'affichent dès le premier lancement après l'installation, sans toucher aux données de l'école.",
-    "- **Notes** : la note saisie est conservée telle quelle, avec le point ou la virgule (12,50 reste 12,50), jusqu'à deux décimales. Une note négative, illisible ou supérieure au barème est refusée avec un message.",
-    "- **Bulletins** : une note de 0 s'affiche 0. Le rangement, le classeur et les totaux affichent les notes au même format.",
-    "- **Moyennes** : la moyenne d'une composition est calculée sur le total des barèmes, dans toutes les classes.",
-    "- **Certificat de fréquentation** : commune et date de délivrance de l'acte de naissance ajoutées.",
-    "- **Statistiques** : les tableaux des âges, des effectifs et des nationalités sont réservés au directeur.",
+    "- **Barre du haut plus élégante** : thème, licences, contact et verrouillage regroupés dans une capsule orange qui s'ouvre au survol.",
+    "- **Bouton « 🔒 Verrouiller »** : le logiciel se verrouille d'un clic, sans fermer la session.",
+    "- **Mise à jour Microsoft Store** : la fenêtre affiche le bon numéro de la nouvelle version.",
+    "- **Écrans modernisés** : Saisie des notes, Bulletins, Rangement, Liste de classe, Gestion des élèves, Matières, EPS, Convertisseur, Synchronisation, Admission exceptionnelle, Fiches de séance.",
+    "- **Registre d'appel et Assiduité** refaits, affichage jusqu'à 10 fois plus rapide ; **Progression** en 3 colonnes.",
+    "- **Rapport de fin d'année** : chiffres modifiables avec recalcul automatique.",
+    "- **Documents imprimés** (âges, effectifs, nationalités) : aperçu et choix des couleurs ; impressions sans page blanche ni tableau coupé.",
+    "- **Assistants** au choix (BRAHIMA, Mme YEO, Mme KONE, HIBOU) ; **signature importée** nette et centrée ; **notifications** plus courtes.",
+    "- Reprend les versions 2.3.22 à 2.3.26 : tableau de bord refait, Caisse et bulletin de salaire, convertisseur PDF ↔ Word/Excel, fenêtres de confirmation modernes.",
   ].join("\n"),
   android: [
     `## Version ${ANDROID_VERSION} — Android`,
