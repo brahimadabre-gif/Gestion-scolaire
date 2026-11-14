@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { db } from "@/lib/db";
 import { fail, handle } from "@/lib/api-helpers";
 
@@ -18,6 +19,21 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const fileUrl = new URL(item.downloadUrl);
     const localPrefix = "/library/";
     if (fileUrl.origin === new URL(_req.url).origin && fileUrl.pathname.startsWith(localPrefix)) {
+      // Cloudflare Workers : pas de disque, le fichier est lu dans les ressources statiques.
+      if (typeof navigator !== "undefined" && navigator.userAgent === "Cloudflare-Workers") {
+        const { env } = getCloudflareContext();
+        const assets = (env as unknown as { ASSETS?: { fetch: (u: URL) => Promise<Response> } }).ASSETS;
+        const res = assets ? await assets.fetch(new URL(fileUrl.pathname, _req.url)) : null;
+        if (!res || !res.ok) return fail("Fichier du document introuvable sur le serveur.", 404);
+        const filename = decodeURIComponent(fileUrl.pathname.split("/").pop() || "document");
+        return new NextResponse(res.body, {
+          headers: {
+            "Content-Type": item.fileType.toLowerCase() === "pdf" ? "application/pdf" : "application/octet-stream",
+            "Content-Disposition": `attachment; filename="${filename}"`,
+            "Cache-Control": "public, max-age=3600",
+          },
+        });
+      }
       const relativePath = fileUrl.pathname.slice(1);
       const publicRoot = path.join(process.cwd(), "public");
       const absolutePath = path.resolve(publicRoot, relativePath);

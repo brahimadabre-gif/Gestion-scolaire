@@ -1,8 +1,17 @@
 import type { NextConfig } from "next";
 
 const isNetlifyBuild = process.env.NETLIFY === "true" || Boolean(process.env.NETLIFY_DB_URL);
+// Construction pour Cloudflare Workers (scripts/cloudflare-build.mjs)
+const isCloudflareBuild = process.env.GSPP_CIBLE === "cloudflare";
 
 const nextConfig: NextConfig = {
+  ...(isCloudflareBuild
+    ? {
+        // Pas de service d'optimisation d'images sur Workers : images servies telles quelles.
+        images: { unoptimized: true },
+        serverExternalPackages: ["@prisma/client", ".prisma/client"],
+      }
+    : {}),
   // Netlify's Next.js runtime packages the server function itself. Keep the
   // standalone bundle for local/Tauri runs, but do not feed it to Netlify.
   ...(isNetlifyBuild ? {} : { output: "standalone" as const }),

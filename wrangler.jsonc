@@ -1,0 +1,19 @@
+// Hébergement Cloudflare Workers (adaptateur OpenNext).
+// Les secrets (DATABASE_URL, JWT_SECRET, RESEND_API_KEY, SOFTWARE_API_KEY…)
+// ne sont PAS ici : ils se saisissent dans le tableau de bord Cloudflare
+// (Workers → gestion-scolaire-pro → Paramètres → Variables et secrets).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gestion-scolaire-pro",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    { "binding": "WORKER_SELF_REFERENCE", "service": "gestion-scolaire-pro" }
+  ],
+  "observability": { "enabled": true }
+}

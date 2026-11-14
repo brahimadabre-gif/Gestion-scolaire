@@ -1,0 +1,8 @@
+# Téléchargements Android : l'APK doit arriver tel quel (aucune compression).
+# Certains gestionnaires de téléchargement Android gardent un APK compressé,
+# et l'installation échoue (« problème lors de l'analyse du package »).
+/downloads/*.apk
+  Cache-Control: public, max-age=0, must-revalidate, no-transform
+  Content-Type: application/vnd.android.package-archive
+  Content-Disposition: attachment
+  X-Content-Type-Options: nosniff

@@ -23,8 +23,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AdminLicenses } from "./admin-licenses";
-import { AdminDashboard } from "./admin-dashboard";
-import { AdminVisits } from "./admin-visits";
+import dynamic from "next/dynamic";
+// Graphiques (recharts) chargés dans le navigateur seulement : ils ne pèsent
+// pas sur le programme serveur (limite de taille de Cloudflare Workers).
+const AdminDashboard = dynamic(() => import("./admin-dashboard").then((m) => m.AdminDashboard), { ssr: false, loading: () => <Spinner /> });
+const AdminVisits = dynamic(() => import("./admin-visits").then((m) => m.AdminVisits), { ssr: false, loading: () => <Spinner /> });
 import {
   LayoutDashboard, Users, CreditCard, Receipt, LifeBuoy, Package, Download, BookOpen,
   Newspaper, HelpCircle, MessageSquareQuote, Settings, Plus, Pencil, Trash2,

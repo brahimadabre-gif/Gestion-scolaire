@@ -9,3 +9,9 @@ node_modules/
 db/*.db-journal
 db/*.db-wal
 db/*.db-shm
+
+# Cloudflare (OpenNext / wrangler)
+.open-next/
+.wrangler/
+.dev.vars*
+prisma/schema.cloudflare.prisma
