@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useTheme } from "next-themes";
 import { Link, navigate, useRoute } from "./router";
 import { useAuth } from "./auth-context";
@@ -13,15 +13,39 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  Menu, Moon, Sun, LogOut, LayoutDashboard, ShieldCheck, GraduationCap,
+  Moon, Sun, LogOut, LayoutDashboard, ShieldCheck, GraduationCap,
   LifeBuoy, Download, User as UserIcon,
 } from "lucide-react";
 
 // ── Logo ─────────────────────────────────────────────────────
-function LogoIcone() {
+// Toque pleine dont le plateau porte les trois traits du menu, gravés à jour
+// (on voit l'orange de la tuile à travers, sans pastille ni trait blanc).
+function ToqueMenu() {
+  const id = useId();
+  return (
+    <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
+      <defs>
+        <mask id={id} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+          <rect width="24" height="24" fill="#fff" />
+          <g stroke="#000" strokeWidth="1.15" strokeLinecap="round">
+            <path d="M8.6 6h6.8M8.6 8h6.8M8.6 10h6.8" />
+          </g>
+        </mask>
+      </defs>
+      <g fill="#fff" mask={`url(#${id})`}>
+        <path d="M12 2.5 23 8l-11 5.5L1 8z" />
+        <path d="M5.6 11.3v3.9c0 1.7 2.9 3.2 6.4 3.2s6.4-1.5 6.4-3.2v-3.9L12 14.5z" />
+      </g>
+      <path d="M21.4 8.8v5.4" stroke="#fff" strokeWidth="1.3" strokeLinecap="round" fill="none" />
+      <circle cx="21.4" cy="15" r="1.1" fill="#fff" />
+    </svg>
+  );
+}
+
+function LogoIcone({ menu = false }: { menu?: boolean }) {
   return (
     <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-600 to-orange-700 shadow-sm">
-      <GraduationCap className="h-5 w-5 text-white" aria-hidden="true" />
+      {menu ? <ToqueMenu /> : <GraduationCap className="h-5 w-5 text-white" aria-hidden="true" />}
     </span>
   );
 }
@@ -104,10 +128,7 @@ export function SiteHeader() {
                 title="Menu"
                 className="group relative shrink-0 rounded-xl outline-none transition-transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
-                <LogoIcone />
-                <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm transition-colors group-hover:bg-orange-600 group-hover:text-white" aria-hidden="true">
-                  <Menu className="h-2.5 w-2.5" />
-                </span>
+                <LogoIcone menu />
               </button>
             </SheetTrigger>
             <Link to="/" className="min-w-0" ariaLabel="Accueil — Gestion Scolaire Pro Plus">
