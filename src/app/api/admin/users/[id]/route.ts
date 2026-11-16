@@ -41,3 +41,36 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return ok(updated);
   });
 }
+
+// DELETE /api/admin/users/[id] — Supprimer définitivement un compte (ex. comptes de démo).
+// Les abonnements, paiements, licences, tickets et parrainages du compte partent avec lui
+// (règles « Cascade » du schéma) ; le journal d'activité est conservé sans le lien au compte.
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  return handle(async () => {
+    assertSameOrigin(req);
+    const admin = await requireAdmin(req);
+    const ip = getClientIp(req);
+    const { id } = await params;
+
+    const target = await db.user.findUnique({
+      where: { id },
+      select: { id: true, email: true, role: true, _count: { select: { subscriptions: true, payments: true, licenseKeys: true } } },
+    });
+    if (!target) return fail("Compte introuvable.", 404);
+    if (target.id === admin.id) return fail("Vous ne pouvez pas supprimer votre propre compte.", 400);
+    if (target.role === "ADMIN") {
+      const autresAdmins = await db.user.count({ where: { role: "ADMIN", id: { not: target.id } } });
+      if (autresAdmins === 0) return fail("Impossible de supprimer le dernier administrateur.", 400);
+    }
+
+    await db.user.delete({ where: { id } });
+    const c = target._count;
+    await logAction(
+      "ADMIN_USER_DELETED",
+      admin.id,
+      `${target.email} (abonnements ${c.subscriptions}, paiements ${c.payments}, licences ${c.licenseKeys})`,
+      ip
+    );
+    return ok({ deleted: true });
+  });
+}

@@ -30,6 +30,7 @@ export async function GET(req: Request) {
           id: true, firstName: true, lastName: true, email: true, phone: true,
           establishment: true, country: true, role: true, active: true,
           emailVerified: true, createdAt: true, lastLoginAt: true,
+          _count: { select: { subscriptions: true, payments: true, licenseKeys: true } },
         },
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * pageSize,

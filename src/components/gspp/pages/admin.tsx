@@ -270,6 +270,33 @@ function AdminUsers() {
     }
   };
 
+  const { user: moi } = useAuth();
+  const [suppression, setSuppression] = useState<string | null>(null);
+  const supprimer = async (u: Record<string, unknown>) => {
+    const nom = `${String(u.firstName)} ${String(u.lastName)} (${String(u.email)})`;
+    const c = (u._count ?? {}) as { subscriptions?: number; payments?: number; licenseKeys?: number };
+    const lies = (c.subscriptions ?? 0) + (c.payments ?? 0) + (c.licenseKeys ?? 0);
+    const detail = lies
+      ? `\n\nSeront aussi effacés : ${c.subscriptions ?? 0} abonnement(s), ${c.payments ?? 0} paiement(s), ${c.licenseKeys ?? 0} licence(s).`
+      : "";
+    if (!window.confirm(`Supprimer définitivement le compte ${nom} ?${detail}\n\nCette action est irréversible.`)) return;
+    // Compte avec abonnements, paiements ou licences : seconde confirmation écrite.
+    if (lies && window.prompt("Ce compte a des abonnements, paiements ou licences. Tapez SUPPRIMER pour confirmer.")?.trim().toUpperCase() !== "SUPPRIMER") {
+      toast.info("Suppression annulée.");
+      return;
+    }
+    setSuppression(String(u.id));
+    try {
+      await api.delete(`/api/admin/users/${u.id}`);
+      toast.success(`Compte supprimé : ${String(u.email)}`);
+      await queryClient.invalidateQueries({ queryKey: ["admin"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Suppression impossible.");
+    } finally {
+      setSuppression(null);
+    }
+  };
+
   return (
     <div>
       <h2 className="text-lg font-bold">Comptes utilisateurs</h2>
@@ -323,7 +350,7 @@ function AdminUsers() {
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex justify-end">
+                      <div className="flex justify-end gap-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -332,6 +359,19 @@ function AdminUsers() {
                         >
                           {u.active ? "Désactiver" : "Réactiver"}
                         </Button>
+                        {String(u.id) !== moi?.id && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 rounded-full border-rose-300 text-xs text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:border-rose-900 dark:text-rose-400 dark:hover:bg-rose-950/40"
+                            disabled={suppression === String(u.id)}
+                            onClick={() => supprimer(u)}
+                            aria-label={`Supprimer le compte ${String(u.email)}`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                            {suppression === String(u.id) ? "Suppression…" : "Supprimer"}
+                          </Button>
+                        )}
                       </div>
                     </td>
                   </tr>
