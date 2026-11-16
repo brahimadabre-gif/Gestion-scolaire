@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { api, Article, FaqItem, Plan, Testimonial } from "../api";
 import { Link, navigate } from "../router";
+import { estPlanEssai, dureePlan, plateformePlan, LIEN_ESSAI } from "../essai";
 import { Section, SectionHeading, Stars, InitialsAvatar, Spinner } from "../ui-bits";
 import { formatDate, formatFcfa } from "@/lib/site";
 import { Button } from "@/components/ui/button";
@@ -337,11 +338,13 @@ function PricingPreview() {
         <Spinner />
       ) : (
         <div className="mt-12 flex flex-col items-center gap-6 md:flex-row md:items-stretch md:justify-center">
-          {(plans ?? []).map((plan) => (
+          {(plans ?? []).map((plan) => {
+            const essai = estPlanEssai(plan);
+            return (
             <article
               key={plan.slug}
-              className={`relative flex w-full max-w-xl flex-col rounded-2xl border bg-card p-7 ${
-                plan.highlighted ? "border-orange-600 shadow-xl shadow-orange-600/10 ring-1 ring-orange-600" : "card-hover"
+              className={`relative flex w-full max-w-md flex-col rounded-2xl border bg-card p-7 ${
+                plan.highlighted ? "border-orange-600 shadow-xl shadow-orange-600/10 ring-1 ring-orange-600" : essai ? "border-emerald-600/60 card-hover" : "card-hover"
               }`}
             >
               {plan.highlighted && (
@@ -349,14 +352,19 @@ function PricingPreview() {
                   Le plus choisi
                 </span>
               )}
+              {essai && (
+                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-emerald-600 px-4 py-1 text-xs font-bold text-white shadow">
+                  Gratuit · sans paiement
+                </span>
+              )}
               <h3 className="text-lg font-bold">{plan.name}</h3>
               <p className="mt-1.5 min-h-10 text-sm text-muted-foreground">{plan.description}</p>
               <p className="mt-5">
                 <span className="text-3xl font-extrabold tracking-tight">{formatFcfa(plan.annualPrice)}</span>
-                <span className="text-sm text-muted-foreground"> / {plan.durationMonths || 12} mois</span>
+                <span className="text-sm text-muted-foreground"> / {dureePlan(plan)}</span>
               </p>
               <p className="mt-1 text-xs font-medium text-orange-700 dark:text-orange-400">
-                Accès complet pendant {plan.durationMonths || 12} mois · {plan.platform === "ANDROID" ? "Android" : "PC Windows"}
+                {essai ? "Inclus dès l’installation, sans clé" : `Accès complet pendant ${dureePlan(plan)}`} · {plateformePlan(plan)}
               </p>
               <ul className="mt-6 flex-1 space-y-2.5">
                 {plan.features.slice(0, 5).map((f) => (
@@ -372,12 +380,13 @@ function PricingPreview() {
               <Button
                 className="mt-6 w-full rounded-full"
                 variant={plan.highlighted ? "default" : "outline"}
-                onClick={() => navigate("/tarifs")}
+                onClick={() => navigate(essai ? LIEN_ESSAI : "/tarifs")}
               >
-                Choisir cette offre
+                {essai ? "Télécharger et essayer" : "Choisir cette offre"}
               </Button>
             </article>
-          ))}
+            );
+          })}
         </div>
       )}
       <p className="mt-8 text-center">

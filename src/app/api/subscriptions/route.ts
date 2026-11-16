@@ -3,6 +3,7 @@ import { ok, fail, handle, getClientIp, logAction, assertSameOrigin } from "@/li
 import { requireUser } from "@/lib/auth";
 import { createSubscriptionSchema } from "@/lib/validations";
 import { generateReference } from "@/lib/auth";
+import { estEssai } from "@/lib/essai-gratuit";
 
 // GET /api/subscriptions — Abonnements de l'utilisateur connecté
 export async function GET(req: Request) {
@@ -31,6 +32,11 @@ export async function POST(req: Request) {
 
     const plan = await db.subscriptionPlan.findUnique({ where: { slug: data.planSlug } });
     if (!plan || !plan.active) return fail("Formule introuvable.", 404);
+
+    // L'essai gratuit de 30 jours est intégré au logiciel : rien à activer ici.
+    if (estEssai(plan)) {
+      return fail("L'essai gratuit de 30 jours est inclus dans le logiciel : téléchargez-le, il démarre dès l'installation, sans clé.", 400);
+    }
 
     // Une seule demande d'abonnement en attente à la fois
     const pending = await db.subscription.findFirst({

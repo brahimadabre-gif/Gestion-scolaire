@@ -3,11 +3,13 @@
 // ── Page Tarifs — comparaison des offres + FAQ abonnements ──
 import { useQuery } from "@tanstack/react-query";
 import { api, FaqItem, Plan } from "../api";
+import { navigate } from "../router";
+import { estPlanEssai, dureePlan, plateformePlan, LIEN_ESSAI } from "../essai";
 import { PageHero } from "../page-hero";
 import { Section, SectionHeading, Spinner } from "../ui-bits";
 import { formatFcfa } from "@/lib/site";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Check, Minus, ShieldCheck, RefreshCcw, KeyRound, Monitor, Smartphone } from "lucide-react";
+import { Check, Minus, ShieldCheck, RefreshCcw, KeyRound, Monitor, Smartphone, Gift } from "lucide-react";
 import { DeveloperContact, developerWhatsAppHref } from "../developer-contact";
 
 export function PricingPage() {
@@ -42,16 +44,16 @@ export function PricingPage() {
           <div className="flex flex-col items-center gap-6 md:flex-row md:items-stretch md:justify-center">
             {(plans ?? []).map((plan) => {
               const price = plan.annualPrice;
-              const months = plan.durationMonths || 12;
-              const period = ` / ${months} mois`;
-              const PlatformIcon = plan.platform === "ANDROID" ? Smartphone : Monitor;
+              const essai = estPlanEssai(plan);
+              const period = ` / ${dureePlan(plan)}`;
+              const PlatformIcon = essai ? Gift : plan.platform === "ANDROID" ? Smartphone : Monitor;
               return (
                 <article
                   key={plan.slug}
-                  className={`relative flex w-full max-w-xl flex-col rounded-2xl border bg-card p-7 ${
+                  className={`relative flex w-full max-w-md flex-col rounded-2xl border bg-card p-7 ${
                     plan.highlighted
                       ? "border-orange-600 shadow-xl shadow-orange-600/10 ring-1 ring-orange-600"
-                      : "card-hover"
+                      : essai ? "border-emerald-600/60 card-hover" : "card-hover"
                   }`}
                 >
                   {plan.highlighted && (
@@ -59,9 +61,14 @@ export function PricingPage() {
                       Recommandée
                     </span>
                   )}
+                  {essai && (
+                    <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-emerald-600 px-4 py-1 text-xs font-bold text-white shadow">
+                      Gratuit · sans paiement
+                    </span>
+                  )}
                   <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
                     <PlatformIcon className="h-3.5 w-3.5" aria-hidden="true" />
-                    {plan.platform === "ANDROID" ? "Android" : "PC Windows"}
+                    {plateformePlan(plan)}
                   </span>
                   <h2 className="mt-3 text-xl font-bold">{plan.name}</h2>
                   <p className="mt-1.5 min-h-10 text-sm text-muted-foreground">{plan.description}</p>
@@ -70,7 +77,9 @@ export function PricingPage() {
                     <span className="text-sm text-muted-foreground"> {period}</span>
                   </p>
                   <p className="mt-1 text-xs font-semibold text-orange-700 dark:text-orange-400">
-                    Accès pendant {months} mois · clé réservée {plan.platform === "ANDROID" ? "à Android" : "au PC"}
+                    {essai
+                      ? "30 jours d’essai inclus dès l’installation · sans clé · PC Windows et Android"
+                      : `Accès pendant ${dureePlan(plan)} · clé réservée ${plan.platform === "ANDROID" ? "à Android" : "au PC"}`}
                   </p>
 
                   <ul className="mt-5 flex-1 space-y-2.5">
@@ -81,6 +90,15 @@ export function PricingPage() {
                       </li>
                     ))}
                   </ul>
+                  {essai ? (
+                    <button
+                      type="button"
+                      onClick={() => navigate(LIEN_ESSAI)}
+                      className="mt-7 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+                    >
+                      <Gift className="h-4 w-4" aria-hidden="true" /> Télécharger et essayer
+                    </button>
+                  ) : (
                   <a
                     className={`mt-7 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2 ${plan.highlighted ? "bg-orange-600 text-white hover:bg-orange-700" : "border hover:bg-secondary"}`}
                     href={developerWhatsAppHref(`Bonjour, je souhaite obtenir une clé d’activation pour la formule ${plan.name} de Gestion Scolaire Pro Plus.`)}
@@ -88,6 +106,7 @@ export function PricingPage() {
                   >
                     <KeyRound className="h-4 w-4" aria-hidden="true" /> Contacter pour obtenir une clé
                   </a>
+                  )}
                 </article>
               );
             })}
@@ -135,7 +154,7 @@ export function PricingPage() {
                   <th key={p.slug} className="px-4 py-3.5 text-center font-semibold">
                     {p.name}
                     <p className="mt-0.5 text-xs font-normal text-muted-foreground">
-              {formatFcfa(p.annualPrice)} / {p.durationMonths || 12} mois
+              {formatFcfa(p.annualPrice)} / {dureePlan(p)}
                     </p>
                   </th>
                 ))}

@@ -3,12 +3,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { api, Plan, SubscriptionRecord } from "../api";
 import { navigate } from "../router";
+import { estPlanEssai, dureePlan, plateformePlan, LIEN_ESSAI } from "../essai";
 import { useAuth } from "../auth-context";
 import { Spinner, StatusBadge } from "../ui-bits";
 import { formatFcfa } from "@/lib/site";
 import { Button } from "@/components/ui/button";
 import { DeveloperContact } from "../developer-contact";
-import { ArrowRight, Check, Clock3, KeyRound } from "lucide-react";
+import { ArrowRight, Check, Clock3, Download, KeyRound } from "lucide-react";
 
 export function AccountSubscriptionPage() {
   const { user, subscription, licenseKey, isLoading: authLoading } = useAuth();
@@ -62,10 +63,15 @@ export function AccountSubscriptionPage() {
             {plan.highlighted && <span className="mb-3 inline-block rounded-full bg-orange-600 px-3 py-1 text-xs font-bold text-white">Recommandée</span>}
             <h2 className="text-xl font-bold">{plan.name}</h2>
             <p className="mt-2 text-sm text-muted-foreground">{plan.description}</p>
-            <p className="mt-4 text-2xl font-extrabold">{formatFcfa(plan.annualPrice)}<span className="text-sm font-normal text-muted-foreground"> / {plan.durationMonths || 12} mois · {plan.platform === "ANDROID" ? "Android" : "PC Windows"}</span></p>
+            <p className="mt-4 text-2xl font-extrabold">{formatFcfa(plan.annualPrice)}<span className="text-sm font-normal text-muted-foreground"> / {dureePlan(plan)} · {plateformePlan(plan)}</span></p>
             <ul className="mt-4 space-y-2">
               {plan.features.slice(0, 4).map((feature) => <li key={feature} className="flex gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />{feature}</li>)}
             </ul>
+            {estPlanEssai(plan) && (
+              <Button className="mt-5 w-full rounded-full" onClick={() => navigate(LIEN_ESSAI)}>
+                <Download className="mr-2 h-4 w-4" aria-hidden="true" /> Télécharger et essayer
+              </Button>
+            )}
           </article>
         ))}
       </div>
