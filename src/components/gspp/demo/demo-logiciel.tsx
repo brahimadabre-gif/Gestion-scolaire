@@ -5,6 +5,7 @@
 // ou de téléphone : tous les modules du menu, données fictives, rien n'est enregistré.
 // Deux modes : « Essayer librement » et « Visite guidée » (bulles étape par étape).
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { navigate } from "../router";
 import { Ctx, CIBLE, type CtxDemo } from "./demo-contexte";
@@ -29,6 +30,20 @@ const ETAPES: Etape[] = [
 ];
 
 type Mode = "libre" | "guide";
+
+/** Logo du logiciel installé (tuile bleue « S » + toque), comme sur Windows et Android. */
+function LogoLogiciel({ taille, className }: { taille: number; className?: string }) {
+  return <Image src="/logo-logiciel.png" alt="" width={taille} height={taille} unoptimized className={cn("shrink-0 select-none", className)} draggable={false} />;
+}
+
+/** Icône Windows (4 carreaux) pour le bouton Démarrer de la barre des tâches. */
+function IconeWindows() {
+  return (
+    <span className="grid h-[15px] w-[15px] grid-cols-2 gap-[1.5px]" aria-hidden="true">
+      {[0, 1, 2, 3].map((i) => <span key={i} className="rounded-[1px] bg-gradient-to-br from-sky-400 to-blue-600" />)}
+    </span>
+  );
+}
 
 export function DemoLogiciel({ appareil }: { appareil: "pc" | "telephone" }) {
   const telephone = appareil === "telephone";
@@ -227,7 +242,7 @@ export function DemoLogiciel({ appareil }: { appareil: "pc" | "telephone" }) {
       {/* Écran d'accueil / verrouillage */}
       {splash && (
         <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-[#B8361E] via-[#C2410C] to-[#7C2D12] p-6 text-center text-white">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-[28px]" aria-hidden="true">🎓</span>
+          <LogoLogiciel taille={64} className="drop-shadow-[0_8px_16px_rgba(0,0,0,0.35)]" />
           <p className="text-[18px] font-extrabold leading-tight">Gestion Scolaire Pro Plus</p>
           <p className="text-[12px] text-orange-100">{s.ecole} · {s.annee}</p>
           {splash === "verrou" && <p className="max-w-xs rounded-lg bg-black/20 px-3 py-1.5 text-[11px]">Logiciel verrouillé — M. TANOH Serge reste connecté. Cliquez sur « Continuer » pour reprendre.</p>}
@@ -323,24 +338,58 @@ export function DemoLogiciel({ appareil }: { appareil: "pc" | "telephone" }) {
         </div>
 
         {telephone ? (
-          <div className="mx-auto w-full max-w-[350px]">
-            <div className="relative h-[690px] max-h-[82vh] min-h-[560px] overflow-hidden rounded-[2.6rem] border-[11px] border-slate-900 bg-slate-900 shadow-2xl ring-1 ring-slate-700">
-              <div className="flex h-7 items-center justify-between bg-white px-6 text-[11px] font-bold text-slate-900 dark:bg-slate-900 dark:text-white">
-                <span>{heure}</span><span className="h-4 w-4 rounded-full bg-slate-900 dark:bg-black" aria-hidden="true" /><span aria-hidden="true">▂▄▆ 🔋</span>
+          /* Téléphone Android : cadre métal, boutons sur le côté, caméra centrale, barre de gestes */
+          <div className="mx-auto w-full max-w-[350px] px-1">
+            <div className="relative rounded-[2.7rem] bg-gradient-to-br from-slate-500 via-slate-800 to-slate-950 p-[3px] shadow-[0_40px_60px_-30px_rgba(15,23,42,0.75),0_0_0_1px_rgba(255,255,255,0.06)]">
+              <span className="absolute -right-[3px] top-[118px] h-16 w-[3px] rounded-r bg-gradient-to-b from-slate-500 to-slate-700" aria-hidden="true" />
+              <span className="absolute -right-[3px] top-[200px] h-10 w-[3px] rounded-r bg-gradient-to-b from-slate-500 to-slate-700" aria-hidden="true" />
+              <div className="relative h-[690px] max-h-[82vh] min-h-[560px] rounded-[2.55rem] bg-black p-[8px]">
+                <div className="relative flex h-full flex-col overflow-hidden rounded-[2.05rem] bg-white dark:bg-slate-900">
+                  <div className="relative flex h-7 shrink-0 items-center justify-between px-5 text-[11px] font-semibold text-slate-900 dark:text-white">
+                    <span>{heure}</span>
+                    <span className="absolute left-1/2 top-1.5 h-3.5 w-3.5 -translate-x-1/2 rounded-full bg-black ring-2 ring-slate-800/80" aria-hidden="true" />
+                    <span className="flex items-end gap-[2px]" aria-hidden="true">
+                      {[5, 7, 9, 11].map((h) => <span key={h} className="w-[3px] rounded-sm bg-current" style={{ height: h }} />)}
+                      <span className="ml-1.5 flex h-[10px] w-[19px] items-center rounded-[3px] border border-current p-[1.5px]"><span className="h-full w-[70%] rounded-[1px] bg-current" /></span>
+                    </span>
+                  </div>
+                  <div className="min-h-0 flex-1">{ecran}</div>
+                  <div className="flex h-5 shrink-0 items-center justify-center"><span className="h-1 w-24 rounded-full bg-slate-800 dark:bg-slate-300" aria-hidden="true" /></div>
+                  <div className="pointer-events-none absolute inset-0 rounded-[2.05rem] bg-[linear-gradient(120deg,rgba(255,255,255,0.14),transparent_32%)]" aria-hidden="true" />
+                </div>
               </div>
-              <div className="h-[calc(100%-2.75rem)]">{ecran}</div>
-              <div className="flex h-4 items-center justify-center bg-white dark:bg-slate-900"><span className="h-1 w-24 rounded-full bg-slate-800 dark:bg-slate-300" aria-hidden="true" /></div>
             </div>
           </div>
         ) : (
+          /* Écran Windows 11 sur pied : barre de titre avec le logo bleu, barre des tâches, pied argent */
           <div className="mx-auto w-full max-w-5xl">
-            <div className="overflow-hidden rounded-t-2xl border-[10px] border-b-[12px] border-slate-800 bg-slate-800 shadow-2xl">
-              <div className="flex items-center gap-2 bg-slate-100 px-3 py-1 text-[10.5px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                <span aria-hidden="true">🎓</span> Gestion Scolaire Pro Plus <span className="ml-auto tracking-[0.5em]" aria-hidden="true">– ▢ ✕</span>
+            <div className="relative rounded-[16px] bg-gradient-to-b from-slate-700 via-slate-800 to-slate-900 p-[10px] pb-[14px] shadow-[0_40px_70px_-35px_rgba(15,23,42,0.75),inset_0_1px_0_rgba(255,255,255,0.12)] ring-1 ring-black/50">
+              <div className="relative overflow-hidden rounded-[6px] bg-[#e9eef7] dark:bg-slate-900">
+                <div className="flex h-8 items-center gap-2 border-b border-slate-200/80 bg-[#f3f4f7] pl-3 text-[11.5px] text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                  <LogoLogiciel taille={16} /> Gestion Scolaire Pro Plus
+                  <span className="ml-auto flex h-full text-[12px]" aria-hidden="true">
+                    <span className="flex w-11 items-center justify-center">─</span>
+                    <span className="flex w-11 items-center justify-center">▢</span>
+                    <span className="flex w-11 items-center justify-center transition-colors hover:bg-red-600 hover:text-white">✕</span>
+                  </span>
+                </div>
+                <div className="h-[600px] max-h-[74vh] min-h-[460px]">{ecran}</div>
+                <div className="relative flex h-10 items-center justify-center gap-1.5 border-t border-white/60 bg-white/80 px-3 backdrop-blur dark:border-slate-700 dark:bg-slate-800/90" aria-hidden="true">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-slate-900/5"><IconeWindows /></span>
+                  <span className="hidden h-7 w-36 items-center gap-1.5 rounded-full bg-slate-900/5 px-3 text-[10.5px] text-slate-500 sm:flex dark:bg-white/10 dark:text-slate-300">⌕ Rechercher</span>
+                  <span className="relative flex h-8 w-8 items-center justify-center rounded-md bg-slate-900/5 dark:bg-white/10">
+                    <LogoLogiciel taille={22} />
+                    <span className="absolute bottom-0 h-[3px] w-3.5 rounded-full bg-blue-600" />
+                  </span>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-md"><span className="h-4 w-5 rounded-[3px] bg-gradient-to-b from-amber-300 to-amber-500" /></span>
+                  <span className="absolute right-3 text-right text-[10px] leading-tight text-slate-700 dark:text-slate-200">{heure}<br />14/11/2026</span>
+                </div>
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.10),transparent_30%)]" aria-hidden="true" />
               </div>
-              <div className="h-[600px] max-h-[78vh] min-h-[480px]">{ecran}</div>
+              <span className="absolute bottom-[4px] left-1/2 h-[4px] w-[4px] -translate-x-1/2 rounded-full bg-sky-400/70 shadow-[0_0_6px_rgba(56,189,248,0.9)]" aria-hidden="true" />
             </div>
-            <div className="mx-auto h-3 w-full rounded-b-2xl bg-gradient-to-b from-slate-300 to-slate-400 dark:from-slate-600 dark:to-slate-700" aria-hidden="true" />
+            <div className="mx-auto h-14 w-28 bg-gradient-to-r from-slate-400 via-slate-200 to-slate-400 [clip-path:polygon(18%_0,82%_0,100%_100%,0_100%)] dark:from-slate-600 dark:via-slate-400 dark:to-slate-600" aria-hidden="true" />
+            <div className="mx-auto h-3 w-72 max-w-[70%] rounded-[50%] bg-gradient-to-b from-slate-300 to-slate-500 shadow-[0_10px_18px_-6px_rgba(15,23,42,0.55)] dark:from-slate-500 dark:to-slate-700" aria-hidden="true" />
           </div>
         )}
         <p className="mt-4 text-center text-xs text-muted-foreground">
