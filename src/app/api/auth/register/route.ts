@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { ok, fail, handle, rateLimit, getClientIp, logAction, assertSameOrigin } from "@/lib/api-helpers";
 import { registerSchema } from "@/lib/validations";
 import { normalizePhoneNumber } from "@/lib/phone";
+import { emailDejaUtilise, numeroDejaUtilise, MESSAGE_EMAIL_PRIS, MESSAGE_NUMERO_PRIS } from "@/lib/unicite";
 import { hashPassword, createSessionToken, SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
 
 export async function POST(req: Request) {
@@ -31,10 +32,9 @@ export async function POST(req: Request) {
       : null;
     if (data.ambassadorCode && !ambassador) return fail("Code ambassadeur invalide ou inactif.", 422);
 
-    const existing = await db.user.findUnique({ where: { email: data.email.toLowerCase() } });
-    if (existing) {
-      return fail("Un compte existe déjà avec cette adresse e-mail.", 409);
-    }
+    // Un seul compte par e-mail et par numéro de téléphone
+    if (await emailDejaUtilise(data.email)) return fail(MESSAGE_EMAIL_PRIS, 409);
+    if (await numeroDejaUtilise(phone)) return fail(MESSAGE_NUMERO_PRIS, 409);
 
     const hashed = await hashPassword(data.password);
     const user = await db.user.create({
