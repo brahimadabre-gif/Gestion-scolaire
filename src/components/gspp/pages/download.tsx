@@ -35,9 +35,9 @@ function getClientOs(): OS {
 const subscribeNoop = () => () => {};
 const getServerOs = () => "other" as OS;
 
-const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.31.apk";
-const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.31.apk";
-const ANDROID_VERSION = "2.3.31";
+const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.32.apk";
+const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.32.apk";
+const ANDROID_VERSION = "2.3.32";
 const ANDROID_FILE_SIZE = "10 Mo";
 const WINDOWS_VERSION = "2.3.31";
 const WINDOWS_STORE_URL = "https://apps.microsoft.com/detail/9N71Q8PTCPCZ?hl=fr-011&gl=CI&ocid=pdpshare";
@@ -59,6 +59,8 @@ const CHANGELOG: Record<"windows" | "android", string> = {
   ].join("\n"),
   android: [
     `## Version ${ANDROID_VERSION} — Android`,
+    "- **Avis de mise à jour** : le logiciel prévient dès qu'une nouvelle version Android est en ligne et propose de la télécharger (vos données sont sauvegardées avant).",
+    "- **Tableau récapitulatif** : les cartes Effectif total, Filles, Garçons, Doublants et Non doublants s'affichent sans déborder sur téléphone.",
     "- **Écrans modernisés** : Convertisseur, EPS, Matières, Bulletins, Liste de classe, Tableau récapitulatif, Rangement, Gestion des élèves, Rapport de fin d'année, Registre matricule et Contacts des parents.",
     "- **Registre d'appel** : la semaine en haut, bascule P / A matin et après-midi, liste des absents du jour et élèves à surveiller.",
     "- **Assiduité** : 5 indicateurs, taux de chaque élève, badge Régulier / Non régulier ; affichage jusqu'à 10 fois plus rapide.",
@@ -151,17 +153,17 @@ export function DownloadPage() {
 
                   {/* La version Windows est distribuée via la page Microsoft Store officielle. */}
                   {os === "windows" ? (
-                    <Button asChild size="lg" className="w-full rounded-full text-base">
+                    <Button asChild size="lg" className="h-auto min-h-12 w-full whitespace-normal rounded-full px-5 py-3 text-center text-[15px] leading-snug sm:text-base">
                       <a href={WINDOWS_STORE_URL} target="_blank" rel="noopener noreferrer">
                         <DownloadIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-                        Télécharger depuis Microsoft Store
+                        <span>Télécharger depuis <span className="whitespace-nowrap">Microsoft Store</span></span>
                       </a>
                     </Button>
                   ) : os === "android" ? (
-                    <Button asChild size="lg" className="w-full rounded-full text-base">
+                    <Button asChild size="lg" className="h-auto min-h-12 w-full whitespace-normal rounded-full px-5 py-3 text-center text-[15px] leading-snug sm:text-base">
                       <a href={ANDROID_INSTALLER_URL} download={ANDROID_INSTALLER_NAME}>
                         <DownloadIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-                        Télécharger pour Android v{ANDROID_VERSION} ({ANDROID_FILE_SIZE})
+                        <span>Télécharger pour Android{" "}<span className="whitespace-nowrap">v{ANDROID_VERSION} ({ANDROID_FILE_SIZE})</span></span>
                       </a>
                     </Button>
                   ) : (
@@ -175,7 +177,7 @@ export function DownloadPage() {
                       </p>
                     </div>
                   )}
-                  <p className="mt-3 text-xs text-muted-foreground">
+                  <p className="mt-3 break-words text-xs text-muted-foreground">
                     {os === "android"
                       ? `Fichier : ${ANDROID_INSTALLER_NAME} · Installer pour Android`
                       : os === "windows"
