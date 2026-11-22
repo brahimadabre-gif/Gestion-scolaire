@@ -10,6 +10,7 @@ interface AuthContextValue {
   user: User | null;
   subscription: MeResponse["subscription"];
   licenseKey: MeResponse["licenseKey"];
+  directKeys: NonNullable<MeResponse["directKeys"]>;
   isLoading: boolean;
   isAdmin: boolean;
   isStaff: boolean;
@@ -21,6 +22,7 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   subscription: null,
   licenseKey: null,
+  directKeys: [],
   isLoading: true,
   isAdmin: false,
   isStaff: false,
@@ -58,6 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     subscription: user ? (data?.subscription ?? null) : null,
     licenseKey: user ? (data?.licenseKey ?? null) : null,
+    directKeys: user ? (data?.directKeys ?? []) : [],
     isLoading,
     isAdmin: user?.role === "ADMIN",
     isStaff: user?.role === "ADMIN" || user?.role === "SUPPORT",

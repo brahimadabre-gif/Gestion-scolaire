@@ -20,6 +20,7 @@ import { GuidePage } from "./pages/guide";
 import { DocumentsPage } from "./pages/documents";
 import { VideosPage } from "./pages/videos";
 import { AnnouncementBar } from "./announcement-bar";
+import { OffreBar } from "./offre-bar";
 import { VisitTracker } from "./visit-tracker";
 import { FaqPage } from "./pages/faq";
 import { SupportPage } from "./pages/support";
@@ -155,13 +156,14 @@ function Shell() {
         <Routes />
       </div>
       <SiteFooter />
+      <OffreBar />
     </>
   );
 }
 
 export function AppShell({ initialPath = "/" }: { initialPath?: string }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme="light" themes={["light", "dark", "confort"]} enableSystem disableTransitionOnChange>
       <QueryClientProvider client={queryClient}>
         <RouterProvider initialPath={initialPath}>
           <AuthProvider>

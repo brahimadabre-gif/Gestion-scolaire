@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  Moon, Sun, LogOut, LayoutDashboard, ShieldCheck, GraduationCap,
+  Moon, Sun, SunDim, LogOut, LayoutDashboard, ShieldCheck, GraduationCap,
   LifeBuoy, Download, User as UserIcon,
 } from "lucide-react";
 
@@ -72,21 +72,33 @@ export function Logo({ compact = false }: { compact?: boolean }) {
   );
 }
 
-// ── Bascule thème clair/sombre ───────────────────────────────
+// ── Bascule thème clair / sombre / confort ───────────────────
+// Même cycle que le logiciel : clair -> sombre -> confort -> clair.
+// L'icône montre le mode suivant ; le bouton devient ambré en mode confort.
+const CYCLE_THEMES = ["light", "dark", "confort"] as const;
+
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
+
+  const suivant = () => {
+    const actuel = theme === "system" || !theme ? resolvedTheme ?? "light" : theme;
+    const i = CYCLE_THEMES.indexOf(actuel as (typeof CYCLE_THEMES)[number]);
+    setTheme(CYCLE_THEMES[(i === -1 ? 0 : i + 1) % CYCLE_THEMES.length]);
+  };
 
   return (
     <Button
       variant="ghost"
       size="icon"
-      aria-label="Basculer entre mode clair et mode sombre"
-      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-      className="rounded-full"
+      aria-label="Changer de thème : clair, sombre ou confort"
+      title="Mode clair / sombre / confort"
+      onClick={suivant}
+      className="rounded-full confort:bg-amber-500 confort:text-white confort:hover:bg-amber-600 confort:hover:text-white"
     >
       {/* Affichage par variantes CSS : aucun rendu conditionnel à l'hydratation */}
-      <Sun className="hidden h-4.5 w-4.5 dark:block" aria-hidden="true" />
-      <Moon className="block h-4.5 w-4.5 dark:hidden" aria-hidden="true" />
+      <Moon className="block h-4.5 w-4.5 dark:hidden confort:hidden" aria-hidden="true" />
+      <SunDim className="hidden h-4.5 w-4.5 dark:block" aria-hidden="true" />
+      <Sun className="hidden h-4.5 w-4.5 confort:block" aria-hidden="true" />
     </Button>
   );
 }

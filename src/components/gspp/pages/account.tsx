@@ -19,7 +19,7 @@ import {
 
 // ── Tableau de bord ──────────────────────────────────────────
 export function AccountDashboard() {
-  const { user, subscription, licenseKey, isLoading } = useAuth();
+  const { user, subscription, licenseKey, directKeys, isLoading } = useAuth();
   const { data: subs } = useQuery<SubscriptionRecord[]>({
     queryKey: ["subscriptions"],
     queryFn: () => api.get<SubscriptionRecord[]>("/api/subscriptions"),
@@ -171,10 +171,44 @@ export function AccountDashboard() {
                 <Copy className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" /> Copier la clé
               </Button>
             </>
-          ) : (
+          ) : directKeys.length === 0 ? (
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               Votre clé de licence apparaîtra ici dès l&apos;activation de votre abonnement.
             </p>
+          ) : null}
+          {directKeys.length > 0 && (
+            <div className="mt-4 space-y-3">
+              <p className="text-sm font-semibold text-orange-700 dark:text-orange-400">
+                {directKeys.length > 1 ? "Clés d'activation" : "Clé d'activation"} ({directKeys[0].validityMonths ?? 3} mois)
+              </p>
+              {directKeys.map((k) => (
+                <div key={k.key} className="rounded-2xl border border-dashed border-orange-600/50 bg-orange-600/5 p-3.5">
+                  <p className="text-xs font-semibold text-muted-foreground">
+                    {k.platform === "ANDROID" ? "Pour Android (téléphone, tablette)" : k.platform === "PC" ? "Pour Windows (ordinateur)" : "Licence"}
+                  </p>
+                  <p className="mt-1 break-all font-mono text-[13px] font-bold tracking-normal select-all sm:text-sm sm:tracking-wider">{k.key}</p>
+                  <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2">
+                    <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <MonitorSmartphone className="h-3.5 w-3.5" aria-hidden="true" />
+                      {k.status === "ACTIVE" && k.expiresAt
+                        ? `Activée · valable jusqu'au ${new Date(k.expiresAt).toLocaleDateString("fr-FR")}`
+                        : `Prête à être activée · ${k.validityMonths ?? 3} mois à partir de l'activation`}
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 rounded-full px-3 text-xs"
+                      onClick={() => {
+                        navigator.clipboard.writeText(k.key);
+                        toast.success("Clé copiée !");
+                      }}
+                    >
+                      <Copy className="mr-1 h-3.5 w-3.5" aria-hidden="true" /> Copier
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
           <Button className="mt-4 w-full rounded-full" onClick={() => navigate("/telecharger")}>
             <Download className="mr-1.5 h-4 w-4" aria-hidden="true" /> Télécharger le logiciel

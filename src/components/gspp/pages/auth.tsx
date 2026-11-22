@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { offreActive, OFFRE_MOIS } from "@/lib/offre-inscription";
 import { cn } from "@/lib/utils";
 import {
   GraduationCap, Eye, EyeOff, Loader2, ShieldCheck, KeyRound, MailCheck, ArrowRight, UserPlus,
@@ -179,11 +180,13 @@ export function RegisterPage() {
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", phone: "",
     password: "", confirmPassword: "", establishment: "", country: "Côte d'Ivoire", ambassadorCode: "",
+    clePlateforme: "PC" as "PC" | "ANDROID",
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
+  const offre = offreActive();
 
   useEffect(() => {
     if (user) navigate("/compte");
@@ -213,9 +216,11 @@ export function RegisterPage() {
     setError(null);
     setLoading(true);
     try {
-      await api.post("/api/auth/register", form);
+      const inscrit = await api.post<{ clesOffertes?: number }>("/api/auth/register", offre ? form : { ...form, clePlateforme: undefined });
       await queryClient.invalidateQueries({ queryKey: ["me"] });
-      toast.success("Compte créé avec succès — bienvenue !");
+      toast.success(inscrit?.clesOffertes
+        ? "Compte créé — votre clé d'activation de 3 mois offerte est dans votre espace !"
+        : "Compte créé avec succès — bienvenue !");
       // Redirige vers l'abonnement si l'utilisateur arrive d'une page tarifs
       navigate(route.query.formule ? `/compte/abonnement?formule=${route.query.formule}` : "/compte");
     } catch (err) {
@@ -282,6 +287,33 @@ export function RegisterPage() {
             </Select>
           </div>
         </div>
+        {offre && (
+          <div role="group" aria-labelledby="reg-cle-titre" className="space-y-2 rounded-2xl border border-orange-600/30 bg-orange-600/5 p-4">
+            <p id="reg-cle-titre" className="text-sm font-semibold">Votre clé de {OFFRE_MOIS} mois offerte : pour quelle version ?</p>
+            <div className="grid grid-cols-2 gap-2">
+              {([
+                { id: "PC", label: "Windows", detail: "ordinateur" },
+                { id: "ANDROID", label: "Android", detail: "téléphone, tablette" },
+              ] as const).map((o) => (
+                <button
+                  key={o.id}
+                  type="button"
+                  aria-pressed={form.clePlateforme === o.id}
+                  onClick={() => setForm((f) => ({ ...f, clePlateforme: o.id }))}
+                  className={`rounded-xl border px-3 py-2.5 text-center text-sm font-semibold transition ${
+                    form.clePlateforme === o.id
+                      ? "border-orange-600 bg-orange-600/10 text-orange-700 dark:text-orange-400"
+                      : "bg-background text-muted-foreground hover:border-ring/50"
+                  }`}
+                >
+                  {o.label}
+                  <span className="block text-xs font-normal">{o.detail}</span>
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">Une seule clé par compte. Les {OFFRE_MOIS} mois démarrent quand vous l&apos;activez dans le logiciel.</p>
+          </div>
+        )}
         <div className="space-y-1">
           <Label htmlFor="reg-password">Mot de passe *</Label>
           <PasswordInput id="reg-password" value={form.password} onChange={set("password")} autoComplete="new-password" placeholder="8 caractères min., majuscule, minuscule, chiffre" />

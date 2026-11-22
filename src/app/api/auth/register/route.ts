@@ -3,7 +3,8 @@ import { ok, fail, handle, rateLimit, getClientIp, logAction, assertSameOrigin }
 import { registerSchema } from "@/lib/validations";
 import { normalizePhoneNumber } from "@/lib/phone";
 import { emailDejaUtilise, numeroDejaUtilise, MESSAGE_EMAIL_PRIS, MESSAGE_NUMERO_PRIS } from "@/lib/unicite";
-import { hashPassword, createSessionToken, SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
+import { hashPassword, createSessionToken, SESSION_COOKIE, sessionCookieOptions, generateLicenseKey } from "@/lib/auth";
+import { offreActive, OFFRE_MOIS } from "@/lib/offre-inscription";
 
 export async function POST(req: Request) {
   return handle(async () => {
@@ -61,6 +62,36 @@ export async function POST(req: Request) {
       });
     }
 
+    // Offre d'inscription : UNE seule clé de ${OFFRE_MOIS} mois par compte, pour la version choisie
+    // (Windows par défaut). La durée démarre à l'activation dans le logiciel.
+    // Un échec ici ne bloque pas l'inscription.
+    let clesOffertes = 0;
+    if (offreActive()) {
+      try {
+        const dejaOfferte = await db.licenseKey.count({
+          where: { userId: user.id, subscriptionId: null, validityMonths: OFFRE_MOIS },
+        });
+        if (dejaOfferte === 0) {
+          const platform = data.clePlateforme ?? "PC";
+          await db.licenseKey.create({
+            data: {
+              key: generateLicenseKey(platform),
+              userId: user.id,
+              subscriptionId: null,
+              status: "INACTIVE",
+              platform,
+              validityMonths: OFFRE_MOIS,
+              maxDevices: 1,
+            },
+          });
+          clesOffertes = 1;
+          await logAction("OFFRE_CLE_OFFERTE", user.id, `Clé ${platform} de ${OFFRE_MOIS} mois offerte à l'inscription`, ip);
+        }
+      } catch (error) {
+        await logAction("OFFRE_CLE_ECHEC", user.id, error instanceof Error ? error.message : "erreur inconnue", ip);
+      }
+    }
+
     // Session automatique après inscription
     const token = await createSessionToken({ userId: user.id, email: user.email, role: user.role });
     await logAction("REGISTER", user.id, `Nouveau compte : ${user.email}`, ip);
@@ -71,6 +102,7 @@ export async function POST(req: Request) {
           id: user.id, firstName: user.firstName, lastName: user.lastName,
           email: user.email, role: user.role,
         },
+        clesOffertes,
       },
       201
     );

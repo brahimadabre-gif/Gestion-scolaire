@@ -65,10 +65,20 @@ export interface LicenseInfo {
   status: string;
 }
 
+export interface DirectKeyInfo {
+  key: string;
+  status: string;
+  platform: "PC" | "ANDROID" | null;
+  validityMonths: number | null;
+  activatedAt: string | null;
+  expiresAt: string | null;
+}
+
 export interface MeResponse {
   user: User;
   subscription: SubscriptionInfo | null;
   licenseKey: LicenseInfo | null;
+  directKeys?: DirectKeyInfo[];
 }
 
 export interface Plan {

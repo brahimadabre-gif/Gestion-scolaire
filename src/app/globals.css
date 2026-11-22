@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant confort (&:is(.confort *));
 
 @theme inline {
   --color-background: var(--background);
@@ -113,6 +114,43 @@
   --sidebar-ring: oklch(0.72 0.17 42);
 }
 
+/* ===== MODE CONFORT (protection des yeux / anti-lumière bleue) =====
+   Comme dans le logiciel : la mise en page claire reste, mais les tons sont
+   réchauffés (fond crème #F3EAD6, cartes #FBF3E2) et un voile ambré léger
+   baisse la lumière bleue. Le voile est un ::after en pointer-events:none
+   pour ne gêner ni les clics ni les éléments en position fixe. */
+.confort {
+  color-scheme: light;
+  --background: #F3EAD6;
+  --foreground: #2f2418;
+  --card: #FBF3E2;
+  --card-foreground: #2f2418;
+  --popover: #FBF3E2;
+  --popover-foreground: #2f2418;
+  --secondary: #EFE3C9;
+  --secondary-foreground: #7a3412;
+  --muted: #F1E7D2;
+  --muted-foreground: #6b5539;
+  --accent: #EBDEC2;
+  --accent-foreground: #7a3412;
+  --border: #E2D2B0;
+  --input: #E2D2B0;
+  --sidebar: #F1E7D2;
+  --sidebar-foreground: #2f2418;
+  --sidebar-accent: #EBDEC2;
+  --sidebar-accent-foreground: #7a3412;
+  --sidebar-border: #E2D2B0;
+}
+html.confort::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  background: rgba(255, 173, 94, 0.10);
+  mix-blend-mode: multiply;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -197,3 +235,14 @@
 
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 }
+
+/* Barre de l'offre d'inscription : le texte part du bord droit et traverse jusqu'au bord gauche, en boucle */
+.offre-defile { overflow: hidden; white-space: nowrap; }
+.offre-defile > span { display: inline-block; padding-left: 100%; animation: offre-defile 28s linear infinite; will-change: transform; }
+.offre-defile:hover > span { animation-play-state: paused; }
+@keyframes offre-defile { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+@media (prefers-reduced-motion: reduce) {
+  .offre-defile > span { animation: none; padding-left: 0; display: block; overflow: hidden; text-overflow: ellipsis; }
+}
+body.avec-offre-bar { padding-bottom: 5.5rem; }
+@media (min-width: 640px) { body.avec-offre-bar { padding-bottom: 3.5rem; } }

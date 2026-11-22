@@ -40,8 +40,16 @@ export async function GET(req: Request) {
       ? await db.licenseKey.findFirst({ where: { userId: user.id, subscriptionId: current.id } })
       : null;
 
+    // Clés à durée (offre d'inscription, codes de l'administration) rattachées au compte
+    const directKeys = await db.licenseKey.findMany({
+      where: { userId: user.id, subscriptionId: null, validityMonths: { not: null } },
+      select: { key: true, status: true, platform: true, validityMonths: true, activatedAt: true, expiresAt: true },
+      orderBy: [{ createdAt: "desc" }, { platform: "desc" }],
+    });
+
     return ok({
       user,
+      directKeys,
       subscription: current
         ? {
             id: current.id,
