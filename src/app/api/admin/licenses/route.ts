@@ -45,13 +45,14 @@ export async function GET(req: Request) {
       deviceFingerprint: license.deviceFingerprint,
       maxDevices: license.maxDevices,
       user: license.user,
+      client: { lastName: license.clientLastName, firstName: license.clientFirstName, school: license.clientSchool, city: license.clientCity },
       subscription: license.subscription,
     })).filter((license) => {
       if (requestedStatus !== "all" && license.status !== requestedStatus.toUpperCase()) return false;
       if (requestedPlatform === "UNKNOWN" && license.platform !== null) return false;
       if ((requestedPlatform === "PC" || requestedPlatform === "ANDROID") && license.platform !== requestedPlatform) return false;
       if (!q) return true;
-      const searchable = [license.key, license.user?.email, license.user?.firstName, license.user?.lastName, license.user?.establishment].filter(Boolean).join(" ").toLocaleLowerCase();
+      const searchable = [license.key, license.user?.email, license.user?.firstName, license.user?.lastName, license.user?.establishment, license.client.lastName, license.client.firstName, license.client.school, license.client.city].filter(Boolean).join(" ").toLocaleLowerCase();
       return searchable.includes(q);
     });
 

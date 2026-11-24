@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { suspensionEnCours } from "@/lib/software-messages-admin";
 import { ok, fail, handle, rateLimit, getClientIp, logAction, withPublicLicenseCors } from "@/lib/api-helpers";
 import { licenseActivateSchema } from "@/lib/validations";
 import { addCalendarMonths } from "@/lib/license-duration";
@@ -44,6 +45,9 @@ export async function POST(req: Request) {
     if (license.user && !license.user.active) return fail("Compte désactivé. Contactez le support.", 403);
 
     const now = new Date();
+    if (await suspensionEnCours({ key: license.key, userId: license.userId }, now)) {
+      return fail("Licence suspendue : paiement non reçu. Contactez le service client.", 403);
+    }
     const subscription = license.subscription;
     if (subscription) {
       if (subscription.status !== "ACTIVE") return fail("Aucun abonnement actif associé à cette licence.", 403);

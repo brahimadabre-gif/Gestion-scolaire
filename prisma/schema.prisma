@@ -173,6 +173,11 @@ model LicenseKey {
   lastCheckAt       DateTime?
   deviceFingerprint String?
   maxDevices        Int           @default(1)
+  // Fiche client saisie par l'administration (clés vendues hors du site, recherche, ciblage des messages)
+  clientLastName    String?
+  clientFirstName   String?
+  clientSchool      String?
+  clientCity        String?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
@@ -347,4 +352,54 @@ model ActivityLog {
   details   String?
   ipAddress String?
   createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────
+// MESSAGES AUX LOGICIELS (écrits dans l'administration)
+// ─────────────────────────────────────────────────────────────
+
+// Message affiché dans les logiciels installés (PC et Android) quand ils se connectent.
+// Les logiciels le demandent à POST /api/software/messages.
+model SoftwareMessage {
+  id                String    @id @default(cuid())
+  title             String
+  body              String
+  kind              String    @default("INFO") // INFO | NEW | IMPORTANT | OFFER | PAYMENT
+  buttonLabel       String?
+  buttonUrl         String?
+  audience          String    @default("ALL") // ALL | PC | ANDROID | SELECTION
+  // Destinataires choisis (audience SELECTION) : comptes et/ou clés de licence.
+  targetUserIds     String[]  @default([])
+  targetKeys        String[]  @default([])
+  status            String    @default("DRAFT") // DRAFT | PUBLISHED | ARCHIVED
+  startsAt          DateTime? // publication programmée (null = dès la publication)
+  endsAt            DateTime? // retrait automatique
+  // Minuteur : échéance affichée en compte à rebours. Avec suspendAtDeadline,
+  // les licences visées sont refusées par /api/license/status après l'échéance
+  // (seulement pour l'audience SELECTION), jusqu'au retrait du message.
+  deadlineAt        DateTime?
+  suspendAtDeadline Boolean   @default(false)
+  publishedAt       DateTime?
+  archivedAt        DateTime?
+  createdById       String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  views SoftwareMessageView[]
+
+  @@index([status, startsAt])
+}
+
+// Accusé de réception : un enregistrement par logiciel (clé de licence ou
+// identifiant d'installation) et par message.
+model SoftwareMessageView {
+  id          String          @id @default(cuid())
+  messageId   String
+  message     SoftwareMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  viewer      String // clé de licence, sinon identifiant d'installation
+  platform    String?
+  deliveredAt DateTime        @default(now())
+  readAt      DateTime?
+
+  @@unique([messageId, viewer])
 }

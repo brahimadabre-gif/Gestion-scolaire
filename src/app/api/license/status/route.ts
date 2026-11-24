@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { suspensionEnCours } from "@/lib/software-messages-admin";
 import { ok, fail, handle, rateLimit, getClientIp, withPublicLicenseCors } from "@/lib/api-helpers";
 import { checkLicensePlatform, detectDevicePlatform, resolveLicensePlatform } from "@/lib/license-platform";
 
@@ -52,6 +53,11 @@ export async function POST(req: Request) {
     if (license.user && !license.user.active) return ok({ valid: false, reason: "ACCOUNT_DISABLED" });
 
     const now = new Date();
+    // Rappel de paiement échu (Administration → Messages) : licence suspendue jusqu'au retrait du message.
+    const suspension = await suspensionEnCours({ key: license.key, userId: license.userId }, now);
+    if (suspension) {
+      return ok({ valid: false, reason: "PAYMENT_OVERDUE", message: "Licence suspendue : paiement non reçu.", suspension: { since: suspension.deadlineAt } });
+    }
     const sub = license.subscription;
     if (sub) {
       if (sub.status === "ACTIVE" && sub.endDate && sub.endDate <= now) {

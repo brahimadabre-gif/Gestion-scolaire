@@ -1,10 +1,16 @@
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { assertSameOrigin, fail, getClientIp, handle, logAction, ok } from "@/lib/api-helpers";
 import { requireAdmin } from "@/lib/auth";
 import { isLicensePlatform, platformFromKey } from "@/lib/license-platform";
 
+const texte = z.string().trim().max(120).optional().default("");
+const clientSchema = z.object({ lastName: texte, firstName: texte, school: texte, city: texte });
+
 // PATCH /api/admin/licenses/:id
-//   { action: "revoke" }                         → révocation définitive
+//   { action: "revoke" }                         → révocation (annulable avec "reactivate")
+//   { action: "reactivate" }                     → remettre en service une clé révoquée
+//   { action: "set-client", client: {...} }      → nom, prénoms, école et ville du client
 //   { action: "set-platform", platform: "PC" }    → rattacher une ancienne clé GSPP- à une plateforme
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   return handle(async () => {
@@ -27,6 +33,34 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       await db.licenseKey.update({ where: { id }, data: { platform } });
       await logAction("LICENSE_PLATFORM_SET", admin.id, `${license.key} → ${platform}`, getClientIp(req));
       return ok({ id, platform });
+    }
+
+    if (action === "set-client") {
+      const fiche = clientSchema.parse((body as { client?: unknown }).client ?? {});
+      const license = await db.licenseKey.findUnique({ where: { id }, select: { key: true } });
+      if (!license) return fail("Licence introuvable.", 404);
+      const data = {
+        clientLastName: fiche.lastName || null,
+        clientFirstName: fiche.firstName || null,
+        clientSchool: fiche.school || null,
+        clientCity: fiche.city || null,
+      };
+      await db.licenseKey.update({ where: { id }, data });
+      await logAction("LICENSE_CLIENT_SET", admin.id, `${license.key} → ${[data.clientLastName, data.clientFirstName, data.clientSchool, data.clientCity].filter(Boolean).join(" · ") || "fiche vidée"}`, getClientIp(req));
+      return ok({ id, ...data });
+    }
+
+    if (action === "reactivate") {
+      const license = await db.licenseKey.findUnique({ where: { id }, select: { key: true, status: true, activatedAt: true } });
+      if (!license) return fail("Licence introuvable.", 404);
+      if (license.status !== "REVOKED") return fail("Cette licence n'est pas révoquée.", 409);
+      // Une clé déjà utilisée redevient active (sa date d'expiration reste la même) ;
+      // une clé jamais activée redevient disponible.
+      const status = license.activatedAt ? "ACTIVE" : "INACTIVE";
+      const changed = await db.licenseKey.updateMany({ where: { id, status: "REVOKED" }, data: { status } });
+      if (changed.count !== 1) return fail("Réactivation impossible, réessayez.", 409);
+      await logAction("LICENSE_REACTIVATED", admin.id, `${license.key} → ${status}`, getClientIp(req));
+      return ok({ id, status });
     }
 
     if (action !== "revoke") return fail("Action invalide.", 400);

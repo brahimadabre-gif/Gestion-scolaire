@@ -27,11 +27,12 @@ import dynamic from "next/dynamic";
 // Graphiques (recharts) chargés dans le navigateur seulement : ils ne pèsent
 // pas sur le programme serveur (limite de taille de Cloudflare Workers).
 const AdminDashboard = dynamic(() => import("./admin-dashboard").then((m) => m.AdminDashboard), { ssr: false, loading: () => <Spinner /> });
+const AdminMessages = dynamic(() => import("./admin-messages").then((m) => m.AdminMessages), { ssr: false, loading: () => <Spinner /> });
 const AdminVisits = dynamic(() => import("./admin-visits").then((m) => m.AdminVisits), { ssr: false, loading: () => <Spinner /> });
 import {
   LayoutDashboard, Users, CreditCard, Receipt, LifeBuoy, Package, Download, BookOpen,
   Newspaper, HelpCircle, MessageSquareQuote, Settings, Plus, Pencil, Trash2,
-  Loader2, TrendingUp, UserCheck, UserX, ShieldCheck, ArrowUpCircle, Activity, KeyRound, Eye,
+  Loader2, TrendingUp, UserCheck, UserX, ShieldCheck, ArrowUpCircle, Activity, KeyRound, Eye, Megaphone,
 } from "lucide-react";
 
 // ═════════════════════════════════════════════════════════════
@@ -933,6 +934,7 @@ export function AdminPage() {
     { id: "users", label: "Utilisateurs", icon: Users },
     { id: "subscriptions", label: "Abonnements", icon: ArrowUpCircle },
     { id: "licenses", label: "Gestion des licences", icon: KeyRound },
+    { id: "messages", label: "Messages aux logiciels", icon: Megaphone },
     { id: "payments", label: "Paiements", icon: Receipt },
     { id: "ambassadors", label: "Ambassadeurs", icon: UserCheck },
     { id: "tickets", label: "Tickets", icon: LifeBuoy },
@@ -974,6 +976,7 @@ export function AdminPage() {
         <TabsContent value="users" className="mt-6"><AdminUsers /></TabsContent>
         <TabsContent value="subscriptions" className="mt-6"><AdminSubscriptions /></TabsContent>
         <TabsContent value="licenses" className="mt-6"><AdminLicenses /></TabsContent>
+        <TabsContent value="messages" className="mt-6"><AdminMessages /></TabsContent>
         <TabsContent value="payments" className="mt-6"><AdminPayments /></TabsContent>
         <TabsContent value="ambassadors" className="mt-6"><AdminAmbassadors /></TabsContent>
         <TabsContent value="tickets" className="mt-6"><AdminTickets /></TabsContent>

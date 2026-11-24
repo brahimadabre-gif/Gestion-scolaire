@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Check, Clipboard, Download, Eye, KeyRound, Loader2, Monitor, Search, ShieldAlert, Smartphone, X } from "lucide-react";
+import { Check, Clipboard, Download, Eye, KeyRound, Loader2, Monitor, RotateCcw, Save, Search, ShieldAlert, Smartphone, X } from "lucide-react";
 
 type LicenseStatus = "AVAILABLE" | "ACTIVE" | "EXPIRED" | "REVOKED";
 type Platform = "PC" | "ANDROID";
@@ -18,6 +18,10 @@ export function PlatformBadge({ platform }: { platform: Platform | null }) {
   const Icon = platform === "ANDROID" ? Smartphone : Monitor;
   return <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${platform === "ANDROID" ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300"}`}><Icon className="h-3.5 w-3.5" aria-hidden="true" />{platformLabels[platform]}</span>;
 }
+interface ClientFiche { lastName: string | null; firstName: string | null; school: string | null; city: string | null }
+const ficheVide: ClientFiche = { lastName: null, firstName: null, school: null, city: null };
+const aUneFiche = (c: ClientFiche | undefined) => Boolean(c && (c.lastName || c.firstName || c.school || c.city));
+const nomClient = (c: ClientFiche) => [c.lastName, c.firstName].filter(Boolean).join(" ");
 interface LicenseRow {
   id: string;
   key: string;
@@ -30,6 +34,7 @@ interface LicenseRow {
   deviceFingerprint: string | null;
   maxDevices: number;
   user: { firstName: string; lastName: string; email: string; establishment: string | null } | null;
+  client: ClientFiche;
   subscription: { status: string; plan: { name: string } } | null;
 }
 interface LicenseResponse { items: LicenseRow[]; truncated: boolean }
@@ -68,6 +73,8 @@ export function AdminLicenses() {
   const [generating, setGenerating] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [details, setDetails] = useState<LicenseRow | null>(null);
+  const [fiche, setFiche] = useState<ClientFiche>(ficheVide);
+  const [savingClient, setSavingClient] = useState(false);
 
   const durationMonths = duration === "custom" ? Number(customMonths) : Number(duration);
   const query = new URLSearchParams({ q: search, status, platform: platformFilter, sort, direction });
@@ -98,7 +105,7 @@ export function AdminLicenses() {
   };
 
   const revoke = async (license: LicenseRow) => {
-    if (!window.confirm(`Révoquer ${license.key} ? Cette action désactivera immédiatement la licence et ne peut pas être annulée.`)) return;
+    if (!window.confirm(`Révoquer ${license.key} ? La licence sera refusée par le logiciel à sa prochaine vérification. Vous pourrez la réactiver plus tard.`)) return;
     try {
       await api.patch(`/api/admin/licenses/${license.id}`, { action: "revoke" });
       toast.success("Licence révoquée.");
@@ -106,6 +113,30 @@ export function AdminLicenses() {
       setDetails(null);
     } catch (error) { toast.error(error instanceof Error ? error.message : "Révocation impossible."); }
   };
+
+  const reactivate = async (license: LicenseRow) => {
+    if (!window.confirm(`Réactiver ${license.key} ? ${license.activatedAt ? "Elle redevient valable jusqu’à sa date d’expiration." : "Elle redevient disponible pour une activation."} Le logiciel l’acceptera à sa prochaine vérification.`)) return;
+    try {
+      await api.patch(`/api/admin/licenses/${license.id}`, { action: "reactivate" });
+      toast.success("Licence réactivée.");
+      await queryClient.invalidateQueries({ queryKey: ["admin", "licenses"] });
+      setDetails(null);
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Réactivation impossible."); }
+  };
+
+  const saveClient = async () => {
+    if (!details) return;
+    setSavingClient(true);
+    try {
+      await api.patch(`/api/admin/licenses/${details.id}`, { action: "set-client", client: { lastName: fiche.lastName ?? "", firstName: fiche.firstName ?? "", school: fiche.school ?? "", city: fiche.city ?? "" } });
+      toast.success("Fiche client enregistrée.");
+      setDetails({ ...details, client: { ...fiche } });
+      await queryClient.invalidateQueries({ queryKey: ["admin", "licenses"] });
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Enregistrement impossible."); }
+    finally { setSavingClient(false); }
+  };
+
+  const openDetails = (license: LicenseRow) => { setFiche({ ...ficheVide, ...license.client }); setDetails(license); };
 
   const assignPlatform = async (license: LicenseRow, value: Platform) => {
     if (!window.confirm(`Rattacher ${license.key} à ${platformLabels[value]} ? La clé sera ensuite refusée sur l’autre plateforme.`)) return;
@@ -118,8 +149,8 @@ export function AdminLicenses() {
   };
 
   const exportCsv = (items: LicenseRow[]) => {
-    const header = ["Code d'activation", "Plateforme", "Création", "Durée", "Client", "E-mail", "Activation", "Expiration", "Statut", "Installation"];
-    const lines = items.map((item) => [item.key, item.platform ? platformLabels[item.platform] : "À rattacher", item.createdAt, durationLabel(item.validityMonths), item.user ? `${item.user.firstName} ${item.user.lastName}` : "", item.user?.email ?? "", item.activatedAt ?? "", item.expiresAt ?? "", statusLabels[item.status], item.deviceFingerprint ?? ""].map(csvCell).join(","));
+    const header = ["Code d'activation", "Plateforme", "Création", "Durée", "Nom", "Prénoms", "École", "Ville", "Compte", "E-mail", "Activation", "Expiration", "Statut", "Installation"];
+    const lines = items.map((item) => [item.key, item.platform ? platformLabels[item.platform] : "À rattacher", item.createdAt, durationLabel(item.validityMonths), item.client?.lastName ?? "", item.client?.firstName ?? "", item.client?.school ?? "", item.client?.city ?? "", item.user ? `${item.user.firstName} ${item.user.lastName}` : "", item.user?.email ?? "", item.activatedAt ?? "", item.expiresAt ?? "", statusLabels[item.status], item.deviceFingerprint ?? ""].map(csvCell).join(","));
     const blob = new Blob(["\uFEFF", [header.map(csvCell).join(","), ...lines].join("\r\n")], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -167,7 +198,7 @@ export function AdminLicenses() {
         </div>
       </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1fr)_170px_170px_170px_auto]">
-        <div className="relative"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" /><Input className="pl-9" value={search} onChange={(event) => { setSelected([]); setSearch(event.target.value); }} placeholder="Rechercher un code ou un client" /></div>
+        <div className="relative"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" /><Input className="pl-9" value={search} onChange={(event) => { setSelected([]); setSearch(event.target.value); }} placeholder="Code, client, école ou ville" /></div>
         <select aria-label="Filtrer par statut" value={status} onChange={(event) => { setSelected([]); setStatus(event.target.value); }} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="all">Tous les statuts</option>{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
         <select aria-label="Filtrer par plateforme" value={platformFilter} onChange={(event) => { setSelected([]); setPlatformFilter(event.target.value); }} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="all">Toutes plateformes</option><option value="PC">PC Windows</option><option value="ANDROID">Android</option><option value="unknown">À rattacher</option></select>
         <select aria-label="Trier les codes" value={sort} onChange={(event) => { setSelected([]); setSort(event.target.value); }} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="createdAt">Date de création</option><option value="activatedAt">Date d’activation</option><option value="expiresAt">Date d’expiration</option><option value="status">Statut</option><option value="key">Code</option></select>
@@ -183,10 +214,10 @@ export function AdminLicenses() {
             <td className="px-3 py-3 font-mono text-xs font-semibold">{item.key}</td>
             <td className="px-3 py-3"><PlatformBadge platform={item.platform} /></td>
             <td className="px-3 py-3">{dateLabel(item.createdAt)}<span className="block text-xs text-muted-foreground">{durationLabel(item.validityMonths)}</span></td>
-            <td className="px-3 py-3">{item.user ? <><span>{item.user.firstName} {item.user.lastName}</span><span className="block text-xs text-muted-foreground">{item.user.email}</span></> : <span className="text-muted-foreground">Non associé</span>}</td>
+            <td className="px-3 py-3">{aUneFiche(item.client) ? <><span className="font-semibold">{item.client.school || nomClient(item.client)}</span><span className="block text-xs text-muted-foreground">{[item.client.school ? nomClient(item.client) : "", item.client.city].filter(Boolean).join(" · ") || (item.user?.email ?? "")}</span></> : item.user ? <><span>{item.user.firstName} {item.user.lastName}</span><span className="block text-xs text-muted-foreground">{item.user.email}</span></> : <button type="button" className="text-xs font-semibold text-orange-700 underline-offset-2 hover:underline dark:text-orange-300" onClick={() => openDetails(item)}>+ Ajouter le client</button>}</td>
             <td className="px-3 py-3">{dateLabel(item.activatedAt)}<span className="block text-xs text-muted-foreground">{dateLabel(item.expiresAt)}</span></td>
             <td className="px-3 py-3"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${item.status === "AVAILABLE" ? "bg-sky-500/10 text-sky-700 dark:text-sky-300" : item.status === "ACTIVE" ? "bg-orange-500/10 text-orange-700 dark:text-orange-300" : item.status === "EXPIRED" ? "bg-amber-500/10 text-amber-700 dark:text-amber-300" : "bg-destructive/10 text-destructive"}`}>{statusLabels[item.status]}</span></td>
-            <td className="px-3 py-3"><div className="flex justify-end gap-1"><Button variant="ghost" size="icon" aria-label={`Copier ${item.key}`} onClick={() => void copy(item.key)}><Clipboard className="h-4 w-4" aria-hidden="true" /></Button><Button variant="ghost" size="icon" aria-label={`Détails ${item.key}`} onClick={() => setDetails(item)}><Eye className="h-4 w-4" aria-hidden="true" /></Button>{(item.status === "AVAILABLE" || item.status === "ACTIVE") && <Button variant="ghost" size="icon" aria-label={`Révoquer ${item.key}`} className="text-destructive" onClick={() => void revoke(item)}><ShieldAlert className="h-4 w-4" aria-hidden="true" /></Button>}</div></td>
+            <td className="px-3 py-3"><div className="flex justify-end gap-1"><Button variant="ghost" size="icon" aria-label={`Copier ${item.key}`} onClick={() => void copy(item.key)}><Clipboard className="h-4 w-4" aria-hidden="true" /></Button><Button variant="ghost" size="icon" aria-label={`Détails ${item.key}`} onClick={() => openDetails(item)}><Eye className="h-4 w-4" aria-hidden="true" /></Button>{(item.status === "AVAILABLE" || item.status === "ACTIVE") && <Button variant="ghost" size="icon" aria-label={`Révoquer ${item.key}`} className="text-destructive" onClick={() => void revoke(item)}><ShieldAlert className="h-4 w-4" aria-hidden="true" /></Button>}{item.status === "REVOKED" && <Button variant="ghost" size="icon" aria-label={`Réactiver ${item.key}`} title="Réactiver" className="text-emerald-700 dark:text-emerald-300" onClick={() => void reactivate(item)}><RotateCcw className="h-4 w-4" aria-hidden="true" /></Button>}</div></td>
           </tr>)}{!rows.length && <tr><td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">Aucun code ne correspond à ces critères.</td></tr>}</tbody>
         </table></div>}
     </section>
@@ -195,15 +226,24 @@ export function AdminLicenses() {
       <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader><DialogTitle>{generatedCodes.length ? "Codes générés" : "Confirmer la génération"}</DialogTitle><DialogDescription>{generatedCodes.length ? "Copiez ou exportez les codes; ils sont aussi consultables dans la liste des licences." : `Vous allez générer ${count} code(s) ${platformLabels[platform]} à usage unique, valable(s) ${durationLabel(durationMonths)} à partir de la première activation.`}</DialogDescription></DialogHeader>
         {generatedCodes.length ? <div className="max-h-64 overflow-auto rounded-lg border bg-muted/30 p-3 font-mono text-sm">{generatedCodes.map((code) => <div key={code} className="py-1">{code}</div>)}</div> : <div className="rounded-xl bg-orange-500/5 p-4 text-sm"><strong>{count} code(s) · {platformLabels[platform]}</strong><span className="block text-muted-foreground">Durée de validité : {durationLabel(durationMonths)}. L’expiration sera calculée par le serveur au premier démarrage autorisé.</span></div>}
-        <DialogFooter>{generatedCodes.length ? <><Button variant="outline" onClick={() => { const generatedRows: LicenseRow[] = generatedCodes.map((key) => ({ id: key, key, platform, status: "AVAILABLE", createdAt: new Date().toISOString(), validityMonths: durationMonths, activatedAt: null, expiresAt: null, deviceFingerprint: null, maxDevices: 1, user: null, subscription: null })); exportCsv(generatedRows); }}><Download className="mr-2 h-4 w-4" aria-hidden="true" />Télécharger CSV</Button><Button onClick={() => void copy(generatedCodes.join("\n"), `${generatedCodes.length} codes copiés.`)}><Clipboard className="mr-2 h-4 w-4" aria-hidden="true" />Copier les codes</Button></> : <><Button variant="outline" onClick={() => setConfirmOpen(false)}>Annuler</Button><Button onClick={() => void generate()} disabled={generating}>{generating && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}Confirmer et générer</Button></>}</DialogFooter>
+        <DialogFooter>{generatedCodes.length ? <><Button variant="outline" onClick={() => { const generatedRows: LicenseRow[] = generatedCodes.map((key) => ({ id: key, key, platform, status: "AVAILABLE", createdAt: new Date().toISOString(), validityMonths: durationMonths, activatedAt: null, expiresAt: null, deviceFingerprint: null, maxDevices: 1, user: null, client: ficheVide, subscription: null })); exportCsv(generatedRows); }}><Download className="mr-2 h-4 w-4" aria-hidden="true" />Télécharger CSV</Button><Button onClick={() => void copy(generatedCodes.join("\n"), `${generatedCodes.length} codes copiés.`)}><Clipboard className="mr-2 h-4 w-4" aria-hidden="true" />Copier les codes</Button></> : <><Button variant="outline" onClick={() => setConfirmOpen(false)}>Annuler</Button><Button onClick={() => void generate()} disabled={generating}>{generating && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}Confirmer et générer</Button></>}</DialogFooter>
       </DialogContent>
     </Dialog>
 
     <Dialog open={!!details} onOpenChange={(open) => { if (!open) setDetails(null); }}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader><DialogTitle>Détails de la licence</DialogTitle><DialogDescription>Informations de création, d’activation et d’installation.</DialogDescription></DialogHeader>
-        {details && <dl className="grid grid-cols-[minmax(120px,0.7fr)_1fr] gap-x-4 gap-y-3 text-sm"><dt className="text-muted-foreground">Code</dt><dd className="break-all font-mono">{details.key}</dd><dt className="text-muted-foreground">Plateforme</dt><dd><PlatformBadge platform={details.platform} />{!details.platform && <span className="mt-2 flex flex-wrap gap-2"><Button size="sm" variant="outline" onClick={() => void assignPlatform(details, "PC")}><Monitor className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />Rattacher au PC</Button><Button size="sm" variant="outline" onClick={() => void assignPlatform(details, "ANDROID")}><Smartphone className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />Rattacher à Android</Button></span>}</dd><dt className="text-muted-foreground">Statut</dt><dd>{statusLabels[details.status]}</dd><dt className="text-muted-foreground">Durée</dt><dd>{durationLabel(details.validityMonths)}</dd><dt className="text-muted-foreground">Création</dt><dd>{dateLabel(details.createdAt)}</dd><dt className="text-muted-foreground">Première activation</dt><dd>{dateLabel(details.activatedAt)}</dd><dt className="text-muted-foreground">Expiration</dt><dd>{dateLabel(details.expiresAt)}</dd><dt className="text-muted-foreground">Client</dt><dd>{details.user ? `${details.user.firstName} ${details.user.lastName} · ${details.user.email}` : "Non associé"}</dd><dt className="text-muted-foreground">Installation</dt><dd className="break-all font-mono text-xs">{details.deviceFingerprint ?? "Non activée"}</dd></dl>}
-        <DialogFooter>{details && (details.status === "AVAILABLE" || details.status === "ACTIVE") && <Button variant="destructive" onClick={() => void revoke(details)}><X className="mr-2 h-4 w-4" aria-hidden="true" />Révoquer</Button>}<Button variant="outline" onClick={() => setDetails(null)}><Check className="mr-2 h-4 w-4" aria-hidden="true" />Fermer</Button></DialogFooter>
+        {details && <dl className="grid grid-cols-[minmax(120px,0.7fr)_1fr] gap-x-4 gap-y-3 text-sm"><dt className="text-muted-foreground">Code</dt><dd className="break-all font-mono">{details.key}</dd><dt className="text-muted-foreground">Plateforme</dt><dd><PlatformBadge platform={details.platform} />{!details.platform && <span className="mt-2 flex flex-wrap gap-2"><Button size="sm" variant="outline" onClick={() => void assignPlatform(details, "PC")}><Monitor className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />Rattacher au PC</Button><Button size="sm" variant="outline" onClick={() => void assignPlatform(details, "ANDROID")}><Smartphone className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />Rattacher à Android</Button></span>}</dd><dt className="text-muted-foreground">Statut</dt><dd>{statusLabels[details.status]}</dd><dt className="text-muted-foreground">Durée</dt><dd>{durationLabel(details.validityMonths)}</dd><dt className="text-muted-foreground">Création</dt><dd>{dateLabel(details.createdAt)}</dd><dt className="text-muted-foreground">Première activation</dt><dd>{dateLabel(details.activatedAt)}</dd><dt className="text-muted-foreground">Expiration</dt><dd>{dateLabel(details.expiresAt)}</dd><dt className="text-muted-foreground">Compte du site</dt><dd>{details.user ? `${details.user.firstName} ${details.user.lastName} · ${details.user.email}` : "Non associé"}</dd><dt className="text-muted-foreground">Installation</dt><dd className="break-all font-mono text-xs">{details.deviceFingerprint ?? "Non activée"}</dd></dl>}
+        {details && <fieldset className="rounded-xl border bg-muted/30 p-4"><legend className="px-1 text-sm font-bold">Fiche client</legend>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="space-y-1 text-xs font-semibold">Nom<Input value={fiche.lastName ?? ""} maxLength={120} placeholder="KOUASSI" onChange={(e) => setFiche({ ...fiche, lastName: e.target.value })} /></label>
+            <label className="space-y-1 text-xs font-semibold">Prénoms<Input value={fiche.firstName ?? ""} maxLength={120} placeholder="Aya Christelle" onChange={(e) => setFiche({ ...fiche, firstName: e.target.value })} /></label>
+            <label className="space-y-1 text-xs font-semibold">École<Input value={fiche.school ?? ""} maxLength={120} placeholder="EPP Les Palmiers" onChange={(e) => setFiche({ ...fiche, school: e.target.value })} /></label>
+            <label className="space-y-1 text-xs font-semibold">Ville<Input value={fiche.city ?? ""} maxLength={120} placeholder="Bouaké" onChange={(e) => setFiche({ ...fiche, city: e.target.value })} /></label>
+          </div>
+          <Button size="sm" className="mt-3 rounded-full" disabled={savingClient} onClick={() => void saveClient()}>{savingClient ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" aria-hidden="true" /> : <Save className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />}Enregistrer la fiche</Button>
+        </fieldset>}
+        <DialogFooter>{details && (details.status === "AVAILABLE" || details.status === "ACTIVE") && <Button variant="destructive" onClick={() => void revoke(details)}><X className="mr-2 h-4 w-4" aria-hidden="true" />Révoquer</Button>}{details?.status === "REVOKED" && <Button className="bg-emerald-600 text-white hover:bg-emerald-700" onClick={() => void reactivate(details)}><RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />Réactiver</Button>}<Button variant="outline" onClick={() => setDetails(null)}><Check className="mr-2 h-4 w-4" aria-hidden="true" />Fermer</Button></DialogFooter>
       </DialogContent>
     </Dialog>
   </div>;
