@@ -35,9 +35,9 @@ function getClientOs(): OS {
 const subscribeNoop = () => () => {};
 const getServerOs = () => "other" as OS;
 
-const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.32.apk";
-const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.32.apk";
-const ANDROID_VERSION = "2.3.32";
+const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.33.apk";
+const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.33.apk";
+const ANDROID_VERSION = "2.3.33";
 const ANDROID_FILE_SIZE = "10 Mo";
 const WINDOWS_VERSION = "2.3.31";
 const WINDOWS_STORE_URL = "https://apps.microsoft.com/detail/9N71Q8PTCPCZ?hl=fr-011&gl=CI&ocid=pdpshare";
@@ -59,6 +59,9 @@ const CHANGELOG: Record<"windows" | "android", string> = {
   ].join("\n"),
   android: [
     `## Version ${ANDROID_VERSION} — Android`,
+    "- **Messages de Gestion Scolaire Pro Plus** : les annonces importantes s'affichent dans une fenêtre à l'ouverture de l'application (« J'ai compris » ou « Plus tard »).",
+    "- **Rappel de paiement** : compte à rebours avant l'échéance ; vos données ne sont jamais effacées et l'accès revient automatiquement dès que le paiement est confirmé.",
+    "- **Licences** : la vérification auprès du serveur fonctionne de nouveau ; une nouvelle clé efface l'ancien blocage.",
     "- **Avis de mise à jour** : le logiciel prévient dès qu'une nouvelle version Android est en ligne et propose de la télécharger (vos données sont sauvegardées avant).",
     "- **Tableau récapitulatif** : les cartes Effectif total, Filles, Garçons, Doublants et Non doublants s'affichent sans déborder sur téléphone.",
     "- **Écrans modernisés** : Convertisseur, EPS, Matières, Bulletins, Liste de classe, Tableau récapitulatif, Rangement, Gestion des élèves, Rapport de fin d'année, Registre matricule et Contacts des parents.",
