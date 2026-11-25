@@ -2,20 +2,20 @@ import { db } from "@/lib/db";
 import { ok, handle } from "@/lib/api-helpers";
 
 const currentRelease = {
-  id: "release-2.3.33",
-  version: "2.3.33",
+  id: "release-2.3.34",
+  version: "2.3.34",
   channel: "stable",
-  releaseDate: new Date("2026-11-24T00:00:00.000Z"),
-  fileSizeMb: 9.98,
+  releaseDate: new Date("2026-11-25T00:00:00.000Z"),
+  fileSizeMb: 10.1,
   minOs: "Android 5.1 ou supérieur, téléphone ou tablette",
   installerName: "APK Android",
-  downloadUrl: "/downloads/Gestion-Scolaire-Pro-v2.3.33.apk",
-  changelog: "## Version 2.3.33 (Android)\n- Messages de Gestion Scolaire Pro Plus : les annonces s’affichent dans une fenêtre à l’ouverture de l’application.\n- Rappel de paiement avec compte à rebours ; vos données ne sont jamais effacées.\n- Licences : la vérification auprès du serveur fonctionne de nouveau.\n- Reprend toutes les nouveautés de la 2.3.32.",
-  md5: "6daec3033a7a99d6e41c19a4250f84d7",
+  downloadUrl: "/downloads/Gestion-Scolaire-Pro-v2.3.34.apk",
+  changelog: "## Version 2.3.34 (Android)\n- Carte scolaire : cartes de toute la classe avec photo, QR code et code-barres, 6 modèles, impression A4 ou carte PVC.\n- Certificats et fiche scolaire : 5 nouveaux modèles aux couleurs de la République.\n- Bulletins : 3 nouveaux modèles (A, C en couleur, E), bulletin affiché en entier sur téléphone, signatures à la bonne taille.\n- Photos des élèves dans Gestion des élèves et la liste des bulletins.\n- Synchronisation Wi-Fi avec la direction dans les deux sens, plus rapide.\n- Reprend toutes les nouveautés de la 2.3.33.",
+  md5: "0621d9814beec50b28caa42c0fa781d9",
   downloads: 0,
   active: true,
-  createdAt: new Date("2026-11-24T00:00:00.000Z"),
-  updatedAt: new Date("2026-11-24T00:00:00.000Z"),
+  createdAt: new Date("2026-11-25T00:00:00.000Z"),
+  updatedAt: new Date("2026-11-25T00:00:00.000Z"),
 };
 
 // GET /api/versions — Dernière version stable active du logiciel (public)

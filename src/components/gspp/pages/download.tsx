@@ -35,9 +35,9 @@ function getClientOs(): OS {
 const subscribeNoop = () => () => {};
 const getServerOs = () => "other" as OS;
 
-const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.33.apk";
-const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.33.apk";
-const ANDROID_VERSION = "2.3.33";
+const ANDROID_INSTALLER_URL = "/downloads/Gestion-Scolaire-Pro-v2.3.34.apk";
+const ANDROID_INSTALLER_NAME = "Gestion-Scolaire-Pro-v2.3.34.apk";
+const ANDROID_VERSION = "2.3.34";
 const ANDROID_FILE_SIZE = "10 Mo";
 const WINDOWS_VERSION = "2.3.31";
 const WINDOWS_STORE_URL = "https://apps.microsoft.com/detail/9N71Q8PTCPCZ?hl=fr-011&gl=CI&ocid=pdpshare";
@@ -59,6 +59,11 @@ const CHANGELOG: Record<"windows" | "android", string> = {
   ].join("\n"),
   android: [
     `## Version ${ANDROID_VERSION} — Android`,
+    "- **Carte scolaire** : cartes de toute la classe (photo, nom, matricule, QR code, code-barres), 6 modèles, impression A4 recto et verso côte à côte ou carte PVC, et export PDF.",
+    "- **Certificats et fiche scolaire** : liste « Modèle » avec 5 nouveaux modèles aux couleurs de la République.",
+    "- **Bulletins** : 3 nouveaux modèles (A, C en couleur, E) ; sur téléphone le bulletin s'affiche en entier, avec un bouton « Taille réelle » pour lire les détails.",
+    "- **Photos des élèves** : vignettes dans Gestion des élèves et dans la liste des bulletins.",
+    "- **Synchronisation Wi-Fi** : notes, absences et photos échangées avec la direction dans les deux sens, plus rapidement.",
     "- **Messages de Gestion Scolaire Pro Plus** : les annonces importantes s'affichent dans une fenêtre à l'ouverture de l'application (« J'ai compris » ou « Plus tard »).",
     "- **Rappel de paiement** : compte à rebours avant l'échéance ; vos données ne sont jamais effacées et l'accès revient automatiquement dès que le paiement est confirmé.",
     "- **Licences** : la vérification auprès du serveur fonctionne de nouveau ; une nouvelle clé efface l'ancien blocage.",
