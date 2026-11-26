@@ -48,7 +48,7 @@ export async function GET(req: Request) {
         where: { status: "COMPLETED", createdAt: { gte: new Date(now.getFullYear(), now.getMonth(), 1) } },
         _sum: { amount: true },
       }),
-      db.activityLog.findMany({ orderBy: { createdAt: "desc" }, take: 12, include: { user: { select: { firstName: true, lastName: true } } } }),
+      db.activityLog.findMany({ where: { action: { not: "TRIAL_START" } }, orderBy: { createdAt: "desc" }, take: 12, include: { user: { select: { firstName: true, lastName: true } } } }),
       db.user.findMany({ orderBy: { createdAt: "desc" }, take: 5, select: { id: true, firstName: true, lastName: true, email: true, createdAt: true, role: true, active: true } }),
       db.softwareVersion.findFirst({ where: { active: true }, orderBy: { releaseDate: "desc" } }),
       db.licenseKey.findMany({
