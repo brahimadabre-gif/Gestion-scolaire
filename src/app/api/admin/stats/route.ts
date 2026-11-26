@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { ok, handle } from "@/lib/api-helpers";
 import { requireAdmin } from "@/lib/auth";
 import { getLicenseStatus, type LicenseStatus } from "@/lib/license-duration";
-import { resolveLicensePlatform, type LicensePlatform } from "@/lib/license-platform";
+import { productFromKey, resolveLicensePlatform, type LicensePlatform } from "@/lib/license-platform";
 
 type PlatformKey = LicensePlatform | "UNKNOWN";
 const PLATFORM_KEYS: PlatformKey[] = ["PC", "ANDROID", "UNKNOWN"];
@@ -71,7 +71,8 @@ export async function GET(req: Request) {
     // sans compte compte pour un client (une installation).
     const clients: Record<PlatformKey, Set<string>> = { PC: new Set(), ANDROID: new Set(), UNKNOWN: new Set() };
 
-    const enriched = licenses.map((license) => {
+    // Tableau de bord de Gestion Scolaire Pro : les clés Cantine Pro (CPPC- / CPAN-) n'y sont pas comptées
+    const enriched = licenses.filter((license) => productFromKey(license.key) === "GSPP").map((license) => {
       const platform: PlatformKey = resolveLicensePlatform(license) ?? "UNKNOWN";
       const status = getLicenseStatus({
         status: license.status,

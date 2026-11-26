@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { assertSameOrigin, fail, getClientIp, handle, logAction, rateLimit, ok } from "@/lib/api-helpers";
 import { generateLicenseKey, requireAdmin } from "@/lib/auth";
 import { getLicenseStatus } from "@/lib/license-duration";
-import { LICENSE_PLATFORMS, PRODUCTS, PRODUCT_LABELS, productFromKey, resolveLicensePlatform } from "@/lib/license-platform";
+import { LICENSE_PLATFORMS, PRODUCTS, PRODUCT_LABELS, normalizeProduct, productFromKey, resolveLicensePlatform } from "@/lib/license-platform";
 
 const createSchema = z.object({
   count: z.number().int().min(1).max(100),
@@ -21,6 +21,8 @@ export async function GET(req: Request) {
     const q = (url.searchParams.get("q") ?? "").trim().slice(0, 120).toLocaleLowerCase();
     const requestedStatus = url.searchParams.get("status") ?? "all";
     const requestedPlatform = (url.searchParams.get("platform") ?? "all").toUpperCase();
+    // Les codes Cantine Pro et Gestion Scolaire Pro ne sont jamais listés ensemble
+    const requestedProduct = normalizeProduct(url.searchParams.get("product"));
     const sort = url.searchParams.get("sort") ?? "createdAt";
     const direction = url.searchParams.get("direction") === "asc" ? 1 : -1;
     const now = new Date();
@@ -51,6 +53,7 @@ export async function GET(req: Request) {
       client: { lastName: license.clientLastName, firstName: license.clientFirstName, school: license.clientSchool, city: license.clientCity },
       subscription: license.subscription,
     })).filter((license) => {
+      if (license.product !== requestedProduct) return false;
       if (requestedStatus !== "all" && license.status !== requestedStatus.toUpperCase()) return false;
       if (requestedPlatform === "UNKNOWN" && license.platform !== null) return false;
       if ((requestedPlatform === "PC" || requestedPlatform === "ANDROID") && license.platform !== requestedPlatform) return false;

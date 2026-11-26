@@ -81,9 +81,9 @@ export function AdminLicenses() {
   const [savingClient, setSavingClient] = useState(false);
 
   const durationMonths = duration === "custom" ? Number(customMonths) : Number(duration);
-  const query = new URLSearchParams({ q: search, status, platform: platformFilter, sort, direction });
+  const query = new URLSearchParams({ q: search, status, platform: platformFilter, sort, direction, product });
   const { data, isLoading, isError, refetch } = useQuery<LicenseResponse>({
-    queryKey: ["admin", "licenses", search, status, platformFilter, sort, direction],
+    queryKey: ["admin", "licenses", product, search, status, platformFilter, sort, direction],
     queryFn: () => api.get<LicenseResponse>(`/api/admin/licenses?${query.toString()}`),
   });
   const rows = data?.items ?? [];
@@ -159,7 +159,7 @@ export function AdminLicenses() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `licences-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `licences-${product === "CANTINE" ? "cantine-pro" : "gestion-scolaire-pro"}-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -167,16 +167,19 @@ export function AdminLicenses() {
   const toggleRow = (id: string) => setSelected((current) => current.includes(id) ? current.filter((value) => value !== id) : [...current, id]);
   const exportRows = selected.length ? rows.filter((item) => selected.includes(item.id)) : rows;
 
+  const changerLogiciel = (value: "GSPP" | "CANTINE") => { setProduct(value); setSelected([]); setGeneratedCodes([]); setPlatformFilter("all"); };
+
   return <div className="space-y-6">
+    {/* Un onglet par logiciel : génération ET liste ne concernent que le logiciel choisi */}
+    <div role="tablist" aria-label="Logiciel" className="grid grid-cols-2 gap-1 rounded-2xl border bg-muted/50 p-1 sm:inline-grid sm:min-w-[440px]">
+      {(["GSPP", "CANTINE"] as const).map((value) => <button key={value} type="button" role="tab" aria-selected={product === value} onClick={() => changerLogiciel(value)} className={`rounded-xl px-4 py-2.5 text-sm font-bold transition ${product === value ? "bg-orange-600 text-white shadow-sm" : "text-muted-foreground hover:bg-background hover:text-foreground"}`}>{value === "GSPP" ? "Gestion Scolaire Pro" : "Cantine Pro"}</button>)}
+    </div>
     <section className="rounded-2xl border bg-card p-5 sm:p-6">
       <div className="flex items-start gap-3">
         <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500/10 text-orange-700 dark:text-orange-300"><KeyRound className="h-5 w-5" aria-hidden="true" /></span>
-        <div><h2 className="text-lg font-bold">Générer des codes d’activation</h2><p className="mt-1 text-sm text-muted-foreground">Les codes commencent leur durée à la première activation dans le logiciel. Chaque code est limité à une installation, à son logiciel et à sa plateforme : GSPC- / GSAN- pour Gestion Scolaire Pro, CPPC- / CPAN- pour Cantine Pro.</p></div>
+        <div><h2 className="text-lg font-bold">Générer des codes {productLabel}</h2><p className="mt-1 text-sm text-muted-foreground">Les codes commencent leur durée à la première activation dans le logiciel. Chaque code est limité à une installation et à sa plateforme : {product === "CANTINE" ? "CPPC- pour le PC, CPAN- pour Android. Ils ne fonctionnent que dans Cantine Pro." : "GSPC- pour le PC, GSAN- pour Android. Ils ne fonctionnent que dans Gestion Scolaire Pro."}</p></div>
       </div>
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <fieldset className="space-y-1.5 text-sm font-medium"><legend className="mb-1.5">Logiciel</legend>
-          <div className="grid grid-cols-2 gap-2">{(["GSPP", "CANTINE"] as const).map((value) => <button key={value} type="button" aria-pressed={product === value} onClick={() => setProduct(value)} className={`flex h-10 items-center justify-center rounded-md border px-2 text-sm font-semibold transition ${product === value ? "border-orange-600 bg-orange-600 text-white" : "border-input bg-background hover:bg-secondary"}`}>{value === "GSPP" ? "Gestion Scolaire" : "Cantine Pro"}</button>)}</div>
-        </fieldset>
         <fieldset className="space-y-1.5 text-sm font-medium"><legend className="mb-1.5">Plateforme</legend>
           <div className="grid grid-cols-2 gap-2">{(["PC", "ANDROID"] as Platform[]).map((value) => { const Icon = value === "ANDROID" ? Smartphone : Monitor; return <button key={value} type="button" aria-pressed={platform === value} onClick={() => setPlatform(value)} className={`flex h-10 items-center justify-center gap-1.5 rounded-md border text-sm font-semibold transition ${platform === value ? "border-orange-600 bg-orange-600 text-white" : "border-input bg-background hover:bg-secondary"}`}><Icon className="h-4 w-4" aria-hidden="true" />{value === "PC" ? "PC" : "Android"}</button>; })}</div>
         </fieldset>
@@ -198,7 +201,7 @@ export function AdminLicenses() {
 
     <section className="rounded-2xl border bg-card p-5 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div><h2 className="text-lg font-bold">Codes d’activation</h2><p className="text-sm text-muted-foreground">Recherche, suivi, révocation et export des licences.</p></div>
+        <div><h2 className="text-lg font-bold">Codes {productLabel}</h2><p className="text-sm text-muted-foreground">Recherche, suivi, révocation et export des licences {productLabel} uniquement.</p></div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" className="rounded-full" disabled={!rows.length} onClick={() => copy(exportRows.map((item) => item.key).join("\n"), `${exportRows.length} code(s) copié(s).`)}><Clipboard className="mr-2 h-4 w-4" aria-hidden="true" />Copier {selected.length ? `(${selected.length})` : "les codes"}</Button>
           <Button variant="outline" className="rounded-full" disabled={!rows.length} onClick={() => exportCsv(exportRows)}><Download className="mr-2 h-4 w-4" aria-hidden="true" />Exporter CSV {selected.length ? `(${selected.length})` : ""}</Button>
@@ -219,13 +222,13 @@ export function AdminLicenses() {
           <tbody className="divide-y">{rows.map((item) => <tr key={item.id} className="hover:bg-secondary/30">
             <td className="px-3 py-3"><input aria-label={`Sélectionner ${item.key}`} type="checkbox" checked={selected.includes(item.id)} onChange={() => toggleRow(item.id)} /></td>
             <td className="px-3 py-3 font-mono text-xs font-semibold">{item.key}</td>
-            <td className="px-3 py-3"><PlatformBadge platform={item.platform} />{item.product === "CANTINE" && <span className="ml-1 inline-flex rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:text-amber-300">Cantine Pro</span>}</td>
+            <td className="px-3 py-3"><PlatformBadge platform={item.platform} /></td>
             <td className="px-3 py-3">{dateLabel(item.createdAt)}<span className="block text-xs text-muted-foreground">{durationLabel(item.validityMonths)}</span></td>
             <td className="px-3 py-3">{aUneFiche(item.client) ? <><span className="font-semibold">{item.client.school || nomClient(item.client)}</span><span className="block text-xs text-muted-foreground">{[item.client.school ? nomClient(item.client) : "", item.client.city].filter(Boolean).join(" · ") || (item.user?.email ?? "")}</span></> : item.user ? <><span>{item.user.firstName} {item.user.lastName}</span><span className="block text-xs text-muted-foreground">{item.user.email}</span></> : <button type="button" className="text-xs font-semibold text-orange-700 underline-offset-2 hover:underline dark:text-orange-300" onClick={() => openDetails(item)}>+ Ajouter le client</button>}</td>
             <td className="px-3 py-3">{dateLabel(item.activatedAt)}<span className="block text-xs text-muted-foreground">{dateLabel(item.expiresAt)}</span></td>
             <td className="px-3 py-3"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${item.status === "AVAILABLE" ? "bg-sky-500/10 text-sky-700 dark:text-sky-300" : item.status === "ACTIVE" ? "bg-orange-500/10 text-orange-700 dark:text-orange-300" : item.status === "EXPIRED" ? "bg-amber-500/10 text-amber-700 dark:text-amber-300" : "bg-destructive/10 text-destructive"}`}>{statusLabels[item.status]}</span></td>
             <td className="px-3 py-3"><div className="flex justify-end gap-1"><Button variant="ghost" size="icon" aria-label={`Copier ${item.key}`} onClick={() => void copy(item.key)}><Clipboard className="h-4 w-4" aria-hidden="true" /></Button><Button variant="ghost" size="icon" aria-label={`Détails ${item.key}`} onClick={() => openDetails(item)}><Eye className="h-4 w-4" aria-hidden="true" /></Button>{(item.status === "AVAILABLE" || item.status === "ACTIVE") && <Button variant="ghost" size="icon" aria-label={`Révoquer ${item.key}`} className="text-destructive" onClick={() => void revoke(item)}><ShieldAlert className="h-4 w-4" aria-hidden="true" /></Button>}{item.status === "REVOKED" && <Button variant="ghost" size="icon" aria-label={`Réactiver ${item.key}`} title="Réactiver" className="text-emerald-700 dark:text-emerald-300" onClick={() => void reactivate(item)}><RotateCcw className="h-4 w-4" aria-hidden="true" /></Button>}</div></td>
-          </tr>)}{!rows.length && <tr><td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">Aucun code ne correspond à ces critères.</td></tr>}</tbody>
+          </tr>)}{!rows.length && <tr><td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">Aucun code {productLabel} ne correspond à ces critères.</td></tr>}</tbody>
         </table></div>}
     </section>
 
