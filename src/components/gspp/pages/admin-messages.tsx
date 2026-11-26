@@ -19,7 +19,7 @@ import {
 
 // ── Types ─────────────────────────────────────────────────────
 type Kind = "INFO" | "NEW" | "IMPORTANT" | "OFFER" | "PAYMENT";
-type Audience = "ALL" | "PC" | "ANDROID" | "SELECTION";
+type Audience = "ALL" | "PC" | "ANDROID" | "CANTINE" | "CANTINE_PC" | "CANTINE_ANDROID" | "SELECTION";
 type ModeCible = "ALL" | "PC" | "ANDROID" | "COCHER" | "CLES";
 type Minuteur = "AUCUN" | "2" | "24" | "48" | "DATE";
 
@@ -178,6 +178,7 @@ export function AdminMessages() {
     return { label: "En ligne", cls: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" };
   };
   const cible = (m: Message) => m.audience === "ALL" ? "Tous les logiciels" : m.audience === "PC" ? "PC seulement" : m.audience === "ANDROID" ? "Android seulement"
+    : m.audience === "CANTINE" ? "Cantine Pro : tous" : m.audience === "CANTINE_PC" ? "Cantine Pro : PC" : m.audience === "CANTINE_ANDROID" ? "Cantine Pro : Android"
     : `${m.targetUserIds.length ? `${m.targetUserIds.length} compte(s)` : ""}${m.targetUserIds.length && m.targetKeys.length ? " + " : ""}${m.targetKeys.length ? `${m.targetKeys.length} clé(s)` : ""}`;
 
   return (
@@ -253,8 +254,13 @@ function Assistant({ brouillon, onFin }: { brouillon: Message | null; onFin: () 
   const [minuteur, setMinuteur] = useState<Minuteur>(brouillon?.deadlineAt ? "DATE" : "AUCUN");
   const [dateEcheance, setDateEcheance] = useState(versLocal(brouillon?.deadlineAt ?? null));
   const [suspendre, setSuspendre] = useState(brouillon?.suspendAtDeadline ?? false);
+  // Logiciel visé par « Tout le monde / PC / Android » : Gestion Scolaire Pro ou Cantine Pro
+  const [logiciel, setLogiciel] = useState<"GSPP" | "CANTINE">(brouillon?.audience.startsWith("CANTINE") ? "CANTINE" : "GSPP");
   const [mode, setMode] = useState<ModeCible>(() => {
     if (!brouillon) return "ALL";
+    if (brouillon.audience === "CANTINE") return "ALL";
+    if (brouillon.audience === "CANTINE_PC") return "PC";
+    if (brouillon.audience === "CANTINE_ANDROID") return "ANDROID";
     if (brouillon.audience !== "SELECTION") return brouillon.audience;
     return brouillon.targetUserIds.length || !brouillon.targetKeys.length ? "COCHER" : "CLES";
   });
@@ -323,7 +329,7 @@ function Assistant({ brouillon, onFin }: { brouillon: Message | null; onFin: () 
     const payload = {
       title: title.trim(), body: body.trim(), kind,
       buttonLabel: buttonUrl ? buttonLabel.trim() : null, buttonUrl: buttonUrl.trim() || null,
-      audience: (selection ? "SELECTION" : mode) as Audience,
+      audience: (selection ? "SELECTION" : logiciel === "CANTINE" ? (mode === "ALL" ? "CANTINE" : `CANTINE_${mode}`) : mode) as Audience,
       targetUserIds: ciblesUsers, targetKeys: ciblesCles,
       startsAt: quand === "PROGRAMMER" ? depuisLocal(debut) : null,
       endsAt: depuisLocal(fin),
@@ -352,7 +358,8 @@ function Assistant({ brouillon, onFin }: { brouillon: Message | null; onFin: () 
     { n: 2, titre: "Choisir les destinataires", sous: "Tous, PC, Android ou des écoles précises" },
     { n: 3, titre: "Vérifier et publier", sous: "Aperçu PC et téléphone" },
   ];
-  const resume = mode === "ALL" ? "Tous les logiciels" : mode === "PC" ? "Tous les PC" : mode === "ANDROID" ? "Tous les téléphones Android"
+  const nomLogiciel = logiciel === "CANTINE" ? " Cantine Pro" : ""
+  const resume = mode === "ALL" ? `Tous les logiciels${nomLogiciel}` : mode === "PC" ? `Tous les PC${nomLogiciel}` : mode === "ANDROID" ? `Tous les téléphones Android${nomLogiciel}`
     : `${nbCibles} destinataire(s)`;
   const deadline = echeance();
 
@@ -402,6 +409,10 @@ function Assistant({ brouillon, onFin }: { brouillon: Message | null; onFin: () 
 
       {/* ── Étape 2 : destinataires ── */}
       {etape === 2 && <section className="rounded-2xl border bg-card p-5 sm:p-6">
+        <div className="mb-4 flex flex-wrap items-center gap-2"><span className="text-sm font-semibold">Logiciel :</span>
+          <Puce actif={logiciel === "GSPP"} onClick={() => setLogiciel("GSPP")}>Gestion Scolaire Pro</Puce>
+          <Puce actif={logiciel === "CANTINE"} onClick={() => setLogiciel("CANTINE")}>Cantine Pro</Puce>
+        </div>
         <div className="flex flex-wrap gap-2">
           <Puce actif={mode === "ALL"} disabled={suspendre && minuteur !== "AUCUN"} title={suspendre ? "Impossible avec la suspension" : undefined} onClick={() => setMode("ALL")}><Globe className="h-3.5 w-3.5" aria-hidden="true" />Tout le monde</Puce>
           <Puce actif={mode === "PC"} disabled={suspendre && minuteur !== "AUCUN"} onClick={() => setMode("PC")}><Monitor className="h-3.5 w-3.5" aria-hidden="true" />PC seulement</Puce>
@@ -410,7 +421,7 @@ function Assistant({ brouillon, onFin }: { brouillon: Message | null; onFin: () 
           <Puce actif={mode === "CLES"} onClick={() => setMode("CLES")}><KeyRound className="h-3.5 w-3.5" aria-hidden="true" />Coller des clés</Puce>
         </div>
 
-        {(mode === "ALL" || mode === "PC" || mode === "ANDROID") && <p className="mt-5 rounded-xl bg-muted/40 p-4 text-sm text-muted-foreground">Le message ira à {mode === "ALL" ? "tous les logiciels" : mode === "PC" ? "tous les logiciels PC" : "tous les logiciels Android"}, y compris ceux encore en essai sans clé.</p>}
+        {(mode === "ALL" || mode === "PC" || mode === "ANDROID") && <p className="mt-5 rounded-xl bg-muted/40 p-4 text-sm text-muted-foreground">Le message ira à {mode === "ALL" ? "tous les logiciels" : mode === "PC" ? "tous les logiciels PC" : "tous les logiciels Android"}{logiciel === "CANTINE" ? " Cantine Pro" : " Gestion Scolaire Pro"}, y compris ceux encore en essai sans clé.</p>}
 
         {mode === "CLES" && <div className="mt-5 space-y-2">
           <label className="block space-y-1.5 text-sm font-semibold">Clés de licence (une par ligne, ou séparées par des virgules)<Textarea rows={6} className="font-mono text-sm" value={clesCollees} onChange={(e) => setClesCollees(e.target.value)} placeholder={"GSPC-XXXX-XXXX-XXXX\nGSAN-XXXX-XXXX-XXXX"} /></label>

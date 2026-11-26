@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { ok, fail, handle, getClientIp, logAction, assertSameOrigin } from "@/lib/api-helpers";
 import { requireAdmin, generateLicenseKey } from "@/lib/auth";
 import { confirmPaymentAndActivate, subscriptionEndDate } from "@/lib/billing";
-import { platformFromPlan } from "@/lib/license-platform";
+import { platformFromPlan, productFromPlan } from "@/lib/license-platform";
 
 // ── Mise à jour d'un enregistrement d'administration ─────────
 // PATCH /api/admin/[entity]/[id]  —  liste blanche stricte d'entités
@@ -98,7 +98,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ entity
             const platform = platformFromPlan(sub.plan) ?? "PC";
             await db.licenseKey.create({
               data: {
-                key: generateLicenseKey(platform),
+                key: generateLicenseKey(platform, productFromPlan(sub.plan)),
                 platform,
                 userId: sub.userId,
                 subscriptionId: sub.id,

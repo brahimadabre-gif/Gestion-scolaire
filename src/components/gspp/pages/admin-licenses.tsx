@@ -26,6 +26,8 @@ interface LicenseRow {
   id: string;
   key: string;
   platform: Platform | null;
+  // GSPP = Gestion Scolaire Pro ; CANTINE = Cantine Pro (clés CPPC- / CPAN-)
+  product?: "GSPP" | "CANTINE";
   status: LicenseStatus;
   createdAt: string;
   validityMonths: number | null;
@@ -63,6 +65,8 @@ export function AdminLicenses() {
   const [status, setStatus] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [platform, setPlatform] = useState<Platform>("PC");
+  const [product, setProduct] = useState<"GSPP" | "CANTINE">("GSPP");
+  const productLabel = product === "CANTINE" ? "Cantine Pro" : "Gestion Scolaire Pro";
   const [sort, setSort] = useState("createdAt");
   const [direction, setDirection] = useState("desc");
   const [count, setCount] = useState("1");
@@ -94,7 +98,7 @@ export function AdminLicenses() {
   const generate = async () => {
     setGenerating(true);
     try {
-      const result = await api.post<{ codes: string[] }>("/api/admin/licenses", { count: Number(count), durationMonths, platform });
+      const result = await api.post<{ codes: string[] }>("/api/admin/licenses", { count: Number(count), durationMonths, platform, product });
       setGeneratedCodes(result.codes);
       setSelected([]);
       await queryClient.invalidateQueries({ queryKey: ["admin", "licenses"] });
@@ -167,9 +171,12 @@ export function AdminLicenses() {
     <section className="rounded-2xl border bg-card p-5 sm:p-6">
       <div className="flex items-start gap-3">
         <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500/10 text-orange-700 dark:text-orange-300"><KeyRound className="h-5 w-5" aria-hidden="true" /></span>
-        <div><h2 className="text-lg font-bold">Générer des codes d’activation</h2><p className="mt-1 text-sm text-muted-foreground">Les codes commencent leur durée à la première activation dans le logiciel. Chaque code est limité à une installation et à sa plateforme : GSPC- pour le PC, GSAN- pour Android.</p></div>
+        <div><h2 className="text-lg font-bold">Générer des codes d’activation</h2><p className="mt-1 text-sm text-muted-foreground">Les codes commencent leur durée à la première activation dans le logiciel. Chaque code est limité à une installation, à son logiciel et à sa plateforme : GSPC- / GSAN- pour Gestion Scolaire Pro, CPPC- / CPAN- pour Cantine Pro.</p></div>
       </div>
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <fieldset className="space-y-1.5 text-sm font-medium"><legend className="mb-1.5">Logiciel</legend>
+          <div className="grid grid-cols-2 gap-2">{(["GSPP", "CANTINE"] as const).map((value) => <button key={value} type="button" aria-pressed={product === value} onClick={() => setProduct(value)} className={`flex h-10 items-center justify-center rounded-md border px-2 text-sm font-semibold transition ${product === value ? "border-orange-600 bg-orange-600 text-white" : "border-input bg-background hover:bg-secondary"}`}>{value === "GSPP" ? "Gestion Scolaire" : "Cantine Pro"}</button>)}</div>
+        </fieldset>
         <fieldset className="space-y-1.5 text-sm font-medium"><legend className="mb-1.5">Plateforme</legend>
           <div className="grid grid-cols-2 gap-2">{(["PC", "ANDROID"] as Platform[]).map((value) => { const Icon = value === "ANDROID" ? Smartphone : Monitor; return <button key={value} type="button" aria-pressed={platform === value} onClick={() => setPlatform(value)} className={`flex h-10 items-center justify-center gap-1.5 rounded-md border text-sm font-semibold transition ${platform === value ? "border-orange-600 bg-orange-600 text-white" : "border-input bg-background hover:bg-secondary"}`}><Icon className="h-4 w-4" aria-hidden="true" />{value === "PC" ? "PC" : "Android"}</button>; })}</div>
         </fieldset>
@@ -212,7 +219,7 @@ export function AdminLicenses() {
           <tbody className="divide-y">{rows.map((item) => <tr key={item.id} className="hover:bg-secondary/30">
             <td className="px-3 py-3"><input aria-label={`Sélectionner ${item.key}`} type="checkbox" checked={selected.includes(item.id)} onChange={() => toggleRow(item.id)} /></td>
             <td className="px-3 py-3 font-mono text-xs font-semibold">{item.key}</td>
-            <td className="px-3 py-3"><PlatformBadge platform={item.platform} /></td>
+            <td className="px-3 py-3"><PlatformBadge platform={item.platform} />{item.product === "CANTINE" && <span className="ml-1 inline-flex rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:text-amber-300">Cantine Pro</span>}</td>
             <td className="px-3 py-3">{dateLabel(item.createdAt)}<span className="block text-xs text-muted-foreground">{durationLabel(item.validityMonths)}</span></td>
             <td className="px-3 py-3">{aUneFiche(item.client) ? <><span className="font-semibold">{item.client.school || nomClient(item.client)}</span><span className="block text-xs text-muted-foreground">{[item.client.school ? nomClient(item.client) : "", item.client.city].filter(Boolean).join(" · ") || (item.user?.email ?? "")}</span></> : item.user ? <><span>{item.user.firstName} {item.user.lastName}</span><span className="block text-xs text-muted-foreground">{item.user.email}</span></> : <button type="button" className="text-xs font-semibold text-orange-700 underline-offset-2 hover:underline dark:text-orange-300" onClick={() => openDetails(item)}>+ Ajouter le client</button>}</td>
             <td className="px-3 py-3">{dateLabel(item.activatedAt)}<span className="block text-xs text-muted-foreground">{dateLabel(item.expiresAt)}</span></td>
@@ -224,9 +231,9 @@ export function AdminLicenses() {
 
     <Dialog open={confirmOpen} onOpenChange={(open) => { if (!generating) setConfirmOpen(open); }}>
       <DialogContent className="max-h-[85vh] overflow-y-auto">
-        <DialogHeader><DialogTitle>{generatedCodes.length ? "Codes générés" : "Confirmer la génération"}</DialogTitle><DialogDescription>{generatedCodes.length ? "Copiez ou exportez les codes; ils sont aussi consultables dans la liste des licences." : `Vous allez générer ${count} code(s) ${platformLabels[platform]} à usage unique, valable(s) ${durationLabel(durationMonths)} à partir de la première activation.`}</DialogDescription></DialogHeader>
-        {generatedCodes.length ? <div className="max-h-64 overflow-auto rounded-lg border bg-muted/30 p-3 font-mono text-sm">{generatedCodes.map((code) => <div key={code} className="py-1">{code}</div>)}</div> : <div className="rounded-xl bg-orange-500/5 p-4 text-sm"><strong>{count} code(s) · {platformLabels[platform]}</strong><span className="block text-muted-foreground">Durée de validité : {durationLabel(durationMonths)}. L’expiration sera calculée par le serveur au premier démarrage autorisé.</span></div>}
-        <DialogFooter>{generatedCodes.length ? <><Button variant="outline" onClick={() => { const generatedRows: LicenseRow[] = generatedCodes.map((key) => ({ id: key, key, platform, status: "AVAILABLE", createdAt: new Date().toISOString(), validityMonths: durationMonths, activatedAt: null, expiresAt: null, deviceFingerprint: null, maxDevices: 1, user: null, client: ficheVide, subscription: null })); exportCsv(generatedRows); }}><Download className="mr-2 h-4 w-4" aria-hidden="true" />Télécharger CSV</Button><Button onClick={() => void copy(generatedCodes.join("\n"), `${generatedCodes.length} codes copiés.`)}><Clipboard className="mr-2 h-4 w-4" aria-hidden="true" />Copier les codes</Button></> : <><Button variant="outline" onClick={() => setConfirmOpen(false)}>Annuler</Button><Button onClick={() => void generate()} disabled={generating}>{generating && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}Confirmer et générer</Button></>}</DialogFooter>
+        <DialogHeader><DialogTitle>{generatedCodes.length ? "Codes générés" : "Confirmer la génération"}</DialogTitle><DialogDescription>{generatedCodes.length ? "Copiez ou exportez les codes; ils sont aussi consultables dans la liste des licences." : `Vous allez générer ${count} code(s) ${productLabel} ${platformLabels[platform]} à usage unique, valable(s) ${durationLabel(durationMonths)} à partir de la première activation.`}</DialogDescription></DialogHeader>
+        {generatedCodes.length ? <div className="max-h-64 overflow-auto rounded-lg border bg-muted/30 p-3 font-mono text-sm">{generatedCodes.map((code) => <div key={code} className="py-1">{code}</div>)}</div> : <div className="rounded-xl bg-orange-500/5 p-4 text-sm"><strong>{count} code(s) · {productLabel} · {platformLabels[platform]}</strong><span className="block text-muted-foreground">Durée de validité : {durationLabel(durationMonths)}. L’expiration sera calculée par le serveur au premier démarrage autorisé.</span></div>}
+        <DialogFooter>{generatedCodes.length ? <><Button variant="outline" onClick={() => { const generatedRows: LicenseRow[] = generatedCodes.map((key) => ({ id: key, key, platform, product, status: "AVAILABLE", createdAt: new Date().toISOString(), validityMonths: durationMonths, activatedAt: null, expiresAt: null, deviceFingerprint: null, maxDevices: 1, user: null, client: ficheVide, subscription: null })); exportCsv(generatedRows); }}><Download className="mr-2 h-4 w-4" aria-hidden="true" />Télécharger CSV</Button><Button onClick={() => void copy(generatedCodes.join("\n"), `${generatedCodes.length} codes copiés.`)}><Clipboard className="mr-2 h-4 w-4" aria-hidden="true" />Copier les codes</Button></> : <><Button variant="outline" onClick={() => setConfirmOpen(false)}>Annuler</Button><Button onClick={() => void generate()} disabled={generating}>{generating && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}Confirmer et générer</Button></>}</DialogFooter>
       </DialogContent>
     </Dialog>
 

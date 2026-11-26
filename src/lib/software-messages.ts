@@ -4,7 +4,9 @@ import { z } from "zod";
 
 export const MESSAGE_KINDS = ["INFO", "NEW", "IMPORTANT", "OFFER", "PAYMENT"] as const;
 export type MessageKind = (typeof MESSAGE_KINDS)[number];
-export const MESSAGE_AUDIENCES = ["ALL", "PC", "ANDROID", "SELECTION"] as const;
+// ALL / PC / ANDROID : logiciels Gestion Scolaire Pro ; CANTINE / CANTINE_PC / CANTINE_ANDROID : logiciels Cantine Pro ;
+// SELECTION : comptes ou clés choisis (les clés portent déjà leur logiciel).
+export const MESSAGE_AUDIENCES = ["ALL", "PC", "ANDROID", "CANTINE", "CANTINE_PC", "CANTINE_ANDROID", "SELECTION"] as const;
 export type MessageAudience = (typeof MESSAGE_AUDIENCES)[number];
 
 export const MESSAGE_KIND_LABELS: Record<MessageKind, string> = {
@@ -91,12 +93,16 @@ export function estEnLigne(m: Pick<MessageCible, "status" | "startsAt" | "endsAt
 /** Ce logiciel (plateforme, clé, compte) doit-il recevoir ce message ? */
 export function viseLogiciel(
   m: MessageCible,
-  logiciel: { platform: "PC" | "ANDROID" | null; licenseKey: string | null; userId: string | null },
+  logiciel: { platform: "PC" | "ANDROID" | null; licenseKey: string | null; userId: string | null; product?: "GSPP" | "CANTINE" },
   now: Date,
 ): boolean {
   if (!estEnLigne(m, now)) return false;
-  if (m.audience === "ALL") return true;
-  if (m.audience === "PC" || m.audience === "ANDROID") return logiciel.platform === m.audience;
+  const cantine = logiciel.product === "CANTINE";
+  if (m.audience === "ALL") return !cantine;
+  if (m.audience === "PC" || m.audience === "ANDROID") return !cantine && logiciel.platform === m.audience;
+  if (m.audience === "CANTINE") return cantine;
+  if (m.audience === "CANTINE_PC") return cantine && logiciel.platform === "PC";
+  if (m.audience === "CANTINE_ANDROID") return cantine && logiciel.platform === "ANDROID";
   if (m.audience !== "SELECTION") return false;
   if (logiciel.licenseKey && m.targetKeys.includes(normaliserCle(logiciel.licenseKey))) return true;
   return Boolean(logiciel.userId && m.targetUserIds.includes(logiciel.userId));

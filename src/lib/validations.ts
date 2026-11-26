@@ -107,6 +107,8 @@ export const licenseActivateSchema = z.object({
   deviceFingerprint: z.string().trim().min(4).max(120),
   // Facultatif : l'en-tête x-gspp-client (desktop | android) fait foi pour l'application.
   platform: z.string().trim().max(20).optional(),
+  // Facultatif : « CANTINE » pour Cantine Pro ; absent = Gestion Scolaire Pro.
+  product: z.string().trim().max(20).optional(),
 });
 
 export const adminPlanSchema = z.object({

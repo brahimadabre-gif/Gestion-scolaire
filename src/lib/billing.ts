@@ -6,7 +6,7 @@
 import { db } from "@/lib/db";
 import { generateLicenseKey } from "@/lib/auth";
 import { addCalendarMonths } from "@/lib/license-duration";
-import { platformFromKey, platformFromPlan } from "@/lib/license-platform";
+import { PRODUCT_LABELS, platformFromKey, platformFromPlan, productFromKey, productFromPlan } from "@/lib/license-platform";
 
 /**
  * Fin d'abonnement : la durée de la formule (12 mois, 3 mois…) fait foi;
@@ -63,6 +63,10 @@ export async function confirmPaymentAndActivate(
     const base = sub.status === "ACTIVE" && sub.endDate && sub.endDate > now ? sub.endDate : now;
     const endDate = subscriptionEndDate(base, sub.billingCycle, sub.plan.durationMonths);
     const platform = platformFromPlan(sub.plan) ?? "PC";
+    const product = productFromPlan(sub.plan);
+    if (requestedKey && productFromKey(requestedKey) !== product) {
+      throw new Error(`Ce code d'activation est prévu pour ${PRODUCT_LABELS[productFromKey(requestedKey)]}, mais la formule « ${sub.plan.name} » est pour ${PRODUCT_LABELS[product]}.`);
+    }
     const requestedPlatform = requestedKey ? platformFromKey(requestedKey) : null;
     if (requestedPlatform && requestedPlatform !== platform) {
       throw new Error(`Ce code d'activation est prévu pour ${requestedPlatform === "ANDROID" ? "Android" : "PC"}, mais la formule « ${sub.plan.name} » est pour ${platform === "ANDROID" ? "Android" : "PC"}.`);
@@ -83,7 +87,7 @@ export async function confirmPaymentAndActivate(
 
     const license = existingLicense ?? await tx.licenseKey.create({
       data: {
-        key: requestedKey ?? generateLicenseKey(platform),
+        key: requestedKey ?? generateLicenseKey(platform, product),
         platform,
         userId: payment.userId,
         subscriptionId: sub.id,

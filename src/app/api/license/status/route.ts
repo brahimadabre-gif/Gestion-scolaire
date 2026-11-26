@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { suspensionEnCours } from "@/lib/software-messages-admin";
 import { ok, fail, handle, rateLimit, getClientIp, withPublicLicenseCors } from "@/lib/api-helpers";
-import { checkLicensePlatform, detectDevicePlatform, resolveLicensePlatform } from "@/lib/license-platform";
+import { checkLicensePlatform, detectDevicePlatform, normalizeProduct, productFromKey, productMismatchMessage, resolveLicensePlatform } from "@/lib/license-platform";
 
 /** POST /api/license/status — statut de l'abonnement ou de la licence directe. */
 export async function POST(req: Request) {
@@ -29,6 +29,8 @@ export async function POST(req: Request) {
     });
     if (!license || license.status === "REVOKED") return ok({ valid: false, reason: "LICENSE_INVALID" });
     if (license.status !== "ACTIVE") return ok({ valid: false, reason: "LICENSE_NOT_ACTIVATED" });
+    const keyProduct = productFromKey(license.key);
+    if (keyProduct !== normalizeProduct(body.product)) return ok({ valid: false, reason: "PRODUCT_MISMATCH", message: productMismatchMessage(keyProduct) });
 
     // Même règle qu'à l'activation : une licence ne reste valide que sur sa plateforme.
     // L'application envoie toujours x-gspp-client; un serveur de confiance peut omettre la plateforme.

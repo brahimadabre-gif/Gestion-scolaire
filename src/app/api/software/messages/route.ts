@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { fail, getClientIp, handle, ok, rateLimit, withPublicLicenseCors } from "@/lib/api-helpers";
-import { detectDevicePlatform } from "@/lib/license-platform";
+import { detectDevicePlatform, normalizeProduct } from "@/lib/license-platform";
 import { normaliserCle, viseLogiciel } from "@/lib/software-messages";
 
 // POST /api/software/messages — messages à afficher dans un logiciel installé.
@@ -36,7 +36,8 @@ export async function POST(req: Request) {
       orderBy: { publishedAt: "desc" },
       take: 50,
     });
-    const logiciel = { platform, licenseKey: licence?.key ?? null, userId: licence?.userId ?? null };
+    // Logiciel qui demande : Cantine Pro envoie product « CANTINE » ; sinon Gestion Scolaire Pro.
+    const logiciel = { platform, licenseKey: licence?.key ?? null, userId: licence?.userId ?? null, product: normalizeProduct(body.product) };
     const messages = candidats.filter((m) => viseLogiciel(m, logiciel, now));
 
     // Accusé de réception (un par logiciel et par message).
@@ -49,6 +50,7 @@ export async function POST(req: Request) {
     }
 
     return ok({
+      product: logiciel.product,
       serverTime: now.toISOString(),
       messages: messages.map((m) => ({
         id: m.id,

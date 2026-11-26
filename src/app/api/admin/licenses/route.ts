@@ -3,12 +3,14 @@ import { db } from "@/lib/db";
 import { assertSameOrigin, fail, getClientIp, handle, logAction, rateLimit, ok } from "@/lib/api-helpers";
 import { generateLicenseKey, requireAdmin } from "@/lib/auth";
 import { getLicenseStatus } from "@/lib/license-duration";
-import { LICENSE_PLATFORMS, resolveLicensePlatform } from "@/lib/license-platform";
+import { LICENSE_PLATFORMS, PRODUCTS, PRODUCT_LABELS, productFromKey, resolveLicensePlatform } from "@/lib/license-platform";
 
 const createSchema = z.object({
   count: z.number().int().min(1).max(100),
   durationMonths: z.number().int().min(1).max(600),
   platform: z.enum(LICENSE_PLATFORMS, { error: "Choisissez la plateforme : PC ou Android." }),
+  // Logiciel visé : Gestion Scolaire Pro (par défaut) ou Cantine Pro (clés CPPC- / CPAN-).
+  product: z.enum(PRODUCTS).default("GSPP"),
 });
 
 // GET /api/admin/licenses — Liste réservée aux administrateurs.
@@ -37,6 +39,7 @@ export async function GET(req: Request) {
       key: license.key,
       // null = ancienne clé GSPP- pas encore rattachée à une plateforme
       platform: resolveLicensePlatform(license),
+      product: productFromKey(license.key),
       status: getLicenseStatus({ status: license.status, expiresAt: license.expiresAt, subscriptionEndDate: license.subscription?.endDate ?? null, subscriptionStatus: license.subscription?.status ?? null }, now),
       createdAt: license.createdAt,
       validityMonths: license.validityMonths,
@@ -82,8 +85,8 @@ export async function POST(req: Request) {
     const rl = rateLimit(`admin-license-generate:${admin.id}`, 10, 15 * 60 * 1000);
     if (!rl.allowed) return fail("Trop de générations. Réessayez plus tard.", 429);
 
-    const { count, durationMonths, platform } = createSchema.parse(await req.json());
-    const codes = Array.from({ length: count }, () => generateLicenseKey(platform));
+    const { count, durationMonths, platform, product } = createSchema.parse(await req.json());
+    const codes = Array.from({ length: count }, () => generateLicenseKey(platform, product));
     if (new Set(codes).size !== codes.length) return fail("La génération a rencontré un doublon. Réessayez.", 409);
 
     try {
@@ -107,7 +110,7 @@ export async function POST(req: Request) {
       throw error;
     }
 
-    await logAction("LICENSE_CODES_GENERATED", admin.id, `${count} code(s) ${platform}, durée ${durationMonths} mois`, ip);
+    await logAction("LICENSE_CODES_GENERATED", admin.id, `${count} code(s) ${PRODUCT_LABELS[product]} ${platform}, durée ${durationMonths} mois`, ip);
     return ok({ codes, count, durationMonths, platform }, 201);
   });
 }

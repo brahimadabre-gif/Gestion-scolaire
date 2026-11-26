@@ -10,8 +10,13 @@ export async function statsMessages(messages: { id: string; audience: string; ta
     db.softwareMessageView.groupBy({ by: ["messageId"], where: { messageId: { in: ids }, readAt: { not: null } }, _count: { _all: true } }),
     db.licenseKey.groupBy({ by: ["platform"], where: { status: "ACTIVE" }, _count: { _all: true } }),
   ]);
-  const totalActives = actives.reduce((s, a) => s + a._count._all, 0);
-  const parPlateforme = (p: string) => actives.find((a) => a.platform === p)?._count._all ?? 0;
+  // Clés Cantine Pro actives (préfixes CPPC- / CPAN-), comptées à part de Gestion Scolaire Pro
+  const [cantinePc, cantineAndroid] = await Promise.all([
+    db.licenseKey.count({ where: { status: "ACTIVE", key: { startsWith: "CPPC-" } } }),
+    db.licenseKey.count({ where: { status: "ACTIVE", key: { startsWith: "CPAN-" } } }),
+  ]);
+  const totalActives = actives.reduce((s, a) => s + a._count._all, 0) - cantinePc - cantineAndroid;
+  const parPlateforme = (p: string) => (actives.find((a) => a.platform === p)?._count._all ?? 0) - (p === "PC" ? cantinePc : cantineAndroid);
 
   // Clés des comptes choisis, chargées en une seule fois pour tous les messages.
   const comptes = [...new Set(messages.flatMap((m) => (m.audience === "SELECTION" ? m.targetUserIds : [])))];
@@ -24,6 +29,9 @@ export async function statsMessages(messages: { id: string; audience: string; ta
     let vises: number | null = null;
     if (m.audience === "ALL") vises = totalActives;
     else if (m.audience === "PC" || m.audience === "ANDROID") vises = parPlateforme(m.audience);
+    else if (m.audience === "CANTINE") vises = cantinePc + cantineAndroid;
+    else if (m.audience === "CANTINE_PC") vises = cantinePc;
+    else if (m.audience === "CANTINE_ANDROID") vises = cantineAndroid;
     else if (m.audience === "SELECTION") {
       const deComptes = clesComptes.filter((c) => c.userId && m.targetUserIds.includes(c.userId)).map((c) => c.key);
       vises = new Set([...m.targetKeys, ...deComptes]).size;

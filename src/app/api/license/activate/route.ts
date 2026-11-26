@@ -3,7 +3,7 @@ import { suspensionEnCours } from "@/lib/software-messages-admin";
 import { ok, fail, handle, rateLimit, getClientIp, logAction, withPublicLicenseCors } from "@/lib/api-helpers";
 import { licenseActivateSchema } from "@/lib/validations";
 import { addCalendarMonths } from "@/lib/license-duration";
-import { checkLicensePlatform, detectDevicePlatform, resolveLicensePlatform } from "@/lib/license-platform";
+import { checkLicensePlatform, detectDevicePlatform, normalizeProduct, productFromKey, productMismatchMessage, resolveLicensePlatform } from "@/lib/license-platform";
 
 /** POST /api/license/activate — activation depuis le logiciel. */
 export async function POST(req: Request) {
@@ -35,6 +35,10 @@ export async function POST(req: Request) {
     } as const;
     let license = await db.licenseKey.findUnique({ where: { key }, include });
     if (!license || license.status === "REVOKED") return fail("Licence invalide ou révoquée.", 404);
+
+    // Une clé Cantine Pro n'active jamais Gestion Scolaire Pro, et inversement (préfixe de la clé).
+    const keyProduct = productFromKey(license.key);
+    if (keyProduct !== normalizeProduct(data.product)) return fail(productMismatchMessage(keyProduct), 403);
 
     // Une clé Android n'active jamais un PC, une clé PC n'active jamais Android.
     const platformCheck = checkLicensePlatform(resolveLicensePlatform(license), devicePlatform);

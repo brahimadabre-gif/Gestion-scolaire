@@ -13,6 +13,42 @@ export const PLATFORM_KEY_PREFIX: Record<LicensePlatform, string> = {
 };
 export const LEGACY_KEY_PREFIX = "GSPP";
 
+// ── Produits : Gestion Scolaire Pro (GSPP) et Cantine Pro (CANTINE) ──
+// Le produit est porté par le préfixe de la clé : CPPC- / CPAN- = Cantine Pro.
+// Aucune colonne en base : une clé GSPP n'ouvre jamais Cantine Pro, et inversement.
+export const PRODUCTS = ["GSPP", "CANTINE"] as const;
+export type Product = (typeof PRODUCTS)[number];
+export const PRODUCT_KEY_PREFIX: Record<Product, Record<LicensePlatform, string>> = {
+  GSPP: PLATFORM_KEY_PREFIX,
+  CANTINE: { PC: "CPPC", ANDROID: "CPAN" },
+};
+export const PRODUCT_LABELS: Record<Product, string> = {
+  GSPP: "Gestion Scolaire Pro",
+  CANTINE: "Cantine Pro",
+};
+export function isProduct(value: unknown): value is Product {
+  return value === "GSPP" || value === "CANTINE";
+}
+/** Produit déclaré par le logiciel (champ `product` du corps). Absent = Gestion Scolaire Pro (anciennes versions). */
+export function normalizeProduct(value: unknown): Product {
+  return typeof value === "string" && value.trim().toUpperCase() === "CANTINE" ? "CANTINE" : "GSPP";
+}
+/** Produit d'une clé d'après son préfixe. */
+export function productFromKey(key: string): Product {
+  const prefix = key.trim().toUpperCase().split("-")[0];
+  return prefix === PRODUCT_KEY_PREFIX.CANTINE.PC || prefix === PRODUCT_KEY_PREFIX.CANTINE.ANDROID ? "CANTINE" : "GSPP";
+}
+/** Produit d'une formule : les formules Cantine Pro ont un identifiant (slug) qui commence par « cantine ». */
+export function productFromPlan(plan: { slug?: string | null } | null | undefined): Product {
+  return plan?.slug?.toLowerCase().startsWith("cantine") ? "CANTINE" : "GSPP";
+}
+/** Message d'erreur quand la clé ne correspond pas au logiciel. */
+export function productMismatchMessage(keyProduct: Product): string {
+  return keyProduct === "CANTINE"
+    ? "Cette clé est une clé Cantine Pro : elle ne peut pas activer Gestion Scolaire Pro."
+    : "Cette clé est une clé Gestion Scolaire Pro : elle ne peut pas activer Cantine Pro.";
+}
+
 export const PLATFORM_LABELS: Record<LicensePlatform, string> = {
   PC: "PC Windows",
   ANDROID: "Android",
@@ -65,8 +101,8 @@ export function detectDevicePlatform(input: {
 /** Plateforme encodée dans le préfixe de la clé (null pour les anciennes clés GSPP-). */
 export function platformFromKey(key: string): LicensePlatform | null {
   const prefix = key.trim().toUpperCase().split("-")[0];
-  if (prefix === PLATFORM_KEY_PREFIX.PC) return "PC";
-  if (prefix === PLATFORM_KEY_PREFIX.ANDROID) return "ANDROID";
+  if (prefix === PLATFORM_KEY_PREFIX.PC || prefix === "CPPC") return "PC";
+  if (prefix === PLATFORM_KEY_PREFIX.ANDROID || prefix === "CPAN") return "ANDROID";
   return null;
 }
 
